@@ -6,6 +6,7 @@ import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.world.item.Item;
+import phanastrae.ywsanf.block.YWSaNFBlocks;
 import phanastrae.ywsanf.item.YWSaNFItems;
 
 public class ModelProvider extends FabricModelProvider {
@@ -15,6 +16,7 @@ public class ModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockModelGenerators BMG) {
+        BMG.createTrivialCube(YWSaNFBlocks.LEUKBOX);
     }
 
     @Override

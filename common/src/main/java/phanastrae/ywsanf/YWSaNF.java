@@ -5,6 +5,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import phanastrae.ywsanf.block.YWSaNFBlocks;
+import phanastrae.ywsanf.block.entity.YWSaNFBlockEntityTypes;
 import phanastrae.ywsanf.item.YWSaNFCreativeModeTabs;
 import phanastrae.ywsanf.item.YWSaNFItems;
 
@@ -22,8 +24,14 @@ public class YWSaNF {
     public static void initRegistryEntries(RegistryListenerAdder rla) {
         // creative mode tabs
         rla.addRegistryListener(BuiltInRegistries.CREATIVE_MODE_TAB, YWSaNFCreativeModeTabs::init);
+
+        // blocks
+        rla.addRegistryListener(BuiltInRegistries.BLOCK, YWSaNFBlocks::init);
         // items
         rla.addRegistryListener(BuiltInRegistries.ITEM, YWSaNFItems::init);
+
+        // block entity types
+        rla.addRegistryListener(BuiltInRegistries.BLOCK_ENTITY_TYPE, YWSaNFBlockEntityTypes::init);
     }
 
     @FunctionalInterface
