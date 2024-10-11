@@ -47,6 +47,6 @@ plugins {
 }
 
 rootProject.name = 'YWSaNF'
-//include('common')
+include('common')
 //include('fabric')
-//include('neoforge')
+include('neoforge')
