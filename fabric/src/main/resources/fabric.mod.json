@@ -18,6 +18,9 @@
 	"entrypoints": {
 		"main": [
 			"phanastrae.ywsanf.fabric.YWSaNFFabric"
+		],
+		"fabric-datagen": [
+			"phanastrae.ywsanf.fabric.data.YWSaNFDataGenerator"
 		]
 	},
 	"mixins": [

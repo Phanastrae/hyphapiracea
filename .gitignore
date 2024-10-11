@@ -8,3 +8,4 @@
 /fabric/runs/
 /fabric/build/
 /fabric/.gradle/
+/common/src/main/generated/.cache/
