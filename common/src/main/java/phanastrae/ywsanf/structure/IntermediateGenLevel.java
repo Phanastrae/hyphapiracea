@@ -46,13 +46,9 @@ public class IntermediateGenLevel implements WorldGenLevel {
     private final WorldGenLevel level;
     private final IntermediateStructureStorage intermediateStorage;
 
-    public IntermediateGenLevel(WorldGenLevel level) {
+    public IntermediateGenLevel(IntermediateStructureStorage intermediateStructureStorage, WorldGenLevel level) {
+        this.intermediateStorage = intermediateStructureStorage;
         this.level = level;
-        this.intermediateStorage = new IntermediateStructureStorage();
-    }
-
-    public IntermediateStructureStorage getStorage() {
-        return this.intermediateStorage;
     }
 
     @Override
@@ -78,8 +74,7 @@ public class IntermediateGenLevel implements WorldGenLevel {
             return blockEntity;
         } else {
             BlockState state = getBlockState(pos);
-            BlockState oldState = this.level.getBlockState(pos);
-            if(state.equals(oldState)) {
+            if(state.is(Blocks.STRUCTURE_VOID)) {
                 return level.getBlockEntity(pos);
             } else {
                 return null;

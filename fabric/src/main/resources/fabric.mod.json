@@ -19,6 +19,9 @@
 		"main": [
 			"phanastrae.ywsanf.fabric.YWSaNFFabric"
 		],
+		"client": [
+			"phanastrae.ywsanf.fabric.client.YWSaNFClientFabric"
+		],
 		"fabric-datagen": [
 			"phanastrae.ywsanf.fabric.data.YWSaNFDataGenerator"
 		]

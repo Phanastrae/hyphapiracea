@@ -2,6 +2,10 @@ package phanastrae.ywsanf.block;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -52,10 +56,20 @@ public class LeukboxBlock extends BaseEntityBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         ItemStack heldStack = player.getItemInHand(hand);
         if(heldStack.is(YWSaNFItems.KEYED_DISC)) {
-            if(!level.isClientSide) {
+            if(!level.isClientSide && level instanceof ServerLevel serverLevel) {
                 BlockEntity blockEntity = level.getBlockEntity(pos);
                 if(blockEntity instanceof LeukboxBlockEntity leukboxBlockEntity) {
-                    leukboxBlockEntity.setActive();
+                    // TODO important: remove this rename-based system, this is just here for easy testing
+                    if(heldStack.has(DataComponents.CUSTOM_NAME)) {
+                        Component component = heldStack.get(DataComponents.CUSTOM_NAME);
+                        if(component != null) {
+                            String s = component.getString();
+                            ResourceLocation rl = ResourceLocation.tryParse(s);
+                            if(rl != null) {
+                                leukboxBlockEntity.startGeneratingStructure(rl, pos, serverLevel);
+                            }
+                        }
+                    }
                 }
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide);

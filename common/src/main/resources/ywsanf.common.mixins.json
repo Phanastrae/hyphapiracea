@@ -5,8 +5,10 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "StructureStartAccessor"
   ],
   "client": [
+    "client.BlockEntityRenderersAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
