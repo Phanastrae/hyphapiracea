@@ -6,11 +6,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -20,6 +22,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.YWSaNF;
+import phanastrae.ywsanf.block.YWSaNFBlocks;
 import phanastrae.ywsanf.mixin.StructureStartAccessor;
 
 import java.util.List;
@@ -38,9 +41,10 @@ public class StructurePlacer {
     private StructureStart structureStart;
     @Nullable
     private IntermediateStructureStorage intermediateStructureStorage;
-    private List<StructurePiece> pieces = new ObjectArrayList<>();
     @Nullable
     private BlockPos structureOrigin;
+    private List<StructurePiece> pieces = new ObjectArrayList<>();
+    private int currentBuildDistance = 0;
 
     public StructurePlacer(ResourceLocation structureRL, BlockPos pos) {
         this.structureRL = structureRL;
@@ -52,9 +56,11 @@ public class StructurePlacer {
         ERROR("error", -1),
         HAS_RESOURCE_LOCATION("has_resource_location", 20),
         HAS_STRUCTURE("has_structure", 20),
-        FILLING_STORAGE("filling_storage", 3),
-        PLACED_PIECES("placed_pieces", 20),
-        FILLED_STORAGE("filled_storage", 20),
+        FILLING_STORAGE("filling_storage", 1),
+        PLACED_PIECES("placed_pieces", 30),
+        FILLED_STORAGE("filled_storage", 10),
+        READY_TO_PLACE("ready_to_place",2),
+        PLACED_STABLES("placed_stables", 10),
         COMPLETED("completed", -1);
 
         private final String id;
@@ -146,14 +152,71 @@ public class StructurePlacer {
 
             this.stage = Stage.FILLED_STORAGE;
             return true;
-        } else if(this.stage == Stage.FILLED_STORAGE && this.intermediateStructureStorage != null) {
-            // place structure storage
-            placeStoredStructure(this.intermediateStructureStorage, serverLevel);
+        } else if(this.stage == Stage.FILLED_STORAGE && this.intermediateStructureStorage != null && this.structureStart != null) {
+            // move fragile blocks (ie block entities, doors, torches, etc.) to a separate storage
+            this.intermediateStructureStorage.forEachContainer(((sectionPos, boxedContainer) -> {
+                BoundingBox box = boxedContainer.getBox();
+                if(box != null) {
+                    BoxedContainer fragilesContainer = new BoxedContainer();
+                    BlockState structureVoid = Blocks.STRUCTURE_VOID.defaultBlockState();
+
+                    for(int x = box.minX(); x <= box.maxX(); x++) {
+                        for(int y = box.minY(); y <= box.maxY(); y++) {
+                            for(int z = box.minZ(); z <= box.maxZ(); z++) {
+                                BlockState state = boxedContainer.get(x, y, z);
+                                if(state.is(Blocks.STRUCTURE_VOID)) {
+                                    continue;
+                                }
+                                if(isStateFragile(state)) {
+                                    boxedContainer.set(x, y, z, structureVoid);
+                                    fragilesContainer.set(x, y, z, state);
+                                }
+                            }
+                        }
+                    }
+
+                    if(fragilesContainer.getBox() != null) {
+                        this.intermediateStructureStorage.addFragileContainer(sectionPos, fragilesContainer);
+                    }
+                }
+            }));
+
+            BoundingBox box = this.structureStart.getBoundingBox();
+            double dx = Mth.absMax(box.minX() - pos.getX(), box.maxX() - pos.getX());
+            double dy = box.getYSpan();
+            double dz = Mth.absMax(box.minX() - pos.getX(), box.maxX() - pos.getX());
+            double d = Math.sqrt(dx*dx+dz*dz) + 0.25F * dy;
+
+            this.currentBuildDistance = Mth.ceil(d) + 45;
+
+            this.stage = Stage.READY_TO_PLACE;
+            return true;
+        } else if(this.stage == Stage.READY_TO_PLACE && this.intermediateStructureStorage != null && this.structureStart != null) {
+            // place stable structure storage
+            BlockPos pos = new BlockPos(this.pos.getX(), this.structureStart.getBoundingBox().maxY(), this.pos.getZ());
+            placeStoredStructureStables(this.intermediateStructureStorage, this.currentBuildDistance, pos, serverLevel);
+
+            this.currentBuildDistance--;
+            if(this.currentBuildDistance <= 0) {
+                this.stage = Stage.PLACED_STABLES;
+            }
+            return true;
+        } else if(this.stage == Stage.PLACED_STABLES && this.intermediateStructureStorage != null) {
+            // place fragile structure storage, block entities, entities
+            placeStoredStructureSpecials(this.intermediateStructureStorage, serverLevel);
 
             this.stage = Stage.COMPLETED;
             return true;
         } else {
             return this.stage == Stage.COMPLETED;
+        }
+    }
+
+    public boolean isStateFragile(BlockState state) {
+        if(state.getBlock() instanceof EntityBlock) {
+            return true;
+        } else {
+            return false; // TODO
         }
     }
 
@@ -268,19 +331,64 @@ public class StructurePlacer {
         }
     }
 
-    public static void placeStoredStructure(IntermediateStructureStorage intermediateStorage, WorldGenLevel level) {
+    public static void placeStoredStructureStables(IntermediateStructureStorage intermediateStorage, int buildDistance, BlockPos pos, WorldGenLevel level) {
         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
-        intermediateStorage.forEachContainer((sectionPos, blockStatePalettedContainer) -> {
-            int mx = sectionPos.minBlockX();
-            int my = sectionPos.minBlockY();
-            int mz = sectionPos.minBlockZ();
-            for(int x = 0; x < 16; x++) {
-                for(int y = 0; y < 16; y++) {
-                    for(int z = 0; z < 16; z++) {
-                        BlockState state = blockStatePalettedContainer.get(x, y, z);
-                        if (!state.is(Blocks.STRUCTURE_VOID)) {
-                            mutableBlockPos.set(mx+x, my+y, mz+z);
-                            level.setBlock(mutableBlockPos, state, 2, 0);
+        BlockState tempState = YWSaNFBlocks.FEASTING_TAR.defaultBlockState();
+        intermediateStorage.forEachContainer((sectionPos, boxedContainer) -> {
+            BoundingBox box = boxedContainer.getBox();
+            if (box != null) {
+                int mx = sectionPos.minBlockX();
+                int my = sectionPos.minBlockY();
+                int mz = sectionPos.minBlockZ();
+                for (int x = box.minX(); x <= box.maxX(); x++) {
+                    int dx = mx + x - pos.getX();
+                    for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                        int dz = mz + z - pos.getZ();
+
+                        double r = Mth.sqrt(dx*dx + dz*dz);
+
+                        for (int y = box.minY(); y <= box.maxY(); y++) {
+                            int dy = my + y - pos.getY();
+
+                            double d = r - 0.25F * dy + 10;
+                            if(buildDistance - 1 < d && d <= buildDistance) {
+                                BlockState state = boxedContainer.get(x, y, z);
+                                if (!state.is(Blocks.STRUCTURE_VOID)) {
+                                    mutableBlockPos.set(mx + x, my + y, mz + z);
+
+                                    level.setBlock(mutableBlockPos, state, 2, 0);
+                                }
+                            } else if(buildDistance - 31 < d && d <= buildDistance - 30) {
+                                BlockState state = boxedContainer.get(x, y, z);
+                                if (!state.is(Blocks.STRUCTURE_VOID)) {
+                                    mutableBlockPos.set(mx + x, my + y, mz + z);
+
+                                    level.setBlock(mutableBlockPos, tempState, 2, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public static void placeStoredStructureSpecials(IntermediateStructureStorage intermediateStorage, WorldGenLevel level) {
+        BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+        intermediateStorage.forEachFragileContainer((sectionPos, boxedContainer) -> {
+            BoundingBox box = boxedContainer.getBox();
+            if(box != null) {
+                int mx = sectionPos.minBlockX();
+                int my = sectionPos.minBlockY();
+                int mz = sectionPos.minBlockZ();
+                for (int x = box.minX(); x <= box.maxX(); x++) {
+                    for (int y = box.minY(); y <= box.maxY(); y++) {
+                        for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                            BlockState state = boxedContainer.get(x, y, z);
+                            if (!state.is(Blocks.STRUCTURE_VOID)) {
+                                mutableBlockPos.set(mx + x, my + y, mz + z);
+                                level.setBlock(mutableBlockPos, state, 2, 0);
+                            }
                         }
                     }
                 }

@@ -4,12 +4,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.PalettedContainer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -21,21 +18,27 @@ import java.util.function.Consumer;
 public class IntermediateStructureStorage {
     private static final int CACHE_SIZE = 4; // TODO is this size ideal?
 
-    private final HashMap<SectionPos, PalettedContainer<BlockState>> statePalettes;
+    private final HashMap<SectionPos, BoxedContainer> blockContainers;
+    private final HashMap<SectionPos, BoxedContainer> fragileBlockContainers;
     private final HashMap<BlockPos, BlockEntity> blockEntities;
     private final List<Entity> entities;
 
     private final SectionPos[] lastSectionPos = new SectionPos[CACHE_SIZE];
-    private final PalettedContainer<BlockState>[] lastContainer = new PalettedContainer[CACHE_SIZE];
+    private final BoxedContainer[] lastContainer = new BoxedContainer[CACHE_SIZE];
 
     public IntermediateStructureStorage() {
-        this.statePalettes = new HashMap<>();
+        this.blockContainers = new HashMap<>();
+        this.fragileBlockContainers = new HashMap<>();
         this.blockEntities = new HashMap<>();
         this.entities = new ObjectArrayList<>();
     }
 
-    public void forEachContainer(BiConsumer<? super SectionPos, ? super PalettedContainer<BlockState>> biConsumer) {
-        this.statePalettes.forEach(biConsumer);
+    public void forEachContainer(BiConsumer<? super SectionPos, ? super BoxedContainer> biConsumer) {
+        this.blockContainers.forEach(biConsumer);
+    }
+
+    public void forEachFragileContainer(BiConsumer<? super SectionPos, ? super BoxedContainer> biConsumer) {
+        this.fragileBlockContainers.forEach(biConsumer);
     }
 
     public void forEachBlockEntity(BiConsumer<? super BlockPos, ? super BlockEntity> biConsumer) {
@@ -46,29 +49,33 @@ public class IntermediateStructureStorage {
         this.entities.forEach(consumer);
     }
 
-    public PalettedContainer<BlockState> getContainer(SectionPos sectionPos) {
+    public void addFragileContainer(SectionPos sectionPos, BoxedContainer fragileContainer) {
+        this.fragileBlockContainers.put(sectionPos, fragileContainer);
+    }
+
+    public BoxedContainer getContainer(SectionPos sectionPos) {
         for (int j = 0; j < CACHE_SIZE; j++) {
             if (sectionPos.equals(this.lastSectionPos[j])) {
-                PalettedContainer<BlockState> container = this.lastContainer[j];
+                BoxedContainer container = this.lastContainer[j];
                 if (container != null) {
                     return container;
                 }
             }
         }
 
-        PalettedContainer<BlockState> container;
-        if(this.statePalettes.containsKey(sectionPos)) {
-            container = this.statePalettes.get(sectionPos);
+        BoxedContainer container;
+        if(this.blockContainers.containsKey(sectionPos)) {
+            container = this.blockContainers.get(sectionPos);
         } else {
-            container = new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.STRUCTURE_VOID.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
-            this.statePalettes.put(sectionPos, container);
+            container = new BoxedContainer();
+            this.blockContainers.put(sectionPos, container);
         }
 
         this.storeInCache(sectionPos, container);
         return container;
     }
 
-    private void storeInCache(SectionPos sectionPos, PalettedContainer<BlockState> palettedContainer) {
+    private void storeInCache(SectionPos sectionPos, BoxedContainer palettedContainer) {
         for (int i = CACHE_SIZE - 1; i > 0; i--) {
             this.lastSectionPos[i] = this.lastSectionPos[i - 1];
             this.lastContainer[i] = this.lastContainer[i - 1];
@@ -83,7 +90,7 @@ public class IntermediateStructureStorage {
         Arrays.fill(this.lastContainer, null);
     }
 
-    public PalettedContainer<BlockState> getContainer(BlockPos pos) {
+    public BoxedContainer getContainer(BlockPos pos) {
         SectionPos sectionPos = SectionPos.of(pos);
         return getContainer(sectionPos);
     }

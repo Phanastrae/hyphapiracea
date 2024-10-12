@@ -87,7 +87,7 @@ public class LeukboxBlockEntity extends BlockEntity {
 
     public Component getText() {
         if(this.active) {
-            return Component.literal("Currently on stage " + this.stage);
+            return Component.literal("Currently on Stage: " + this.stage);
         } else {
             return Component.literal("Idle");
         }

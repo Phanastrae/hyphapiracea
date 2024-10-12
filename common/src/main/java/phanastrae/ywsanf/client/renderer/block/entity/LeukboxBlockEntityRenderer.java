@@ -3,6 +3,7 @@ package phanastrae.ywsanf.client.renderer.block.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -28,7 +29,7 @@ public class LeukboxBlockEntityRenderer implements BlockEntityRenderer<LeukboxBl
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
         poseStack.scale(0.025F, -0.025F, 0.025F);
 
-        drawText(blockEntity.getText(), poseStack.last().pose(), bufferSource, packedLight);
+        drawText(blockEntity.getText(), poseStack.last().pose(), bufferSource, LightTexture.FULL_BRIGHT);
 
         poseStack.popPose();
     }

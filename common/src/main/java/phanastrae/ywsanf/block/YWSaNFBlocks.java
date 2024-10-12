@@ -10,9 +10,11 @@ import java.util.function.BiConsumer;
 public class YWSaNFBlocks {
 
     public static final Block LEUKBOX = new LeukboxBlock(properties());
+    public static final Block FEASTING_TAR = new Block(properties().emissiveRendering((state, blockGetter, blockPos) -> true));
 
     public static void init(BiConsumer<ResourceLocation, Block> r) {
         r.accept(id("leukbox"), LEUKBOX);
+        r.accept(id("feasting_tar"), FEASTING_TAR);
     }
 
     private static ResourceLocation id(String path) {

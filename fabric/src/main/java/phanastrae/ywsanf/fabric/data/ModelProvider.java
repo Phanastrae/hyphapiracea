@@ -17,6 +17,7 @@ public class ModelProvider extends FabricModelProvider {
     @Override
     public void generateBlockStateModels(BlockModelGenerators BMG) {
         BMG.createTrivialCube(YWSaNFBlocks.LEUKBOX);
+        BMG.createTrivialCube(YWSaNFBlocks.FEASTING_TAR);
     }
 
     @Override
