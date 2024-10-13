@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -75,6 +76,15 @@ public class IntermediateStructureStorage {
         return container;
     }
 
+    @Nullable
+    public BoxedContainer getFragileContainer(SectionPos sectionPos) {
+        if(this.fragileBlockContainers.containsKey(sectionPos)) {
+            return this.fragileBlockContainers.get(sectionPos);
+        } else {
+            return null;
+        }
+    }
+
     private void storeInCache(SectionPos sectionPos, BoxedContainer palettedContainer) {
         for (int i = CACHE_SIZE - 1; i > 0; i--) {
             this.lastSectionPos[i] = this.lastSectionPos[i - 1];
@@ -95,6 +105,12 @@ public class IntermediateStructureStorage {
         return getContainer(sectionPos);
     }
 
+    @Nullable
+    public BoxedContainer getFragileContainer(BlockPos pos) {
+        SectionPos sectionPos = SectionPos.of(pos);
+        return getFragileContainer(sectionPos);
+    }
+
     public boolean setBlockState(BlockPos pos, BlockState state) {
         getContainer(pos).set(pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF, state);
         if(state.hasBlockEntity() && state.getBlock() instanceof EntityBlock entityBlock) {
@@ -109,6 +125,15 @@ public class IntermediateStructureStorage {
 
     public BlockState getBlockState(BlockPos pos) {
         return getContainer(pos).get(pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF);
+    }
+
+    public BlockState getFragileBlockState(BlockPos pos) {
+        BoxedContainer fragileContainer = this.getFragileContainer(pos);
+        if(fragileContainer == null) {
+            return Blocks.STRUCTURE_VOID.defaultBlockState();
+        } else {
+            return fragileContainer.get(pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF);
+        }
     }
 
     @Nullable
