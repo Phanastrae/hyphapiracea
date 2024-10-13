@@ -3,20 +3,26 @@ package phanastrae.ywsanf.block;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.block.entity.LeukboxBlockEntity;
@@ -25,6 +31,7 @@ import phanastrae.ywsanf.item.YWSaNFItems;
 
 public class LeukboxBlock extends BaseEntityBlock {
     public static final MapCodec<LeukboxBlock> CODEC = simpleCodec(LeukboxBlock::new);
+    public static final BooleanProperty HAS_RECORD = BlockStateProperties.HAS_RECORD;
 
     @Override
     public MapCodec<LeukboxBlock> codec() {
@@ -33,6 +40,43 @@ public class LeukboxBlock extends BaseEntityBlock {
 
     public LeukboxBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(HAS_RECORD, Boolean.valueOf(false)));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(HAS_RECORD);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        CustomData data = stack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
+        if (data.contains("disc_item")) {
+            level.setBlock(pos, state.setValue(HAS_RECORD, true), 2);
+        }
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
+                blockEntity.popOutTheItem();
+            }
+
+            super.onRemove(state, level, pos, newState, isMoving);
+        }
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (state.getValue(HAS_RECORD)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        } else {
+            ItemStack itemstack = player.getItemInHand(hand);
+            ItemInteractionResult iteminteractionresult = tryInsertIntoLeukbox(level, pos, itemstack, player);
+            return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
+        }
     }
 
     @Override
@@ -52,29 +96,25 @@ public class LeukboxBlock extends BaseEntityBlock {
         return level.isClientSide ? null : createTickerHelper(blockEntityType, YWSaNFBlockEntityTypes.LEUKBOX, LeukboxBlockEntity::serverTick);
     }
 
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        ItemStack heldStack = player.getItemInHand(hand);
-        if(heldStack.is(YWSaNFItems.KEYED_DISC)) {
-            if(!level.isClientSide && level instanceof ServerLevel serverLevel) {
-                BlockEntity blockEntity = level.getBlockEntity(pos);
-                if(blockEntity instanceof LeukboxBlockEntity leukboxBlockEntity) {
-                    // TODO important: remove this rename-based system, this is just here for easy testing
-                    if(heldStack.has(DataComponents.CUSTOM_NAME)) {
-                        Component component = heldStack.get(DataComponents.CUSTOM_NAME);
-                        if(component != null) {
-                            String s = component.getString();
-                            ResourceLocation rl = ResourceLocation.tryParse(s);
-                            if(rl != null) {
-                                leukboxBlockEntity.startGeneratingStructure(rl, pos, serverLevel);
-                            }
-                        }
+    public static ItemInteractionResult tryInsertIntoLeukbox(Level level, BlockPos pos, ItemStack stack, Player player) {
+        if (!stack.is(YWSaNFItems.KEYED_DISC)) { // TODO tweak criteria
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        } else {
+            BlockState blockstate = level.getBlockState(pos);
+            if (blockstate.is(YWSaNFBlocks.LEUKBOX) && !blockstate.getValue(HAS_RECORD)) {
+                if (!level.isClientSide) {
+                    ItemStack itemstack = stack.consumeAndReturn(1, player);
+                    if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
+                        blockEntity.setTheItem(itemstack);
+                        level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 1.5F, 0.2F);
+                        level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, blockstate));
                     }
                 }
+
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            } else {
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
-        } else {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
     }
 }

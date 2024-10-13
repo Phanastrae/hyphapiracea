@@ -4,5 +4,17 @@
 
   "item.ywsanf.keyed_disc": "Keyed Disc",
 
-  "itemGroup.ywsanf": "You Wouldn't Steal a Nether Fortress"
+  "itemGroup.ywsanf": "You Wouldn't Steal a Nether Fortress",
+
+  "ywsanf.leukbox.progress": "%s%%]",
+  "ywsanf.leukbox.stage.completed": "[Completed!]",
+  "ywsanf.leukbox.stage.error": "[Error!]",
+  "ywsanf.leukbox.stage.place_blocks": "[We Feast]",
+  "ywsanf.leukbox.stage.fill_storage_pieces": "[Assembling a Model]",
+  "ywsanf.leukbox.stage.fill_storage_after": "[Finalising Construction]",
+  "ywsanf.leukbox.stage.place_specials": "[Concluding the Meal]",
+  "ywsanf.leukbox.stage.get_structure": "[Reading Disc]",
+  "ywsanf.leukbox.stage.get_structure_start": "[Generating Blueprints]",
+  "ywsanf.leukbox.stage.idle": "[Awaiting Instructions]",
+  "ywsanf.leukbox.stage.post_process": "[Preparing to Feast]"
 }

@@ -25,13 +25,26 @@ public class LeukboxBlockEntityRenderer implements BlockEntityRenderer<LeukboxBl
     @Override
     public void render(LeukboxBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         poseStack.pushPose();
+
         poseStack.translate(0.5, 2.25, 0.5);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
         poseStack.scale(0.025F, -0.025F, 0.025F);
 
-        drawText(blockEntity.getText(), poseStack.last().pose(), bufferSource, LightTexture.FULL_BRIGHT);
-
+        drawText(blockEntity.getTopText(), poseStack.last().pose(), bufferSource, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
+
+        Component bottomText = blockEntity.getBottomText();
+        if(bottomText != null) {
+            poseStack.pushPose();
+
+            poseStack.translate(0.5, 2.0, 0.5);
+            poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+            poseStack.scale(0.025F, -0.025F, 0.025F);
+
+            drawText(bottomText, poseStack.last().pose(), bufferSource, LightTexture.FULL_BRIGHT);
+            poseStack.popPose();
+        }
+
     }
 
     public void drawText(Component text, Matrix4f matrix4f, MultiBufferSource bufferSource, int packedLight) {

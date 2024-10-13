@@ -37,7 +37,10 @@ public class StructurePlacer {
     public static final int CONVERSION_DELAY = 50;
     public static final int SPAWN_TIME_PADDING = 8;
 
-    private Stage stage = Stage.ERROR;
+    private Stage stage = Stage.IDLE;
+    private int maxProgress = 0;
+    private int progress = 0;
+    private int stepProgress = 0;
 
     private final ResourceLocation structureRL;
     private final BlockPos pos;
@@ -57,27 +60,30 @@ public class StructurePlacer {
 
     public StructurePlacer(ResourceLocation structureRL, BlockPos pos) {
         this.structureRL = structureRL;
-        this.stage = Stage.HAS_RESOURCE_LOCATION;
         this.pos = pos;
+        this.setStage(Stage.GET_STRUCTURE, 1);
     }
 
     public enum Stage {
-        ERROR("error", -1),
-        HAS_RESOURCE_LOCATION("has_resource_location", 20),
-        HAS_STRUCTURE("has_structure", 20),
-        FILLING_STORAGE("filling_storage", 1),
-        PLACED_PIECES("placed_pieces", 30),
-        FILLED_STORAGE("filled_storage", 10),
-        READY_TO_PLACE("ready_to_place",1),
-        PLACED_STABLES("placed_stables", 10),
-        COMPLETED("completed", -1);
+        ERROR("error", -1, false),
+        IDLE("idle", -1, false),
+        GET_STRUCTURE("get_structure", 20, true),
+        GET_STRUCTURE_START("get_structure_start", 20, true),
+        FILL_STORAGE_PIECES("fill_storage_pieces", 1, true),
+        FILL_STORAGE_AFTER("fill_storage_after", 30, true),
+        POST_PROCESS("post_process", 10, true),
+        PLACE_BLOCKS("place_blocks",1, true),
+        PLACE_SPECIALS("place_specials", 20, true),
+        COMPLETED("completed", 60, false);
 
         private final String id;
         private final int wait;
+        private final boolean showProgress;
 
-        Stage(String id, int wait) {
+        Stage(String id, int wait, boolean showProgress) {
             this.id = id;
             this.wait = wait;
+            this.showProgress = showProgress;
         }
 
         public String getId() {
@@ -87,30 +93,68 @@ public class StructurePlacer {
         public int getWait() {
             return this.wait;
         }
+
+        public boolean shouldShowProgress() {
+            return this.showProgress;
+        }
+    }
+
+    public void setStage(Stage stage, int requiredOperations) {
+        this.stage = stage;
+        this.maxProgress = stage.getWait() * requiredOperations;
+        this.progress = 0;
+    }
+
+    public void setStage(Stage stage) {
+        this.setStage(stage, 1);
     }
 
     public Stage getStage() {
         return this.stage;
     }
 
+    public int getProgressPercent() {
+        if(this.maxProgress <= 0) {
+            return 100;
+        } else {
+            float progressFraction = this.progress / (float)this.maxProgress;
+            return Math.round(progressFraction * 100);
+        }
+    }
+
+    // returns true if activity happened
+    public boolean tick(ServerLevel serverLevel) {
+        int wait = this.stage.wait;
+        if(wait == -1) return false;
+
+        this.progress++;
+        this.stepProgress++;
+        if(this.stepProgress >= wait) {
+            this.stepProgress = 0;
+            this.advance(serverLevel);
+            return true;
+        }
+        return false;
+    }
+
     public boolean advance(ServerLevel serverLevel) {
-        if(this.stage == Stage.HAS_RESOURCE_LOCATION) {
+        if(this.stage == Stage.GET_STRUCTURE) {
             // get structure from RL
             Optional<Structure> structureOptional = getStructure(serverLevel.registryAccess(), this.structureRL);
             if(structureOptional.isEmpty()) {
-                this.stage = Stage.ERROR;
+                this.setStage(Stage.ERROR);
                 return false;
             }
 
             this.structure = structureOptional.get();
 
-            this.stage = Stage.HAS_STRUCTURE;
+            this.setStage(Stage.GET_STRUCTURE_START);
             return true;
-        } else if(this.stage == Stage.HAS_STRUCTURE && this.structure != null) {
+        } else if(this.stage == Stage.GET_STRUCTURE_START && this.structure != null) {
             // get structure start from structure
             StructureStart structureStart = getStructureStart(this.structure, this.pos, serverLevel);
             if (!structureStart.isValid()) {
-                this.stage = Stage.ERROR;
+                this.setStage(Stage.ERROR);
                 return false;
             }
 
@@ -123,13 +167,13 @@ public class StructurePlacer {
             }
             this.intermediateStructureStorage = new IntermediateStructureStorage();
 
-            this.stage = Stage.FILLING_STORAGE;
+            this.setStage(Stage.FILL_STORAGE_PIECES, this.pieces.size());
             return true;
-        } else if(this.stage == Stage.FILLING_STORAGE && this.structureStart != null && this.intermediateStructureStorage != null) {
+        } else if(this.stage == Stage.FILL_STORAGE_PIECES && this.structureStart != null && this.intermediateStructureStorage != null) {
             // fill structure storage from structureStart, adding the pieces one by one until done
             if(!this.pieces.isEmpty()) {
                 if(this.structureOrigin == null) {
-                    this.stage = Stage.ERROR;
+                    this.setStage(Stage.ERROR);
                     return false;
                 }
 
@@ -141,7 +185,7 @@ public class StructurePlacer {
                         serverLevel.getChunkSource().getGenerator(),
                         serverLevel.getRandom(),
                         this.structureOrigin)) {
-                    this.stage = Stage.ERROR;
+                    this.setStage(Stage.ERROR);
                     return false;
                 } else {
                     this.pieces.removeFirst();
@@ -149,19 +193,19 @@ public class StructurePlacer {
             }
 
             if(this.pieces.isEmpty()) {
-                this.stage = Stage.PLACED_PIECES;
+                this.setStage(Stage.FILL_STORAGE_AFTER);
             }
             return true;
-        } else if(this.stage == Stage.PLACED_PIECES && this.structureStart != null && this.intermediateStructureStorage != null) {
+        } else if(this.stage == Stage.FILL_STORAGE_AFTER && this.structureStart != null && this.intermediateStructureStorage != null) {
             // fill structure storage from structureStart, doing the after place stuff
             if(!fillAfterPlace(this.intermediateStructureStorage, this.structureStart, serverLevel)) {
-                this.stage = Stage.ERROR;
+                this.setStage(Stage.ERROR);
                 return false;
             }
 
-            this.stage = Stage.FILLED_STORAGE;
+            this.setStage(Stage.POST_PROCESS);
             return true;
-        } else if(this.stage == Stage.FILLED_STORAGE && this.intermediateStructureStorage != null && this.structureStart != null) {
+        } else if(this.stage == Stage.POST_PROCESS && this.intermediateStructureStorage != null && this.structureStart != null) {
             // move fragile blocks (ie block entities, doors, torches, etc.) to a separate storage
             this.intermediateStructureStorage.forEachContainer(((sectionPos, boxedContainer) -> {
                 BoundingBox box = boxedContainer.getBox();
@@ -195,23 +239,24 @@ public class StructurePlacer {
             this.minSpawnTime = times[0];
             this.currentSpawnTime = times[1];
 
-            this.stage = Stage.READY_TO_PLACE;
+            this.setStage(Stage.PLACE_BLOCKS, this.currentSpawnTime - this.minSpawnTime + 2);
             return true;
-        } else if(this.stage == Stage.READY_TO_PLACE && this.intermediateStructureStorage != null && this.structureStart != null) {
+        } else if(this.stage == Stage.PLACE_BLOCKS && this.intermediateStructureStorage != null && this.structureStart != null) {
             // place stable structure storage
             placeStoredStructureStables(this.intermediateStructureStorage, this.currentSpawnTime, this.pos, serverLevel);
 
             if(this.currentSpawnTime < this.minSpawnTime) {
-                this.stage = Stage.PLACED_STABLES;
+                this.setStage(Stage.PLACE_SPECIALS);
+                return true;
             }
             this.currentSpawnTime--;
 
             return true;
-        } else if(this.stage == Stage.PLACED_STABLES && this.intermediateStructureStorage != null) {
+        } else if(this.stage == Stage.PLACE_SPECIALS && this.intermediateStructureStorage != null) {
             // place fragile structure storage, block entities, entities
             placeStoredStructureSpecials(this.intermediateStructureStorage, serverLevel);
 
-            this.stage = Stage.COMPLETED;
+            this.setStage(Stage.COMPLETED);
             return true;
         } else {
             return this.stage == Stage.COMPLETED;
