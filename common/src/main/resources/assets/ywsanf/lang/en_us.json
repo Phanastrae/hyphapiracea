@@ -6,7 +6,7 @@
 
   "itemGroup.ywsanf": "You Wouldn't Steal a Nether Fortress",
 
-  "ywsanf.leukbox.progress": "%s%%]",
+  "ywsanf.leukbox.progress": "%s%%",
   "ywsanf.leukbox.stage.completed": "[Completed!]",
   "ywsanf.leukbox.stage.error": "[Error!]",
   "ywsanf.leukbox.stage.place_blocks": "[We Feast]",

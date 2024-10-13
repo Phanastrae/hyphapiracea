@@ -8,13 +8,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.StructureManager;
-import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -22,6 +17,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
+import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.YWSaNF;
 import phanastrae.ywsanf.block.YWSaNFBlocks;
@@ -71,7 +67,7 @@ public class StructurePlacer {
         GET_STRUCTURE_START("get_structure_start", 20, true),
         FILL_STORAGE_PIECES("fill_storage_pieces", 1, true),
         FILL_STORAGE_AFTER("fill_storage_after", 30, true),
-        POST_PROCESS("post_process", 10, true),
+        POST_PROCESS("post_process", 30, true),
         PLACE_BLOCKS("place_blocks",1, true),
         PLACE_SPECIALS("place_specials", 20, true),
         COMPLETED("completed", 60, false);
@@ -151,6 +147,7 @@ public class StructurePlacer {
             this.setStage(Stage.GET_STRUCTURE_START);
             return true;
         } else if(this.stage == Stage.GET_STRUCTURE_START && this.structure != null) {
+            // TODO this may be able to be split further across time for jigsaw structures
             // get structure start from structure
             StructureStart structureStart = getStructureStart(this.structure, this.pos, serverLevel);
             if (!structureStart.isValid()) {
@@ -170,6 +167,7 @@ public class StructurePlacer {
             this.setStage(Stage.FILL_STORAGE_PIECES, this.pieces.size());
             return true;
         } else if(this.stage == Stage.FILL_STORAGE_PIECES && this.structureStart != null && this.intermediateStructureStorage != null) {
+            // TODO this may be able to be split further across time for jigsaw structure pieces using ListPoolElement
             // fill structure storage from structureStart, adding the pieces one by one until done
             if(!this.pieces.isEmpty()) {
                 if(this.structureOrigin == null) {
@@ -198,7 +196,7 @@ public class StructurePlacer {
             return true;
         } else if(this.stage == Stage.FILL_STORAGE_AFTER && this.structureStart != null && this.intermediateStructureStorage != null) {
             // fill structure storage from structureStart, doing the after place stuff
-            if(!fillAfterPlace(this.intermediateStructureStorage, this.structureStart, serverLevel)) {
+            if(!fillAfterPlace(this.intermediateStructureStorage, this.structureStart, serverLevel, this.pos)) {
                 this.setStage(Stage.ERROR);
                 return false;
             }
@@ -213,6 +211,10 @@ public class StructurePlacer {
                     BoxedContainer fragilesContainer = new BoxedContainer();
                     BlockState feastingTar = YWSaNFBlocks.FEASTING_TAR.defaultBlockState();
 
+                    BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+                    int mx = sectionPos.minBlockX();
+                    int my = sectionPos.minBlockY();
+                    int mz = sectionPos.minBlockZ();
                     for(int x = box.minX(); x <= box.maxX(); x++) {
                         for(int y = box.minY(); y <= box.maxY(); y++) {
                             for(int z = box.minZ(); z <= box.maxZ(); z++) {
@@ -220,7 +222,8 @@ public class StructurePlacer {
                                 if(state.is(Blocks.STRUCTURE_VOID)) {
                                     continue;
                                 }
-                                if(isStateFragile(state)) {
+                                mutableBlockPos.set(mx+x, my+y, mz+z);
+                                if(isStateFragile(state, serverLevel, mutableBlockPos)) {
                                     boxedContainer.set(x, y, z, feastingTar);
                                     fragilesContainer.set(x, y, z, state);
                                 }
@@ -263,12 +266,25 @@ public class StructurePlacer {
         }
     }
 
-    public boolean isStateFragile(BlockState state) {
-        if(state.getBlock() instanceof EntityBlock) {
+    public boolean isStateFragile(BlockState state, LevelReader levelReader, BlockPos blockPos) {
+        Block block = state.getBlock();
+        if(block instanceof EntityBlock) {
             return true;
-        } else {
-            return false; // TODO
         }
+
+        if(block instanceof DoorBlock) {
+            // bottoms of doors are not always properly detected by the canSurvive check
+            return true;
+        }
+
+        if(!state.canSurvive(levelReader, blockPos)) {
+            // this prevents some, but not all, problems
+            return true;
+        }
+
+        // TODO consider adding any other 'fragile' blocks here, if they exist (all redstone components? falling blocks? fluids?)
+
+        return false;
     }
 
     public static boolean isStateFeastable(BlockState state, BlockGetter level, BlockPos pos) {
@@ -283,6 +299,7 @@ public class StructurePlacer {
             // cannot feast upon indestructible blocks, ie bedrock
             return false;
         }
+        // TODO consider blacklisting other blocks? eg obsidian?, iron block?
 
         return true;
     }
@@ -320,7 +337,7 @@ public class StructurePlacer {
         );
     }
 
-    public static boolean placeStructurePiece(StructurePiece structurePiece, WorldGenLevel worldGenLevel , ServerLevel level, StructureManager structureManager, ChunkGenerator generator, RandomSource random, BlockPos structureOrigin) {
+    public static boolean placeStructurePiece(StructurePiece structurePiece, WorldGenLevel worldGenLevel, ServerLevel level, StructureManager structureManager, ChunkGenerator generator, RandomSource random, BlockPos structureOrigin) {
         BoundingBox boundingBox = structurePiece.getBoundingBox();
         ChunkPos startPos = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.minX()), SectionPos.blockToSectionCoord(boundingBox.minZ()));
         ChunkPos endPos = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
@@ -345,14 +362,14 @@ public class StructurePlacer {
                             }
                     );
         } catch (Exception e) {
-            YWSaNF.LOGGER.error("Error trying to generate structure!"); // TODO consider changing this
+            YWSaNF.LOGGER.error("Error trying to place piece for structure with Leukbox at {}!", structureOrigin.toString());
             return false;
         }
 
         return true;
     }
 
-    public static boolean fillAfterPlace(IntermediateStructureStorage intermediateStructureStorage, StructureStart structureStart, ServerLevel serverLevel) {
+    public static boolean fillAfterPlace(IntermediateStructureStorage intermediateStructureStorage, StructureStart structureStart, ServerLevel serverLevel, BlockPos structureOrigin) {
         BoundingBox boundingBox = structureStart.getBoundingBox();
         ChunkPos startPos = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.minX()), SectionPos.blockToSectionCoord(boundingBox.minZ()));
         ChunkPos endPos = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
@@ -387,7 +404,7 @@ public class StructurePlacer {
                                     chunkPos)
                     );
         } catch (Exception e) {
-            YWSaNF.LOGGER.error("Error trying to generate structure!"); // TODO consider changing this
+            YWSaNF.LOGGER.error("Error trying to apply after-place for structure with Leukbox at {}!", structureOrigin.toString());
             return false;
         }
 
@@ -402,8 +419,7 @@ public class StructurePlacer {
         }
     }
 
-    public static void placeStoredStructureStables(IntermediateStructureStorage intermediateStorage, int currentSpawnTime, BlockPos pos, WorldGenLevel level) {
-        // TODO update neighbors?
+    public static void placeStoredStructureStables(IntermediateStructureStorage intermediateStorage, int currentSpawnTime, BlockPos pos, ServerLevel level) {
         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
         BlockState feastingTAR = YWSaNFBlocks.FEASTING_TAR.defaultBlockState();
         intermediateStorage.forEachContainer((sectionPos, boxedContainer) -> {
@@ -434,7 +450,8 @@ public class StructurePlacer {
 
                                 BlockState oldState = level.getBlockState(mutableBlockPos);
                                 if(isStateSubsumed(oldState)) {
-                                    level.setBlock(mutableBlockPos, newState, 2, 0);
+                                    setBlock(level, mutableBlockPos, newState, true);
+                                    tryUpdateSelf(level, mutableBlockPos, newState);
                                 }
                             }
                         } else if(tInRange(t + CONVERSION_DELAY, currentSpawnTime)) {
@@ -447,7 +464,7 @@ public class StructurePlacer {
                                     continue;
                                 }
                                 if(isStateFeastable(oldState, level, mutableBlockPos)) {
-                                    level.setBlock(mutableBlockPos, feastingTAR, 2, 0);
+                                    setBlock(level, mutableBlockPos, feastingTAR, true);
                                 }
                             }
                         }
@@ -457,9 +474,9 @@ public class StructurePlacer {
         });
     }
 
-    public static void placeStoredStructureSpecials(IntermediateStructureStorage intermediateStorage, WorldGenLevel level) {
-        // TODO prevent theoretical chest merging, tweak fragility criteria, update neigbors?
+    public static void placeStoredStructureSpecials(IntermediateStructureStorage intermediateStorage, ServerLevel level) {
         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+        // place blocks
         intermediateStorage.forEachFragileContainer((sectionPos, boxedContainer) -> {
             BoundingBox box = boxedContainer.getBox();
             if(box != null) {
@@ -475,7 +492,7 @@ public class StructurePlacer {
 
                                 BlockState oldState = level.getBlockState(mutableBlockPos);
                                 if(isStateSubsumed(oldState)) {
-                                    level.setBlock(mutableBlockPos, state, 2, 0);
+                                    setBlock(level, mutableBlockPos, state, false);
                                 }
                             }
                         }
@@ -483,14 +500,60 @@ public class StructurePlacer {
                 }
             }
         });
+        // place block entities
         intermediateStorage.forEachBlockEntity(((blockPos, blockEntity) -> {
             BlockState state = intermediateStorage.getFragileBlockState(blockPos);
             BlockState entityState = blockEntity.getBlockState();
             if(state.getBlock().equals(entityState.getBlock())) {
-                level.getLevel().getChunkAt(blockPos).addAndRegisterBlockEntity(blockEntity);
+                level.getChunkAt(blockPos).addAndRegisterBlockEntity(blockEntity);
             }
         }));
+        // update blocks
+        intermediateStorage.forEachFragileContainer((sectionPos, boxedContainer) -> {
+            BoundingBox box = boxedContainer.getBox();
+            if(box != null) {
+                int mx = sectionPos.minBlockX();
+                int my = sectionPos.minBlockY();
+                int mz = sectionPos.minBlockZ();
+                for (int x = box.minX(); x <= box.maxX(); x++) {
+                    for (int y = box.minY(); y <= box.maxY(); y++) {
+                        for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                            BlockState state = boxedContainer.get(x, y, z);
+                            mutableBlockPos.set(mx + x, my + y, mz + z);
+                            BlockState newState = level.getLevel().getChunkAt(mutableBlockPos).getBlockState(mutableBlockPos);
+                            if(state.equals(newState)) {
+                                level.blockUpdated(mutableBlockPos, state.getBlock());
+                                if (state.hasAnalogOutputSignal()) {
+                                    level.updateNeighbourForOutputSignal(mutableBlockPos, state.getBlock());
+                                }
+                                tryUpdateSelf(level, mutableBlockPos, state);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        // place entities
         intermediateStorage.forEachEntity(level::addFreshEntity);
+    }
+
+    public static void setBlock(ServerLevel level, BlockPos pos, BlockState state, boolean updateNeighbors) {
+        level.setBlock(pos, state, updateNeighbors ? 3 : 2, 512);
+    }
+
+    public static void tryUpdateSelf(ServerLevel level, BlockPos pos, BlockState state) {
+        FluidState fluidState = state.getFluidState();
+        if (!fluidState.isEmpty()) {
+            fluidState.tick(level, pos);
+        }
+
+        Block block = state.getBlock();
+        if (!(block instanceof LiquidBlock)) {
+            BlockState newState = Block.updateFromNeighbourShapes(state, level, pos);
+            if (!newState.equals(state)) {
+                level.setBlock(pos, newState, 20);
+            }
+        }
     }
 
     private static boolean checkLoaded(ServerLevel level, ChunkPos start, ChunkPos end) {
@@ -555,7 +618,7 @@ public class StructurePlacer {
     }
 
     public static double calcSpawnTime(double h, double dy, double n) {
-        return h * 3.5F + 0.6F * -dy + n * 2.4F;
+        return h * 7.0F + 0.9F * -dy + n * 4.5F;
     }
 
     public static IntNoise2D generateNoise() {
