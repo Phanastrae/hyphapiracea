@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "ywsanf:block/hyphal_conductor",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "ywsanf:block/hyphal_conductorwall",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "ywsanf:block/hyphal_conductorwall"
+    },
+    "facing=south": {
+      "model": "ywsanf:block/hyphal_conductorwall",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "ywsanf:block/hyphal_conductor"
+    },
+    "facing=west": {
+      "model": "ywsanf:block/hyphal_conductorwall",
+      "y": 270
+    }
+  }
+}

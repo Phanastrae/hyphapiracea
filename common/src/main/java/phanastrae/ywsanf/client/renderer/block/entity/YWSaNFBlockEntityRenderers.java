@@ -10,6 +10,7 @@ public class YWSaNFBlockEntityRenderers {
 
     public static void init() {
         register(YWSaNFBlockEntityTypes.LEUKBOX, LeukboxBlockEntityRenderer::new);
+        register(YWSaNFBlockEntityTypes.HYPHAL_CONDUCTOR, HyphalConductorBlockEntityRenderer::new);
     }
 
     public static <T extends BlockEntity> void register(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> factory) {

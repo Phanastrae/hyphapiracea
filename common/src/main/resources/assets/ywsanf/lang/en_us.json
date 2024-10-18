@@ -1,7 +1,9 @@
 {
   "block.ywsanf.feasting_tar": "Feasting TAR",
+  "block.ywsanf.hyphal_conductor": "Hyphal Conductor",
   "block.ywsanf.leukbox": "Leukbox",
 
+  "item.ywsanf.hyphaline": "Hyphaline",
   "item.ywsanf.keyed_disc": "Keyed Disc",
 
   "itemGroup.ywsanf": "You Wouldn't Steal a Nether Fortress",

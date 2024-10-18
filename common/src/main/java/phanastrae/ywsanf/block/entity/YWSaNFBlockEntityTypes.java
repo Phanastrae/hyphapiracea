@@ -13,8 +13,11 @@ public class YWSaNFBlockEntityTypes {
 
     public static final BlockEntityType<LeukboxBlockEntity> LEUKBOX = create("leukbox", LeukboxBlockEntity::new, YWSaNFBlocks.LEUKBOX);
 
+    public static final BlockEntityType<HyphalConductorBlockEntity> HYPHAL_CONDUCTOR = create("hyphal_conductor", HyphalConductorBlockEntity::new, YWSaNFBlocks.HYPHAL_CONDUCTOR);
+
     public static void init(BiConsumer<ResourceLocation, BlockEntityType<?>> r) {
         r.accept(id("leukbox"), LEUKBOX);
+        r.accept(id("hyphal_conductor"), HYPHAL_CONDUCTOR);
     }
 
     private static ResourceLocation id(String path) {

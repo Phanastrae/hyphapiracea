@@ -20,18 +20,18 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.block.entity.LeukboxBlockEntity;
 import phanastrae.ywsanf.block.entity.YWSaNFBlockEntityTypes;
+import phanastrae.ywsanf.block.state.YWSaNFBlockProperties;
 import phanastrae.ywsanf.item.YWSaNFItems;
 
 public class LeukboxBlock extends BaseEntityBlock {
     public static final MapCodec<LeukboxBlock> CODEC = simpleCodec(LeukboxBlock::new);
-    public static final BooleanProperty HAS_RECORD = BlockStateProperties.HAS_RECORD;
+    public static final BooleanProperty HAS_DISC = YWSaNFBlockProperties.HAS_DISC;
 
     @Override
     public MapCodec<LeukboxBlock> codec() {
@@ -40,43 +40,12 @@ public class LeukboxBlock extends BaseEntityBlock {
 
     public LeukboxBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(HAS_RECORD, Boolean.valueOf(false)));
+        this.registerDefaultState(this.stateDefinition.any().setValue(HAS_DISC, Boolean.valueOf(false)));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(HAS_RECORD);
-    }
-
-    @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        super.setPlacedBy(level, pos, state, placer, stack);
-        CustomData data = stack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
-        if (data.contains("disc_item")) {
-            level.setBlock(pos, state.setValue(HAS_RECORD, true), 2);
-        }
-    }
-
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
-                blockEntity.popOutTheItem();
-            }
-
-            super.onRemove(state, level, pos, newState, isMoving);
-        }
-    }
-
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (state.getValue(HAS_RECORD)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        } else {
-            ItemStack itemstack = player.getItemInHand(hand);
-            ItemInteractionResult iteminteractionresult = tryInsertIntoLeukbox(level, pos, itemstack, player);
-            return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
-        }
+        builder.add(HAS_DISC);
     }
 
     @Override
@@ -96,12 +65,43 @@ public class LeukboxBlock extends BaseEntityBlock {
         return level.isClientSide ? null : createTickerHelper(blockEntityType, YWSaNFBlockEntityTypes.LEUKBOX, LeukboxBlockEntity::serverTick);
     }
 
-    public static ItemInteractionResult tryInsertIntoLeukbox(Level level, BlockPos pos, ItemStack stack, Player player) {
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        CustomData data = stack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
+        if (data.contains(LeukboxBlockEntity.TAG_DISC_ITEM)) {
+            level.setBlock(pos, state.setValue(HAS_DISC, true), 2);
+        }
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
+                blockEntity.popOutTheItem();
+            }
+
+            super.onRemove(state, level, pos, newState, isMoving);
+        }
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (state.getValue(HAS_DISC)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        } else {
+            ItemStack itemstack = player.getItemInHand(hand);
+            ItemInteractionResult iteminteractionresult = tryInsertItem(level, pos, itemstack, player);
+            return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
+        }
+    }
+
+    public static ItemInteractionResult tryInsertItem(Level level, BlockPos pos, ItemStack stack, Player player) {
         if (!stack.is(YWSaNFItems.KEYED_DISC)) { // TODO tweak criteria
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         } else {
             BlockState blockstate = level.getBlockState(pos);
-            if (blockstate.is(YWSaNFBlocks.LEUKBOX) && !blockstate.getValue(HAS_RECORD)) {
+            if (blockstate.is(YWSaNFBlocks.LEUKBOX) && !blockstate.getValue(HAS_DISC)) {
                 if (!level.isClientSide) {
                     ItemStack itemstack = stack.consumeAndReturn(1, player);
                     if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {

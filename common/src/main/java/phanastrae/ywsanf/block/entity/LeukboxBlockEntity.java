@@ -193,6 +193,13 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
     }
 
+    private void notifyItemChanged(boolean hasDisc) {
+        if (this.level != null && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
+            this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(LeukboxBlock.HAS_DISC, hasDisc), 2);
+            this.level.gameEvent(GameEvent.BLOCK_CHANGE, this.getBlockPos(), GameEvent.Context.of(this.getBlockState()));
+        }
+    }
+
     @Override
     public ItemStack getTheItem() {
         return this.item;
@@ -223,21 +230,14 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
     }
 
-    private void notifyItemChanged(boolean hasDisc) {
-        if (this.level != null && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
-            this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(LeukboxBlock.HAS_RECORD, hasDisc), 2);
-            this.level.gameEvent(GameEvent.BLOCK_CHANGE, this.getBlockPos(), GameEvent.Context.of(this.getBlockState()));
-        }
+    @Override
+    public BlockEntity getContainerBlockEntity() {
+        return this;
     }
 
     @Override
     public int getMaxStackSize() {
         return 1;
-    }
-
-    @Override
-    public BlockEntity getContainerBlockEntity() {
-        return this;
     }
 
     @Override
