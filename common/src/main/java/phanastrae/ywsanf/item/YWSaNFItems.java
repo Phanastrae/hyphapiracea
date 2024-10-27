@@ -17,6 +17,7 @@ public class YWSaNFItems {
 
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON));
     public static final Item HYPHALINE = new HyphalineItem(properties());
+    public static final Item MAGNETOMETER = new MagnetometerItem(properties());
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
         BiConsumer<String, Item> rwt = (s, i) -> { // register and add to creative mode tab
@@ -28,6 +29,7 @@ public class YWSaNFItems {
         rwt.accept("leukbox", LEUKBOX);
         rwt.accept("hyphal_conductor", HYPHAL_CONDUCTOR);
         rwt.accept("hyphaline", HYPHALINE);
+        rwt.accept("magnetometer", MAGNETOMETER);
     }
 
     private static ResourceLocation id(String path) {

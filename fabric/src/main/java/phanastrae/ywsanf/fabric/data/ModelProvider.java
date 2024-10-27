@@ -18,15 +18,10 @@ import phanastrae.ywsanf.block.YWSaNFBlocks;
 import phanastrae.ywsanf.item.YWSaNFItems;
 
 import static net.minecraft.core.Direction.*;
-import static net.minecraft.core.Direction.DOWN;
-import static net.minecraft.core.Direction.EAST;
-import static net.minecraft.core.Direction.NORTH;
-import static net.minecraft.core.Direction.SOUTH;
-import static net.minecraft.core.Direction.UP;
-import static net.minecraft.core.Direction.WEST;
 import static net.minecraft.data.models.blockstates.VariantProperties.*;
 import static net.minecraft.data.models.blockstates.VariantProperties.Rotation.*;
-import static net.minecraft.data.models.model.TextureSlot.*;
+import static net.minecraft.data.models.model.TextureSlot.ALL;
+import static net.minecraft.data.models.model.TextureSlot.PARTICLE;
 
 public class ModelProvider extends FabricModelProvider {
     public ModelProvider(FabricDataOutput output) {
@@ -43,12 +38,21 @@ public class ModelProvider extends FabricModelProvider {
 
     @Override
     public void generateItemModels(ItemModelGenerators IMG) {
-        generateFlat(IMG, YWSaNFItems.KEYED_DISC);
-        generateFlat(IMG, YWSaNFItems.HYPHALINE);
+        generateFlat(IMG,
+                YWSaNFItems.KEYED_DISC,
+                YWSaNFItems.HYPHALINE,
+                YWSaNFItems.MAGNETOMETER
+        );
     }
 
-    private static void generateFlat(ItemModelGenerators itemModelGenerator, Item item) {
-        itemModelGenerator.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
+    private static void generateFlat(ItemModelGenerators IMG, Item... items) {
+        for(Item item : items) {
+            generateFlat(IMG, item);
+        }
+    }
+
+    private static void generateFlat(ItemModelGenerators IMG, Item item) {
+        IMG.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
     }
 
     public static void createConductorBlock(BlockModelGenerators BMG, Block block) {

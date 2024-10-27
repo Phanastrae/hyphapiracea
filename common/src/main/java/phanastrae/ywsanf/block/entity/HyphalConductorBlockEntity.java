@@ -24,7 +24,9 @@ import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.block.HyphalConductorBlock;
 import phanastrae.ywsanf.block.state.ConductorStateProperty;
+import phanastrae.ywsanf.electromagnetism.WireLine;
 import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
+import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +39,9 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     public static final String TAG_LINKED_BLOCK_RELATIVE_Z = "linked_block_relative_z";
     public static final double MAX_HELD_WIRE_RANGE = 16.0;
 
+    private final WireLine wireLine;
+    private boolean inLevelList = false;
+
     private ItemStack item = ItemStack.EMPTY;
     @Nullable
     private Entity linkedEntity;
@@ -48,6 +53,12 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
     public HyphalConductorBlockEntity(BlockPos pos, BlockState blockState) {
         super(YWSaNFBlockEntityTypes.HYPHAL_CONDUCTOR, pos, blockState);
+
+        this.wireLine = new WireLine(pos.getCenter());
+
+        // TODO implement current, dropoff radius
+        this.setCurrent(1.0F);
+        this.setDropoffRadius(32.0F);
     }
 
     @Override
@@ -159,6 +170,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         if(this.linkedEntity != null) {
             YWSaNFEntityAttachment.getAttachment(this.linkedEntity).unlinkTo(this);
         }
+        this.removeFromLevelListIfPossible();
         super.setRemoved();
     }
 
@@ -168,8 +180,49 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         if(this.linkedEntity != null) {
             YWSaNFEntityAttachment.getAttachment(this.linkedEntity).linkTo(this);
         }
+        updateLevelListStatus();
         this.hasObservedEndpoint = false;
         this.checkEndpointTimer = 0;
+    }
+
+    @Override
+    public void setLevel(Level level) {
+        if(this.level != level) {
+            this.removeFromLevelListIfPossible();
+        }
+        super.setLevel(level);
+        updateLevelListStatus();
+    }
+
+    private void updateLevelListStatus() {
+        // TODO switch to check if the item is valid/active or whatever instead of just if it's empty?
+        boolean canAffectWorld = !this.isRemoved() && this.hasItem() && this.linkedBlockPos != null;
+
+        if(canAffectWorld) {
+            addToLevelListIfPossible();
+        } else {
+            removeFromLevelListIfPossible();
+        }
+
+        if(this.item.isEmpty() || this.linkedBlockPos == null) {
+            this.removeFromLevelListIfPossible();
+        } else {
+            this.addToLevelListIfPossible();
+        }
+    }
+
+    private void addToLevelListIfPossible() {
+        if(!this.inLevelList && this.level != null) {
+            YWSaNFLevelAttachment.getAttachment(this.level).addWire(this.wireLine);
+            this.inLevelList = true;
+        }
+    }
+
+    private void removeFromLevelListIfPossible() {
+        if(this.inLevelList && this.level != null) {
+            YWSaNFLevelAttachment.getAttachment(this.level).removeWire(this.wireLine);
+            this.inLevelList = false;
+        }
     }
 
     public boolean observeEndpoint() {
@@ -227,7 +280,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         }
         if(this.linkedBlockPos != null) {
             BlockPos bp = this.linkedBlockPos;
-            this.linkedBlockPos = null;
+            this.setLinkedBlockPos(null);
             if(!this.isRemoved() && this.level != null && !this.level.isClientSide) {
                 if(this.level.getBlockEntity(bp) instanceof HyphalConductorBlockEntity linkedBlockEntity) {
                     linkedBlockEntity.unlink();
@@ -261,16 +314,40 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         }
 
         unlink();
-        this.linkedBlockPos = blockPos;
+        this.setLinkedBlockPos(blockPos);
 
         if(!this.isRemoved() && this.linkedBlockPos != null) {
             if(this.level != null && !this.level.isClientSide && this.level.getBlockEntity(this.linkedBlockPos) instanceof HyphalConductorBlockEntity linkedBlockEntity) {
-                linkedBlockEntity.linkedBlockPos = this.getBlockPos();
+                linkedBlockEntity.setLinkedBlockPos(this.getBlockPos());
                 linkedBlockEntity.checkBlockStateAndSendUpdate();
             }
         }
 
         checkBlockStateAndSendUpdate();
+    }
+
+    private void setLinkedBlockPos(@Nullable BlockPos blockPos) {
+        this.linkedBlockPos = blockPos;
+        if(blockPos == null) {
+            this.wireLine.setEndPoint(this.wireLine.getStart());
+        } else {
+            this.wireLine.setEndPoint(blockPos.getCenter());
+        }
+        this.updateLevelListStatus();
+    }
+
+    public void setCurrent(float current) {
+        this.wireLine.setCurrent(current);
+        if(this.inLevelList && this.level != null) {
+            YWSaNFLevelAttachment.getAttachment(this.level).updateWire(this.wireLine);
+        }
+    }
+
+    public void setDropoffRadius(float dropoffRadius) {
+        this.wireLine.setDropoffRadius(dropoffRadius);
+        if(this.inLevelList && this.level != null) {
+            YWSaNFLevelAttachment.getAttachment(this.level).updateWire(this.wireLine);
+        }
     }
 
     public void checkBlockStateAndSendUpdate() {
@@ -309,6 +386,10 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         if(this.level != null && !this.level.isClientSide && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
         }
+    }
+
+    public WireLine getWireLine() {
+        return this.wireLine;
     }
 
     @Nullable
@@ -356,6 +437,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     @Override
     public void setTheItem(ItemStack item) {
         this.item = item;
+        this.updateLevelListStatus();
     }
 
     @Override

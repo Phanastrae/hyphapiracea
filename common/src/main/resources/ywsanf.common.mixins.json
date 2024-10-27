@@ -6,6 +6,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityMixin",
+    "LevelMixin",
+    "SimpleParticleTypeAccessor",
     "StructurePieceMixin",
     "StructureStartAccessor"
   ],

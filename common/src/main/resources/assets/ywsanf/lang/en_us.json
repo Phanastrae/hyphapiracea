@@ -3,8 +3,11 @@
   "block.ywsanf.hyphal_conductor": "Hyphal Conductor",
   "block.ywsanf.leukbox": "Leukbox",
 
+  "gui.ywsanf.magnetometer.field_strength_microtesla": "Magnetic Field Strength: %s µT",
+
   "item.ywsanf.hyphaline": "Hyphaline",
   "item.ywsanf.keyed_disc": "Keyed Disc",
+  "item.ywsanf.magnetometer": "Magnetometer",
 
   "itemGroup.ywsanf": "You Wouldn't Steal a Nether Fortress",
 

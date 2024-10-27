@@ -9,6 +9,7 @@ import phanastrae.ywsanf.block.YWSaNFBlocks;
 import phanastrae.ywsanf.block.entity.YWSaNFBlockEntityTypes;
 import phanastrae.ywsanf.item.YWSaNFCreativeModeTabs;
 import phanastrae.ywsanf.item.YWSaNFItems;
+import phanastrae.ywsanf.particle.YWSaNFParticleTypes;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -32,6 +33,9 @@ public class YWSaNF {
 
         // block entity types
         rla.addRegistryListener(BuiltInRegistries.BLOCK_ENTITY_TYPE, YWSaNFBlockEntityTypes::init);
+
+        // particle types
+        rla.addRegistryListener(BuiltInRegistries.PARTICLE_TYPE, YWSaNFParticleTypes::init);
     }
 
     @FunctionalInterface
