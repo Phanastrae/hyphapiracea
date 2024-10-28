@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "ywsanf:block/ammeter_block_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "ywsanf:block/ammeter_block",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "ywsanf:block/ammeter_block"
+    },
+    "facing=south": {
+      "model": "ywsanf:block/ammeter_block",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "ywsanf:block/ammeter_block_vertical"
+    },
+    "facing=west": {
+      "model": "ywsanf:block/ammeter_block",
+      "y": 270
+    }
+  }
+}

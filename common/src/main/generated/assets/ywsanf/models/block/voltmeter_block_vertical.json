@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "ywsanf:block/voltmeter_block_back",
+    "east": "ywsanf:block/voltmeter_block_side",
+    "north": "ywsanf:block/voltmeter_block_side",
+    "particle": "ywsanf:block/voltmeter_block_side",
+    "south": "ywsanf:block/voltmeter_block_side",
+    "up": "ywsanf:block/voltmeter_block_front",
+    "west": "ywsanf:block/voltmeter_block_side"
+  }
+}

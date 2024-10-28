@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "ywsanf:block/stormsap_cell_side",
+    "east": "ywsanf:block/stormsap_cell_side",
+    "north": "ywsanf:block/stormsap_cell_front",
+    "particle": "ywsanf:block/stormsap_cell_side",
+    "south": "ywsanf:block/stormsap_cell_back",
+    "up": "ywsanf:block/stormsap_cell_side",
+    "west": "ywsanf:block/stormsap_cell_side"
+  }
+}

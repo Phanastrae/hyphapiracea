@@ -14,11 +14,19 @@ public class YWSaNFBlockEntityTypes {
     public static final BlockEntityType<LeukboxBlockEntity> LEUKBOX = create("leukbox", LeukboxBlockEntity::new, YWSaNFBlocks.LEUKBOX);
     public static final BlockEntityType<HyphalConductorBlockEntity> HYPHAL_CONDUCTOR = create("hyphal_conductor", HyphalConductorBlockEntity::new, YWSaNFBlocks.HYPHAL_CONDUCTOR);
     public static final BlockEntityType<MagnetometerBlockEntity> MAGNETOMETER_BLOCK = create("magnetometer_block", MagnetometerBlockEntity::new, YWSaNFBlocks.MAGNETOMETER_BLOCK);
+    public static final BlockEntityType<GalvanocarpicBulbBlockEntity> GALVANOCARPIC_BULB = create("galvanocarpic_bulb", GalvanocarpicBulbBlockEntity::new, YWSaNFBlocks.GALVANOCARPIC_BULB);
+    public static final BlockEntityType<AmmeterBlockEntity> AMMETER_BLOCK = create("ammeter_block", AmmeterBlockEntity::new, YWSaNFBlocks.AMMETER_BLOCK);
+    public static final BlockEntityType<VoltmeterBlockEntity> VOLTMETER_BLOCK = create("voltmeter_block", VoltmeterBlockEntity::new, YWSaNFBlocks.VOLTMETER_BLOCK);
+    public static final BlockEntityType<StormsapCellBlockEntity> STORMSAP_CELL = create("stormsap_cell", StormsapCellBlockEntity::new, YWSaNFBlocks.STORMSAP_CELL);
 
     public static void init(BiConsumer<ResourceLocation, BlockEntityType<?>> r) {
         r.accept(id("leukbox"), LEUKBOX);
         r.accept(id("hyphal_conductor"), HYPHAL_CONDUCTOR);
         r.accept(id("magnetometer_block"), MAGNETOMETER_BLOCK);
+        r.accept(id("galvanocarpic_bulb"), GALVANOCARPIC_BULB);
+        r.accept(id("ammeter_block"), AMMETER_BLOCK);
+        r.accept(id("voltmeter_block"), VOLTMETER_BLOCK);
+        r.accept(id("stormsap_cell"), STORMSAP_CELL);
     }
 
     private static ResourceLocation id(String path) {

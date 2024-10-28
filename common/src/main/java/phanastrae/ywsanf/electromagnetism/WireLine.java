@@ -19,6 +19,9 @@ public class WireLine {
     private double maxPossibleInfluenceRadius;
     private double maxPossibleInfluenceRadiusSqr;
 
+    private float resistancePerBlock;
+    private float totalResistance;
+
     public WireLine(Vec3 start) {
         this.start = start;
         this.end = start;
@@ -33,6 +36,9 @@ public class WireLine {
         this.dropoffRadius = 0;
         this.dropoffRadiusSqr = 0;
         this.maxPossibleInfluenceRadiusSqr = 0;
+
+        this.resistancePerBlock = 1F;
+        this.totalResistance = 0;
     }
 
     public void setCurrent(float current) {
@@ -55,11 +61,22 @@ public class WireLine {
         this.iVec = this.startToEnd.normalize();
 
         this.updateMaxInfluenceRadius();
+        this.updateTotalResistance();
+    }
+
+    public void setResistancePerBlock(float resistancePerBlock) {
+        this.resistancePerBlock = resistancePerBlock;
+
+        this.updateTotalResistance();
     }
 
     private void updateMaxInfluenceRadius() {
         this.maxPossibleInfluenceRadius = (this.startToEndDistance * 0.5) + this.dropoffRadius;
         this.maxPossibleInfluenceRadiusSqr = this.maxPossibleInfluenceRadius * this.maxPossibleInfluenceRadius;
+    }
+
+    public void updateTotalResistance() {
+        this.totalResistance = (float)this.startToEndDistance * this.resistancePerBlock;
     }
 
     public Vec3 getStart() {
@@ -104,6 +121,14 @@ public class WireLine {
 
     public double getMaxPossibleInfluenceRadiusSqr() {
         return this.maxPossibleInfluenceRadiusSqr;
+    }
+
+    public float getResistancePerBlock() {
+        return this.resistancePerBlock;
+    }
+
+    public float getTotalResistance() {
+        return this.totalResistance;
     }
 
     public boolean canInfluencePoint(Vec3 pos) {

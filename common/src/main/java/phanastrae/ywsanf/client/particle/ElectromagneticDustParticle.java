@@ -70,8 +70,8 @@ public class ElectromagneticDustParticle extends TextureSheetParticle {
         Vec3 velocity = new Vec3(this.xd * 20, this.yd * 20, this.zd * 20);
 
         Vec3 magneticField = YWSaNFLevelAttachment.getAttachment(this.level).getMagneticFieldAtPosition(position);
-        Vec3 eForce = velocity.cross(magneticField).scale(this.electricCharge);
-        Vec3 mForce = magneticField.scale(this.magneticCharge);
+        Vec3 eForce = this.electricCharge == 0 ? Vec3.ZERO : velocity.cross(magneticField).scale(this.electricCharge);
+        Vec3 mForce = this.magneticCharge == 0 ? Vec3.ZERO : magneticField.scale(this.magneticCharge);
 
         Vec3 totalForce = eForce.add(mForce);
         // divide force by mass to get acceleration (meters per second squared)
@@ -209,7 +209,7 @@ public class ElectromagneticDustParticle extends TextureSheetParticle {
             int chargeSign = positiveCharge ? 1 : -1;
 
             if(chargeIsMagnetic) {
-                emDustParticle.setMagneticCharge(chargeSign * 80000);
+                emDustParticle.setMagneticCharge(chargeSign * 1000);
                 if(positiveCharge) {
                     // green
                     emDustParticle.setColor(0.5f, 1.0f, 0.25f);

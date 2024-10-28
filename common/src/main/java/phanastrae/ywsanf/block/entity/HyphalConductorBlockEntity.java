@@ -1,6 +1,7 @@
 package phanastrae.ywsanf.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -22,10 +23,12 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
+import phanastrae.ywsanf.block.ChargeSacContainer;
 import phanastrae.ywsanf.block.HyphalConductorBlock;
 import phanastrae.ywsanf.block.state.ConductorStateProperty;
 import phanastrae.ywsanf.component.YWSaNFComponentTypes;
 import phanastrae.ywsanf.component.type.WireLineComponent;
+import phanastrae.ywsanf.electromagnetism.ChargeSac;
 import phanastrae.ywsanf.electromagnetism.WireLine;
 import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
 import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
@@ -52,13 +55,12 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     private boolean hasObservedEndpoint = true;
     private int checkEndpointTimer = 0;
 
+    private int lastCurrent = 0;
+
     public HyphalConductorBlockEntity(BlockPos pos, BlockState blockState) {
         super(YWSaNFBlockEntityTypes.HYPHAL_CONDUCTOR, pos, blockState);
 
         this.wireLine = new WireLine(pos.getCenter());
-
-        // TODO implement current
-        this.setCurrent(1.0F);
     }
 
     @Override
@@ -172,6 +174,59 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                 blockEntity.checkEndpointTimer--;
             }
         }
+
+        long chargeDelta = blockEntity.getChargeDeltaMilliCoulombs();
+        if(chargeDelta != 0 && blockEntity.linkedBlockPos != null) {
+            ChargeSac startSac = getSupportingSac(level, pos);
+            ChargeSac endSac = getSupportingSac(level, blockEntity.getLinkedBlockPos());
+            if(startSac != null && endSac != null) {
+                startSac.addCharge(chargeDelta);
+                endSac.addCharge(-chargeDelta);
+
+                startSac.sendUpdate();
+                endSac.sendUpdate();
+            }
+        }
+
+        float current = -chargeDelta * 20 / 1000F;
+        if(current != blockEntity.lastCurrent) {
+            blockEntity.setCurrent(current);
+        }
+    }
+
+    public static void clientTick(Level level, BlockPos pos, BlockState state, HyphalConductorBlockEntity blockEntity) {
+        long chargeDelta = blockEntity.getChargeDeltaMilliCoulombs();
+
+        float current = -chargeDelta * 20 / 1000F;
+        if(current != blockEntity.lastCurrent) {
+            blockEntity.setCurrent(current);
+        }
+    }
+
+    public long getChargeDeltaMilliCoulombs() {
+        if(this.hasItem() && this.linkedBlockPos != null && this.level != null) {
+            ChargeSac startSac = getSupportingSac(level, this.getBlockPos());
+            ChargeSac endSac = getSupportingSac(level, this.linkedBlockPos);
+
+            return ChargeSac.getChargeDeltaMilliCoulombs(startSac, endSac, this.wireLine.getTotalResistance());
+        }
+
+        return 0;
+    }
+
+    @Nullable
+    public static ChargeSac getSupportingSac(Level level, BlockPos coilPos) {
+        BlockState state = level.getBlockState(coilPos);
+        if(state.hasProperty(HyphalConductorBlock.FACING)) {
+            Direction facing = state.getValue(HyphalConductorBlock.FACING);
+            BlockPos supportPos = coilPos.offset(facing.getOpposite().getNormal());
+            BlockState supportState = level.getBlockState(supportPos);
+            if(supportState.getBlock() instanceof ChargeSacContainer chargeSacContainer) {
+                return chargeSacContainer.getChargeSac(level, supportPos, supportState, facing);
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -471,12 +526,17 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
         WireLineComponent component = this.getWireLineComponent();
         float oldDropoffRadius = this.wireLine.getDropoffRadius();
+        float oldResistancePerBlock = this.wireLine.getResistancePerBlock();
         float newDropoffRadius = component == null ? 0 : component.rangeOfInfluence();
+        float newResistancePerBlock = component == null ? 1F : component.resistancePerBlock();
 
         boolean needsAreaUpdate = false;
         if(oldDropoffRadius != newDropoffRadius) {
             this.wireLine.setDropoffRadius(newDropoffRadius);
             needsAreaUpdate = true;
+        }
+        if(oldResistancePerBlock != newResistancePerBlock) {
+            this.wireLine.setResistancePerBlock(newResistancePerBlock);
         }
 
         this.updateLevelListStatus(needsAreaUpdate);

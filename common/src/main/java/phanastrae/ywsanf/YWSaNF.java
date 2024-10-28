@@ -49,7 +49,7 @@ public class YWSaNF {
 
     public static void modifyDataComponents(ComponentModificationHelper helper) {
         helper.modifyComponentsMap(Items.STRING, YWSaNFComponentTypes.WIRE_LINE_COMPONENT,
-                new WireLineComponent(6, 8, WireLineComponent.textureOf("string"), new Vector3f(0.9F, 0.9F, 0.9F), new Vector3f(0.7F, 0.7F, 0.7F)));
+                new WireLineComponent(6, 8, 0.1F, WireLineComponent.textureOf("string"), new Vector3f(0.9F, 0.9F, 0.9F), new Vector3f(0.7F, 0.7F, 0.7F)));
     }
 
     @FunctionalInterface

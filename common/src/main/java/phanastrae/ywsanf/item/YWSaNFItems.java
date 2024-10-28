@@ -17,9 +17,13 @@ public class YWSaNFItems {
     public static final BlockItem LEUKBOX = ofBlock(YWSaNFBlocks.LEUKBOX);
     public static final BlockItem HYPHAL_CONDUCTOR = ofBlock(YWSaNFBlocks.HYPHAL_CONDUCTOR);
     public static final BlockItem MAGNETOMETER_BLOCK = ofBlock(YWSaNFBlocks.MAGNETOMETER_BLOCK);
+    public static final BlockItem GALVANOCARPIC_BULB = ofBlock(YWSaNFBlocks.GALVANOCARPIC_BULB);
+    public static final BlockItem AMMETER_BLOCK = ofBlock(YWSaNFBlocks.AMMETER_BLOCK);
+    public static final BlockItem VOLTMETER_BLOCK = ofBlock(YWSaNFBlocks.VOLTMETER_BLOCK);
+    public static final BlockItem STORMSAP_CELL = ofBlock(YWSaNFBlocks.STORMSAP_CELL);
 
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON));
-    public static final Item HYPHALINE = new HyphalineItem(properties().component(YWSaNFComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40)));
+    public static final Item HYPHALINE = new HyphalineItem(properties().component(YWSaNFComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40, 0.004F)));
     public static final Item MAGNETOMETER = new MagnetometerItem(properties().stacksTo(1));
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
@@ -34,6 +38,10 @@ public class YWSaNFItems {
         rwt.accept("hyphaline", HYPHALINE);
         rwt.accept("magnetometer", MAGNETOMETER);
         rwt.accept("magnetometer_block", MAGNETOMETER_BLOCK);
+        rwt.accept("galvanocarpic_bulb", GALVANOCARPIC_BULB);
+        rwt.accept("ammeter_block", AMMETER_BLOCK);
+        rwt.accept("voltmeter_block", VOLTMETER_BLOCK);
+        rwt.accept("stormsap_cell", STORMSAP_CELL);
     }
 
     private static ResourceLocation id(String path) {

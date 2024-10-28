@@ -2,11 +2,13 @@ package phanastrae.ywsanf.fabric.data;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.minecraft.core.Direction;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.data.models.blockstates.PropertyDispatch;
 import net.minecraft.data.models.blockstates.Variant;
+import net.minecraft.data.models.blockstates.VariantProperties;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
@@ -33,7 +35,13 @@ public class ModelProvider extends FabricModelProvider {
     public void generateBlockStateModels(BlockModelGenerators BMG) {
         BMG.createTrivialCube(YWSaNFBlocks.LEUKBOX);
         BMG.createTrivialCube(YWSaNFBlocks.FEASTING_TAR);
+        BMG.createTrivialCube(YWSaNFBlocks.GALVANOCARPIC_BULB);
+
         this.createTopSideBottom(BMG, YWSaNFBlocks.MAGNETOMETER_BLOCK);
+
+        this.createDirectionalBlock(BMG, YWSaNFBlocks.VOLTMETER_BLOCK);
+        this.createDirectionalBlock(BMG, YWSaNFBlocks.AMMETER_BLOCK);
+        this.createDirectionalBlock(BMG, YWSaNFBlocks.STORMSAP_CELL);
 
         createConductorBlock(BMG, YWSaNFBlocks.HYPHAL_CONDUCTOR);
     }
@@ -92,6 +100,46 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
                 .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
         BMG.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(block, ModelTemplates.CUBE.create(block, textureMapping, BMG.modelOutput)));
+    }
+
+    public void createDirectionalBlock(BlockModelGenerators BMG, Block block) {
+        TextureMapping horizontalMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_front"))
+                .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_back"))
+                .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
+        ResourceLocation horizontalModel = ModelTemplates.CUBE.create(block, horizontalMapping, BMG.modelOutput);
+
+        TextureMapping verticalMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_back"))
+                .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_front"))
+                .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
+        ResourceLocation verticalModel = ModelTemplates.CUBE.createWithSuffix(block, "_vertical", verticalMapping, BMG.modelOutput);
+
+        BMG.blockStateOutput
+                .accept(
+                        MultiVariantGenerator.multiVariant(block)
+                                .with(
+                                        PropertyDispatch.property(BlockStateProperties.FACING)
+                                                .select(
+                                                        Direction.DOWN, Variant.variant().with(VariantProperties.MODEL, verticalModel).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180)
+                                                )
+                                                .select(Direction.UP, Variant.variant().with(VariantProperties.MODEL, verticalModel))
+                                                .select(Direction.NORTH, Variant.variant().with(VariantProperties.MODEL, horizontalModel))
+                                                .select(Direction.EAST, Variant.variant().with(VariantProperties.MODEL, horizontalModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                                                .select(
+                                                        Direction.SOUTH, Variant.variant().with(VariantProperties.MODEL, horizontalModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
+                                                )
+                                                .select(Direction.WEST, Variant.variant().with(VariantProperties.MODEL, horizontalModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                                )
+                );
     }
 
     public static Variant variant() {

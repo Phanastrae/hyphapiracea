@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "ywsanf:block/stormsap_cell_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "ywsanf:block/stormsap_cell",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "ywsanf:block/stormsap_cell"
+    },
+    "facing=south": {
+      "model": "ywsanf:block/stormsap_cell",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "ywsanf:block/stormsap_cell_vertical"
+    },
+    "facing=west": {
+      "model": "ywsanf:block/stormsap_cell",
+      "y": 270
+    }
+  }
+}

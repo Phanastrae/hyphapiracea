@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "ywsanf:block/ammeter_block_back",
+    "east": "ywsanf:block/ammeter_block_side",
+    "north": "ywsanf:block/ammeter_block_side",
+    "particle": "ywsanf:block/ammeter_block_side",
+    "south": "ywsanf:block/ammeter_block_side",
+    "up": "ywsanf:block/ammeter_block_front",
+    "west": "ywsanf:block/ammeter_block_side"
+  }
+}

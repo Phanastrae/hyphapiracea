@@ -1,20 +1,30 @@
 {
+  "block.ywsanf.ammeter_block": "Ammeter Block",
   "block.ywsanf.feasting_tar": "Feasting TAR",
+  "block.ywsanf.galvanocarpic_bulb": "Galvanocarpic Bulb",
   "block.ywsanf.hyphal_conductor": "Hyphal Conductor",
   "block.ywsanf.leukbox": "Leukbox",
   "block.ywsanf.magnetometer_block": "Magnetometer Block",
+  "block.ywsanf.stormsap_cell": "Stormsap Cell",
+  "block.ywsanf.voltmeter_block": "Voltmeter Block",
 
   "gui.ywsanf.magnetometer.field_strength_microtesla": "Magnetic Field Strength: %s µT",
 
   "item.modifiers.ywsanf.equals.m": "%s m %s",
+  "item.modifiers.ywsanf.equals.ohm_per_meter": "%s Ω/m %s",
   "item.modifiers.ywsanf.wire_line": "When attached to Hyphal Conductor:",
   "item.modifiers.ywsanf.wire_line.max_wire_length": "Maximum Wire Length",
   "item.modifiers.ywsanf.wire_line.radius_of_influence": "Range of Influence",
+  "item.modifiers.ywsanf.wire_line.resistance_per_block": "Resistance per Block",
   "item.ywsanf.hyphaline": "Hyphaline",
   "item.ywsanf.keyed_disc": "Keyed Disc",
   "item.ywsanf.magnetometer": "Magnetometer",
 
   "itemGroup.ywsanf": "You Wouldn't Steal a Nether Fortress",
+
+  "ywsanf.displays.amp": "%s A",
+  "ywsanf.displays.millicoulomb": "%s mC",
+  "ywsanf.displays.volt": "%s V",
 
   "ywsanf.leukbox.progress": "%s%%",
   "ywsanf.leukbox.stage.completed": "[Completed!]",

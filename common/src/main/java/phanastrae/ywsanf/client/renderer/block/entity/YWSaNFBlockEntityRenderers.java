@@ -11,6 +11,10 @@ public class YWSaNFBlockEntityRenderers {
     public static void init() {
         register(YWSaNFBlockEntityTypes.LEUKBOX, LeukboxBlockEntityRenderer::new);
         register(YWSaNFBlockEntityTypes.HYPHAL_CONDUCTOR, HyphalConductorBlockEntityRenderer::new);
+        register(YWSaNFBlockEntityTypes.GALVANOCARPIC_BULB, GalvanocarpicBulbBlockEntityRenderer::new);
+        register(YWSaNFBlockEntityTypes.AMMETER_BLOCK, AmmeterBlockEntityRenderer::new);
+        register(YWSaNFBlockEntityTypes.VOLTMETER_BLOCK, VoltmeterBlockEntityRenderer::new);
+        register(YWSaNFBlockEntityTypes.STORMSAP_CELL, StormsapCellBlockEntityRenderer::new);
     }
 
     public static <T extends BlockEntity> void register(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> factory) {
