@@ -12,12 +12,13 @@ import java.util.function.BiConsumer;
 public class YWSaNFBlockEntityTypes {
 
     public static final BlockEntityType<LeukboxBlockEntity> LEUKBOX = create("leukbox", LeukboxBlockEntity::new, YWSaNFBlocks.LEUKBOX);
-
     public static final BlockEntityType<HyphalConductorBlockEntity> HYPHAL_CONDUCTOR = create("hyphal_conductor", HyphalConductorBlockEntity::new, YWSaNFBlocks.HYPHAL_CONDUCTOR);
+    public static final BlockEntityType<MagnetometerBlockEntity> MAGNETOMETER_BLOCK = create("magnetometer_block", MagnetometerBlockEntity::new, YWSaNFBlocks.MAGNETOMETER_BLOCK);
 
     public static void init(BiConsumer<ResourceLocation, BlockEntityType<?>> r) {
         r.accept(id("leukbox"), LEUKBOX);
         r.accept(id("hyphal_conductor"), HYPHAL_CONDUCTOR);
+        r.accept(id("magnetometer_block"), MAGNETOMETER_BLOCK);
     }
 
     private static ResourceLocation id(String path) {

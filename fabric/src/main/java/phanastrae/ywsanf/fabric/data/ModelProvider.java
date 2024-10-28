@@ -9,6 +9,7 @@ import net.minecraft.data.models.blockstates.PropertyDispatch;
 import net.minecraft.data.models.blockstates.Variant;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.data.models.model.TextureMapping;
+import net.minecraft.data.models.model.TextureSlot;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -32,6 +33,7 @@ public class ModelProvider extends FabricModelProvider {
     public void generateBlockStateModels(BlockModelGenerators BMG) {
         BMG.createTrivialCube(YWSaNFBlocks.LEUKBOX);
         BMG.createTrivialCube(YWSaNFBlocks.FEASTING_TAR);
+        this.createTopSideBottom(BMG, YWSaNFBlocks.MAGNETOMETER_BLOCK);
 
         createConductorBlock(BMG, YWSaNFBlocks.HYPHAL_CONDUCTOR);
     }
@@ -40,8 +42,7 @@ public class ModelProvider extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerators IMG) {
         generateFlat(IMG,
                 YWSaNFItems.KEYED_DISC,
-                YWSaNFItems.HYPHALINE,
-                YWSaNFItems.MAGNETOMETER
+                YWSaNFItems.HYPHALINE
         );
     }
 
@@ -79,6 +80,18 @@ public class ModelProvider extends FabricModelProvider {
                                                 .select(WEST, variant().with(MODEL, horizontalModel).with(Y_ROT, R270))
                                 )
                 );
+    }
+
+    private void createTopSideBottom(BlockModelGenerators BMG, Block block) {
+        TextureMapping textureMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_bottom"))
+                .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_top"))
+                .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
+        BMG.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(block, ModelTemplates.CUBE.create(block, textureMapping, BMG.modelOutput)));
     }
 
     public static Variant variant() {

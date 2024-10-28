@@ -74,14 +74,14 @@ public class LineSpeckParticle extends TextureSheetParticle {
             float f = random.nextFloat() * 0.1F + 0.2F;
             int i = random.nextInt(3);
             if(i == 0) {
-                // gray
+                // dark blue
                 float g = f * 0.3F + 0.3F;
-                lineSpeckParticle.setColor(g, g, g);
+                lineSpeckParticle.setColor(0.2F + 0.3F * f, 0.2F + 0.3F * f, 0.3F + 0.4F * f);
             } else if(i == 1) {
                 // pink
                 lineSpeckParticle.setColor(0.8F + 0.2F * f, 0.4F + 0.3F * f, 0.5F + 0.4F * f);
             } else {
-                // green
+                // turquoise
                 lineSpeckParticle.setColor(0.4F + 0.3F * f, 0.8F + 0.2F * f, 0.6F + 0.15F * f);
             }
 

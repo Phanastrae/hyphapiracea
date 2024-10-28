@@ -12,8 +12,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+import phanastrae.ywsanf.YWSaNF;
 import phanastrae.ywsanf.client.renderer.block.entity.YWSaNFBlockEntityRenderers;
 import phanastrae.ywsanf.item.MagnetometerItem;
+import phanastrae.ywsanf.item.YWSaNFItems;
+import phanastrae.ywsanf.mixin.client.ItemPropertiesAccessor;
 import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
 
 public class YWSaNFClient {
@@ -21,6 +24,9 @@ public class YWSaNFClient {
     public static void init() {
         // register block entity renderers
         YWSaNFBlockEntityRenderers.init();
+
+        // register item properties
+        YWSaNFClient.registerItemProperties();
     }
 
     public static void renderGuiOverlayItemName(GuiGraphics guiGraphics) {
@@ -56,5 +62,13 @@ public class YWSaNFClient {
 
             guiGraphics.drawStringWithBackdrop(font, component, x, y, width, FastColor.ARGB32.color(255, -1));
         }
+    }
+
+    public static void registerItemProperties() {
+        ItemPropertiesAccessor.invokeRegister(
+                YWSaNFItems.MAGNETOMETER,
+                YWSaNF.id("off"),
+                (stack, level, entity, i) -> entity instanceof Player player && player.getCooldowns().isOnCooldown(YWSaNFItems.MAGNETOMETER) ? 1.0F : 0.0F
+        );
     }
 }

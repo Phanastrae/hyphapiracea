@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "ywsanf:block/magnetometer_block_bottom",
+    "east": "ywsanf:block/magnetometer_block_side",
+    "north": "ywsanf:block/magnetometer_block_side",
+    "particle": "ywsanf:block/magnetometer_block_side",
+    "south": "ywsanf:block/magnetometer_block_side",
+    "up": "ywsanf:block/magnetometer_block_top",
+    "west": "ywsanf:block/magnetometer_block_side"
+  }
+}
