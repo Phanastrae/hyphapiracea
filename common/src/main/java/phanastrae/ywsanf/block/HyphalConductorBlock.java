@@ -1,17 +1,21 @@
 package phanastrae.ywsanf.block;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -25,7 +29,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -41,8 +47,11 @@ import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
 
 public class HyphalConductorBlock extends BaseEntityBlock {
     private static final MapCodec<HyphalConductorBlock> CODEC = simpleCodec(HyphalConductorBlock::new);
+
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final BooleanProperty STICKY = YWSaNFBlockProperties.STICKY;
     public static final ConductorStateProperty CONDUCTOR_STATE = YWSaNFBlockProperties.CONDUCTOR_WIRE_STATE;
+
     protected static final VoxelShape SMALL_COIL_AABB = Block.box(6.0, 6.0, 6.0, 10.0, 10.0, 10.0);
     protected static final VoxelShape FULL_COIL_AABB = Block.box(6.0, 3.0, 6.0, 10.0, 13.0, 10.0);
     protected static final VoxelShape UP_AABB = Shapes.join(
@@ -88,13 +97,14 @@ public class HyphalConductorBlock extends BaseEntityBlock {
     public HyphalConductorBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(FACING, Direction.UP).setValue(CONDUCTOR_STATE, ConductorStateProperty.ConductorState.EMPTY)
+                this.stateDefinition.any().setValue(FACING, Direction.UP).setValue(STICKY, false).setValue(CONDUCTOR_STATE, ConductorStateProperty.ConductorState.EMPTY)
         );
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+        builder.add(STICKY);
         builder.add(CONDUCTOR_STATE);
     }
 
@@ -196,7 +206,45 @@ public class HyphalConductorBlock extends BaseEntityBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         ItemInteractionResult success = ItemInteractionResult.sidedSuccess(level.isClientSide);
+
+        boolean sticky = state.getValue(STICKY);
         ConductorStateProperty.ConductorState conductorState = state.getValue(CONDUCTOR_STATE);
+
+        if(player.getAbilities().mayBuild) {
+            if (!sticky && stack.is(Items.SLIME_BALL)) {
+                // add sticky
+                if (!level.isClientSide) {
+                    if (player instanceof ServerPlayer) {
+                        CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
+                    }
+
+                    BlockState newState = state.setValue(STICKY, true);
+                    level.setBlock(pos, newState, 11);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
+
+                    stack.consume(1, player);
+                }
+                level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0F, 1.0F);
+                return success;
+            } else if (sticky && stack.is(ItemTags.AXES)) {
+                // remove sticky
+                if (!level.isClientSide) {
+                    if (player instanceof ServerPlayer) {
+                        CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
+                    }
+
+                    BlockState newState = state.setValue(STICKY, false);
+                    level.setBlock(pos, newState, 11);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
+
+                    stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+                }
+                level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, pos, 0);
+                return success;
+            }
+        }
+
         if(level.getBlockEntity(pos) instanceof HyphalConductorBlockEntity blockEntity) {
             if(blockEntity.updateBlockStateIfNeeded()) {
                 return success;
@@ -204,19 +252,19 @@ public class HyphalConductorBlock extends BaseEntityBlock {
 
             switch (conductorState) {
                 case HOLDING_WIRE -> {
-                    if (tryTakeWireFromSource(level, pos, blockEntity, player)) {
+                    if (!sticky && tryTakeWireFromSource(level, pos, blockEntity, player)) {
                         return success;
                     } else if (tryReturnWireToSource(level, pos, blockEntity, player)) {
                         return success;
                     }
                 }
                 case ACCEPTING_WIRE -> {
-                    if (tryTakeWireFromEndpoint(level, pos, blockEntity, player)) {
+                    if (!sticky && tryTakeWireFromEndpoint(level, pos, blockEntity, player)) {
                         return success;
                     }
                 }
                 case EMPTY -> {
-                    if (tryInsertWire(level, pos, state, blockEntity, stack, player)) {
+                    if (player.getAbilities().mayBuild && tryInsertWire(level, pos, state, blockEntity, stack, player)) {
                         return success;
                     } else if (tryConnectWireToEndpoint(level, pos, blockEntity, player)) {
                         return success;
@@ -301,7 +349,7 @@ public class HyphalConductorBlock extends BaseEntityBlock {
             blockEntity.setTheItem(itemstack);
             blockEntity.checkBlockStateAndSendUpdate();
 
-            if(blockEntity.canLinkTo(player)) {
+            if(blockEntity.canLinkTo(player) && state.hasProperty(STICKY) && !state.getValue(STICKY)) {
                 blockEntity.linkTo(player);
             }
 
