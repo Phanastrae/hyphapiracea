@@ -7,6 +7,8 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import phanastrae.ywsanf.YWSaNF;
 import phanastrae.ywsanf.block.YWSaNFBlocks;
+import phanastrae.ywsanf.component.YWSaNFComponentTypes;
+import phanastrae.ywsanf.component.type.WireLineComponent;
 
 import java.util.function.BiConsumer;
 
@@ -16,7 +18,7 @@ public class YWSaNFItems {
     public static final BlockItem HYPHAL_CONDUCTOR = ofBlock(YWSaNFBlocks.HYPHAL_CONDUCTOR);
 
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON));
-    public static final Item HYPHALINE = new HyphalineItem(properties());
+    public static final Item HYPHALINE = new HyphalineItem(properties().component(YWSaNFComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40)));
     public static final Item MAGNETOMETER = new MagnetometerItem(properties());
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {

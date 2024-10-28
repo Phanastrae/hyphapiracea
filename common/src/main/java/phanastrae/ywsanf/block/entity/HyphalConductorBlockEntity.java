@@ -24,6 +24,8 @@ import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.block.HyphalConductorBlock;
 import phanastrae.ywsanf.block.state.ConductorStateProperty;
+import phanastrae.ywsanf.component.YWSaNFComponentTypes;
+import phanastrae.ywsanf.component.type.WireLineComponent;
 import phanastrae.ywsanf.electromagnetism.WireLine;
 import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
 import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
@@ -37,7 +39,6 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     public static final String TAG_LINKED_BLOCK_RELATIVE_X = "linked_block_relative_x";
     public static final String TAG_LINKED_BLOCK_RELATIVE_Y = "linked_block_relative_y";
     public static final String TAG_LINKED_BLOCK_RELATIVE_Z = "linked_block_relative_z";
-    public static final double MAX_HELD_WIRE_RANGE = 16.0;
 
     private final WireLine wireLine;
     private boolean inLevelList = false;
@@ -56,18 +57,19 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
         this.wireLine = new WireLine(pos.getCenter());
 
-        // TODO implement current, dropoff radius
+        // TODO implement current
         this.setCurrent(1.0F);
-        this.setDropoffRadius(32.0F);
     }
 
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        // note: item loading needs to happen early to get access to the maxWireRange
         if (nbt.contains(TAG_WIRE_ITEM, 10)) {
-            this.item = ItemStack.parse(registries, nbt.getCompound(TAG_WIRE_ITEM)).orElse(ItemStack.EMPTY);
+            this.setTheItem(ItemStack.parse(registries, nbt.getCompound(TAG_WIRE_ITEM)).orElse(ItemStack.EMPTY));
         } else {
-            this.item = ItemStack.EMPTY;
+            this.setTheItem(ItemStack.EMPTY);
         }
+
         if(nbt.hasUUID(TAG_LINKED_ENTITY)) {
             UUID uuid = nbt.getUUID(TAG_LINKED_ENTITY);
 
@@ -79,9 +81,11 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                     this.unlink();
                 }
             } else if(this.level != null && this.level.isClientSide()) {
+                // note: item needs to have been loaded before this point
+                double scanRange = this.getMaxWireRange() * 2.25F;
+
                 // note: if the entity is not yet loaded on the client when the block entity is loaded, they won't be linked
                 // this probably isn't ideal, but given the context (players temporarily holding wires) it shouldn't really matter
-                double scanRange = MAX_HELD_WIRE_RANGE * 1.25F;
                 List<Entity> e = this.level.getEntities((Entity)null, AABB.ofSize(this.getBlockPos().getCenter(), scanRange, scanRange, scanRange), (entity -> entity.getUUID().equals(uuid)));
                 if(e.isEmpty()) {
                     this.unlink();
@@ -94,12 +98,13 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                 this.unlink();
             }
         }
+
         if(nbt.contains(TAG_LINKED_BLOCK_RELATIVE_X, Tag.TAG_INT) && nbt.contains(TAG_LINKED_BLOCK_RELATIVE_Y, Tag.TAG_INT) && nbt.contains(TAG_LINKED_BLOCK_RELATIVE_Z, Tag.TAG_INT)) {
             int x = nbt.getInt(TAG_LINKED_BLOCK_RELATIVE_X);
             int y = nbt.getInt(TAG_LINKED_BLOCK_RELATIVE_Y);
             int z = nbt.getInt(TAG_LINKED_BLOCK_RELATIVE_Z);
             BlockPos pos = this.getBlockPos().offset(x, y, z);
-            this.linkTo((pos));
+            this.linkTo(pos);
 
             this.hasObservedEndpoint = false;
             this.checkEndpointTimer = 0;
@@ -131,8 +136,12 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
-        CompoundTag nbtCompound = this.saveCustomOnly(registryLookup);
-        return nbtCompound;
+        CompoundTag compoundTag = this.saveCustomOnly(registryLookup);
+
+        // send non-empty tag to avoid issues
+        compoundTag.putInt("dummy", 0);
+
+        return compoundTag;
     }
 
     @Nullable
@@ -180,7 +189,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         if(this.linkedEntity != null) {
             YWSaNFEntityAttachment.getAttachment(this.linkedEntity).linkTo(this);
         }
-        updateLevelListStatus();
+        updateLevelListStatus(false);
         this.hasObservedEndpoint = false;
         this.checkEndpointTimer = 0;
     }
@@ -191,23 +200,20 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
             this.removeFromLevelListIfPossible();
         }
         super.setLevel(level);
-        updateLevelListStatus();
+        updateLevelListStatus(false);
     }
 
-    private void updateLevelListStatus() {
-        // TODO switch to check if the item is valid/active or whatever instead of just if it's empty?
-        boolean canAffectWorld = !this.isRemoved() && this.hasItem() && this.linkedBlockPos != null;
+    private void updateLevelListStatus(boolean needsAreaUpdate) {
+        boolean canAffectWorld = !this.isRemoved() && this.wireLine.getMaxPossibleInfluenceRadiusSqr() > 0 && this.linkedBlockPos != null;
 
         if(canAffectWorld) {
-            addToLevelListIfPossible();
+            if(!this.inLevelList) {
+                addToLevelListIfPossible();
+            } else if(needsAreaUpdate) {
+                this.updateInLevelListIfPossible();
+            }
         } else {
             removeFromLevelListIfPossible();
-        }
-
-        if(this.item.isEmpty() || this.linkedBlockPos == null) {
-            this.removeFromLevelListIfPossible();
-        } else {
-            this.addToLevelListIfPossible();
         }
     }
 
@@ -222,6 +228,12 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         if(this.inLevelList && this.level != null) {
             YWSaNFLevelAttachment.getAttachment(this.level).removeWire(this.wireLine);
             this.inLevelList = false;
+        }
+    }
+
+    private void updateInLevelListIfPossible() {
+        if(this.inLevelList && this.level != null) {
+            YWSaNFLevelAttachment.getAttachment(this.level).updateWire(this.wireLine);
         }
     }
 
@@ -255,7 +267,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         if(entity.isRemoved() || !entity.isAlive() || entity.isSpectator()) {
             return false;
         }
-        return canLinkTo(entity.position());
+        return canLinkTo(entity.getEyePosition());
     }
 
     public boolean canLinkTo(HyphalConductorBlockEntity blockEntity) {
@@ -267,7 +279,8 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     }
 
     public boolean canLinkTo(Vec3 pos) {
-        return this.getBlockPos().getCenter().distanceToSqr(pos) <= MAX_HELD_WIRE_RANGE * MAX_HELD_WIRE_RANGE;
+        float range = this.getMaxWireRange();
+        return this.getBlockPos().getCenter().distanceToSqr(pos) <= range * range;
     }
 
     public void unlink() {
@@ -333,7 +346,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         } else {
             this.wireLine.setEndPoint(blockPos.getCenter());
         }
-        this.updateLevelListStatus();
+        this.updateLevelListStatus(false);
     }
 
     public void setCurrent(float current) {
@@ -422,6 +435,24 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         return !this.item.isEmpty();
     }
 
+    @Nullable
+    public WireLineComponent getWireLineComponent() {
+        if(!this.item.isEmpty() && this.item.has(YWSaNFComponentTypes.WIRE_LINE_COMPONENT)) {
+            return this.item.get(YWSaNFComponentTypes.WIRE_LINE_COMPONENT);
+        } else {
+            return null;
+        }
+    }
+
+    public float getMaxWireRange() {
+        WireLineComponent component = this.getWireLineComponent();
+        if(component == null) {
+            return 0;
+        } else {
+            return component.maxWireLength();
+        }
+    }
+
     @Override
     public ItemStack getTheItem() {
         return this.item;
@@ -437,7 +468,18 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     @Override
     public void setTheItem(ItemStack item) {
         this.item = item;
-        this.updateLevelListStatus();
+
+        WireLineComponent component = this.getWireLineComponent();
+        float oldDropoffRadius = this.wireLine.getDropoffRadius();
+        float newDropoffRadius = component == null ? 0 : component.rangeOfInfluence();
+
+        boolean needsAreaUpdate = false;
+        if(oldDropoffRadius != newDropoffRadius) {
+            this.wireLine.setDropoffRadius(newDropoffRadius);
+            needsAreaUpdate = true;
+        }
+
+        this.updateLevelListStatus(needsAreaUpdate);
     }
 
     @Override

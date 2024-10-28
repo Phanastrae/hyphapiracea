@@ -2,6 +2,7 @@ package phanastrae.ywsanf.client.renderer.block.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.LeashKnotModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.PartPose;
@@ -17,25 +18,31 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import phanastrae.ywsanf.YWSaNF;
+import org.joml.Vector3f;
 import phanastrae.ywsanf.block.HyphalConductorBlock;
 import phanastrae.ywsanf.block.entity.HyphalConductorBlockEntity;
 import phanastrae.ywsanf.block.state.ConductorStateProperty;
 import phanastrae.ywsanf.client.renderer.entity.model.YWSaNFEntityModelLayers;
+import phanastrae.ywsanf.component.type.WireLineComponent;
+import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
 
 public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<HyphalConductorBlockEntity> {
-    private static final ResourceLocation KNOT_LOCATION = YWSaNF.id("textures/entity/hyphaline_coil.png");
     private final LeashKnotModel<LeashFenceKnotEntity> model;
     private final LeashKnotModel<LeashFenceKnotEntity> smallModel;
 
@@ -53,35 +60,52 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
     public void render(HyphalConductorBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         Level level = blockEntity.getLevel();
 
-        // render link
-        if(level != null && blockEntity.hasItem()) {
-            Vec3 linkPos = getLinkPosition(blockEntity, partialTick);
-            if(linkPos != null) {
-                poseStack.pushPose();
-                poseStack.translate(0.5, 0.5, 0.5);
-
-                Vec3 thisPos = blockEntity.getBlockPos().getCenter();
-                BlockPos targetBlockPos = BlockPos.containing(linkPos);
-
-                int startBlockLight = LightTexture.block(packedLight);
-                int startSkyLight = LightTexture.sky(packedLight);
-
-                int endBlockLight = level.getBrightness(LightLayer.BLOCK, targetBlockPos);
-                int endSkyLight = level.getBrightness(LightLayer.SKY, targetBlockPos);
-
-                this.renderWire(poseStack, bufferSource, thisPos, linkPos, startBlockLight, endBlockLight, startSkyLight, endSkyLight);
-
-                poseStack.popPose();
+        boolean isSource = true;
+        WireLineComponent wireLineComponent = blockEntity.getWireLineComponent();
+        if(wireLineComponent == null && level != null) {
+            BlockPos linkedPos = blockEntity.getLinkedBlockPos();
+            if(linkedPos != null && level.getBlockEntity(linkedPos) instanceof HyphalConductorBlockEntity linkedHCBE) {
+                wireLineComponent = linkedHCBE.getWireLineComponent();
+                isSource = false;
             }
         }
+        if(wireLineComponent != null) {
 
-        BlockState state = blockEntity.getBlockState();
-        if(state.hasProperty(HyphalConductorBlock.CONDUCTOR_STATE) && state.hasProperty(HyphalConductorBlock.FACING)) {
-            ConductorStateProperty.ConductorState conductorState = state.getValue(HyphalConductorBlock.CONDUCTOR_STATE);
-            Direction direction = state.getValue(HyphalConductorBlock.FACING);
+            // render link
+            if (level != null && isSource) {
+                Vec3 linkPos = getLinkPosition(blockEntity, partialTick);
+                if (linkPos != null) {
+                    poseStack.pushPose();
+                    poseStack.translate(0.5, 0.5, 0.5);
 
-            if(conductorState != ConductorStateProperty.ConductorState.EMPTY) {
-                Model useModel = conductorState == ConductorStateProperty.ConductorState.HOLDING_WIRE ? this.model : this.smallModel;
+                    Vec3 thisPos = blockEntity.getBlockPos().getCenter();
+                    BlockPos targetBlockPos = BlockPos.containing(linkPos);
+
+                    int startBlockLight = LightTexture.block(packedLight);
+                    int startSkyLight = LightTexture.sky(packedLight);
+
+                    int endBlockLight = level.getBrightness(LightLayer.BLOCK, targetBlockPos);
+                    int endSkyLight = level.getBrightness(LightLayer.SKY, targetBlockPos);
+
+                    float reachRatio = 0;
+                    if (blockEntity.getLinkedEntity() != null) {
+                        float distance = (float) thisPos.distanceTo(linkPos);
+                        float maxReach = blockEntity.getMaxWireRange();
+                        reachRatio = distance / maxReach;
+                    }
+
+                    this.renderWire(poseStack, bufferSource, wireLineComponent, thisPos, linkPos, startBlockLight, endBlockLight, startSkyLight, endSkyLight, reachRatio);
+
+                    poseStack.popPose();
+                }
+            }
+
+            // draw coil
+            BlockState state = blockEntity.getBlockState();
+            if(state.hasProperty(HyphalConductorBlock.FACING)) {
+                Direction direction = state.getValue(HyphalConductorBlock.FACING);
+
+                Model useModel = isSource ? this.model : this.smallModel;
 
                 poseStack.pushPose();
                 poseStack.translate(0.5, 0.5, 0.5);
@@ -93,7 +117,7 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
 
                 poseStack.scale(-1.0F, -1.0F, 1.0F);
 
-                VertexConsumer vertexconsumer = bufferSource.getBuffer(useModel.renderType(KNOT_LOCATION));
+                VertexConsumer vertexconsumer = bufferSource.getBuffer(useModel.renderType(wireLineComponent.getTextureFull()));
                 useModel.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
 
                 poseStack.popPose();
@@ -105,7 +129,56 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
     public Vec3 getLinkPosition(HyphalConductorBlockEntity blockEntity, float partialTick) {
         Entity linkedEntity = blockEntity.getLinkedEntity();
         if(linkedEntity != null) {
-            return linkedEntity.getRopeHoldPosition(partialTick);
+            Minecraft client = Minecraft.getInstance();
+            if(client.cameraEntity == linkedEntity && client.options.getCameraType().isFirstPerson() && linkedEntity instanceof LivingEntity livingEntity && YWSaNFEntityAttachment.getAttachment(linkedEntity).getFirstLink() == blockEntity) {
+                AttributeInstance reachAttribute = livingEntity.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
+                double reach = reachAttribute == null ? 4.5 : reachAttribute.getValue();
+
+                Vec3 eyePos = linkedEntity.getEyePosition(partialTick);
+                Vec3 viewVec = linkedEntity.getViewVector(partialTick);
+
+                HitResult hitResult = linkedEntity.pick(reach, partialTick, false);
+                Vec3 pos;
+                if(hitResult.getType() == HitResult.Type.BLOCK) {
+                    BlockHitResult blockHitResult = ((BlockHitResult)hitResult);
+
+                    pos = hitResult.getLocation();
+                    Vec3i normal = blockHitResult.getDirection().getNormal();
+                    pos = pos.add(normal.getX() * 0.05, normal.getY() * 0.05, normal.getZ() * 0.05);
+
+                    Level level = blockEntity.getLevel();
+                    if(level != null) {
+                        BlockState state = level.getBlockState(blockHitResult.getBlockPos());
+                        if(state.getBlock() instanceof HyphalConductorBlock && state.hasProperty(HyphalConductorBlock.CONDUCTOR_STATE) && state.getValue(HyphalConductorBlock.CONDUCTOR_STATE) != ConductorStateProperty.ConductorState.HOLDING_WIRE) {
+                            if(level.getBlockEntity(blockHitResult.getBlockPos()) instanceof HyphalConductorBlockEntity targetHCBE) {
+                                if(targetHCBE.getLinkedBlockPos() == null) {
+                                    Vec3 target = blockHitResult.getBlockPos().getCenter();
+                                    if (blockEntity.canLinkTo(target)) {
+                                        return target;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    pos = eyePos.add(viewVec.scale(reach));
+                }
+
+                Vec3 sourcePos = blockEntity.getBlockPos().getCenter();
+                double distance = sourcePos.distanceTo(pos);
+                double maxDistance = blockEntity.getMaxWireRange();
+                if(distance > maxDistance) {
+                    Vec3 offset = pos.subtract(sourcePos);
+                    double overDistance = distance - maxDistance;
+
+                    Vec3 adjust = viewVec.scale(-overDistance * distance / viewVec.dot(offset));
+                    pos = pos.add(adjust);
+                }
+
+                return pos;
+            } else {
+                return linkedEntity.getRopeHoldPosition(partialTick);
+            }
         } else {
             BlockPos pos = blockEntity.getLinkedBlockPos();
             if(pos != null) {
@@ -116,7 +189,7 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
         return null;
     }
 
-    private void renderWire(PoseStack poseStack, MultiBufferSource bufferSource, Vec3 thisPos, Vec3 targetPos, int startBlockLight, int endBlockLight, int startSkyLight, int endSkyLight) {
+    private void renderWire(PoseStack poseStack, MultiBufferSource bufferSource, WireLineComponent wireLineComponent, Vec3 thisPos, Vec3 targetPos, int startBlockLight, int endBlockLight, int startSkyLight, int endSkyLight, float reachRatio) {
         poseStack.pushPose();
         float relX = (float)(targetPos.x - thisPos.x);
         float relY = (float)(targetPos.y - thisPos.y);
@@ -138,7 +211,7 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
             dz = scale / 2.0F;
         }
         for (int i = 0; i <= 24; i++) {
-            addVertexPair(vertexconsumer, matrix4f, relX, relY, relZ, startBlockLight, endBlockLight, startSkyLight, endSkyLight, scale, scale, dx, dz, i, false);
+            addVertexPair(vertexconsumer, matrix4f, wireLineComponent, relX, relY, relZ, startBlockLight, endBlockLight, startSkyLight, endSkyLight, scale, scale, dx, dz, i, false, reachRatio);
         }
 
         if(applyVerticalFix) {
@@ -146,40 +219,29 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
             dz = -scale / 2.0F;
         }
         for (int i = 24; i >= 0; i--) {
-            addVertexPair(vertexconsumer, matrix4f, relX, relY, relZ, startBlockLight, endBlockLight, startSkyLight, endSkyLight, scale, 0.0F, dx, dz, i, true);
+            addVertexPair(vertexconsumer, matrix4f, wireLineComponent, relX, relY, relZ, startBlockLight, endBlockLight, startSkyLight, endSkyLight, scale, 0.0F, dx, dz, i, true, reachRatio);
         }
         poseStack.popPose();
     }
 
-    private static void addVertexPair(
-            VertexConsumer buffer,
-            Matrix4f pose,
-            float startX,
-            float startY,
-            float startZ,
-            int entityBlockLight,
-            int holderBlockLight,
-            int entitySkyLight,
-            int holderSkyLight,
-            float yOffset,
-            float dy,
-            float dx,
-            float dz,
-            int index,
-            boolean reverse
-    ) {
+    private static void addVertexPair(VertexConsumer buffer, Matrix4f pose, WireLineComponent wireLineComponent, float startX, float startY, float startZ, int entityBlockLight, int holderBlockLight, int entitySkyLight, int holderSkyLight, float yOffset, float dy, float dx, float dz, int index, boolean reverse, float reachRatio) {
         float lerpFactor = (float)index / 24.0F;
 
         int lerpedBlockLight = (int)Mth.lerp(lerpFactor, (float)entityBlockLight, (float)holderBlockLight);
         int lerpedSkyLight = (int)Mth.lerp(lerpFactor, (float)entitySkyLight, (float)holderSkyLight);
-
         int light = LightTexture.pack(lerpedBlockLight, lerpedSkyLight);
 
-        float brightness = index % 2 == (reverse ? 1 : 0) ? 0.7F : 1.0F;
+        float lerpedReachRatio = reachRatio * lerpFactor;
+        float adjustedReachRatio = Math.clamp(lerpedReachRatio * 2 - 1, 0, 1);
+        float dimFactor = 1.0F - 0.7F * adjustedReachRatio * adjustedReachRatio;
 
-        float r = 0.7F * brightness;
-        float g = 0.7F * brightness;
-        float b = 0.5F * brightness;
+        boolean useDark = index % 2 == (reverse ? 1 : 0);
+        Vector3f lightColor = wireLineComponent.lightColor();
+        Vector3f darkColor = wireLineComponent.darkColor();
+
+        float r = (useDark ? darkColor.x : lightColor.x) * dimFactor + 0.7F * adjustedReachRatio * adjustedReachRatio;
+        float g = (useDark ? darkColor.y : lightColor.y) * dimFactor;
+        float b = (useDark ? darkColor.z : lightColor.z) * dimFactor;
 
         float lerpedX = startX * lerpFactor;
         float lerpedY = startY > 0.0F ? startY * lerpFactor * lerpFactor : startY - startY * (1.0F - lerpFactor) * (1.0F - lerpFactor);

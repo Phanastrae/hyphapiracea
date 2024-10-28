@@ -36,8 +36,8 @@ import phanastrae.ywsanf.block.entity.HyphalConductorBlockEntity;
 import phanastrae.ywsanf.block.entity.YWSaNFBlockEntityTypes;
 import phanastrae.ywsanf.block.state.ConductorStateProperty;
 import phanastrae.ywsanf.block.state.YWSaNFBlockProperties;
+import phanastrae.ywsanf.component.YWSaNFComponentTypes;
 import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
-import phanastrae.ywsanf.item.YWSaNFItems;
 
 public class HyphalConductorBlock extends BaseEntityBlock {
     private static final MapCodec<HyphalConductorBlock> CODEC = simpleCodec(HyphalConductorBlock::new);
@@ -216,9 +216,9 @@ public class HyphalConductorBlock extends BaseEntityBlock {
                     }
                 }
                 case EMPTY -> {
-                    if (tryConnectWireToEndpoint(level, pos, blockEntity, player)) {
+                    if (tryInsertWire(level, pos, state, blockEntity, stack, player)) {
                         return success;
-                    } else if (tryInsertWire(level, pos, state, blockEntity, stack, player)) {
+                    } else if (tryConnectWireToEndpoint(level, pos, blockEntity, player)) {
                         return success;
                     }
                 }
@@ -257,9 +257,6 @@ public class HyphalConductorBlock extends BaseEntityBlock {
     }
 
     public static boolean tryTakeWireFromEndpoint(Level level, BlockPos pos, HyphalConductorBlockEntity blockEntity, Entity entity) {
-        if(!blockEntity.canLinkTo(entity)) {
-            return false;
-        }
         BlockPos linkedPos = blockEntity.getLinkedBlockPos();
         if(linkedPos != null) {
             if(level.getBlockEntity(linkedPos) instanceof HyphalConductorBlockEntity linkedBlockEntity) {
@@ -298,16 +295,15 @@ public class HyphalConductorBlock extends BaseEntityBlock {
         if (!canAcceptStack(stack)) {
             return false;
         }
-        if(!blockEntity.canLinkTo(player)) {
-            return false;
-        }
 
         if (!level.isClientSide) {
             ItemStack itemstack = stack.consumeAndReturn(1, player);
             blockEntity.setTheItem(itemstack);
             blockEntity.checkBlockStateAndSendUpdate();
 
-            blockEntity.linkTo(player);
+            if(blockEntity.canLinkTo(player)) {
+                blockEntity.linkTo(player);
+            }
 
             level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.ITEM_FRAME_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
@@ -315,7 +311,6 @@ public class HyphalConductorBlock extends BaseEntityBlock {
     }
 
     public static boolean canAcceptStack(ItemStack stack) {
-        // TODO switch to component
-        return stack.is(YWSaNFItems.HYPHALINE);
+        return stack.has(YWSaNFComponentTypes.WIRE_LINE_COMPONENT);
     }
 }

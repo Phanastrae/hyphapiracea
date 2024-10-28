@@ -1,11 +1,14 @@
 package phanastrae.ywsanf.fabric;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import phanastrae.ywsanf.YWSaNF;
@@ -29,6 +32,16 @@ public class YWSaNFFabric implements ModInitializer {
 
 		// creative tabs
 		setupCreativeTabs();
+
+		// modify default components
+		DefaultItemComponentEvents.MODIFY.register((context -> {
+			YWSaNF.modifyDataComponents(new YWSaNF.ComponentModificationHelper() {
+				@Override
+				public <T> void modifyComponentsMap(Item item, DataComponentType<T> type, T component) {
+					context.modify(item, builder -> builder.set(type, component));
+				}
+			});
+		}));
 	}
 
 	public void setupCreativeTabs() {

@@ -1,9 +1,11 @@
 package phanastrae.ywsanf.neoforge;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.IEventBus;
@@ -11,6 +13,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import phanastrae.ywsanf.YWSaNF;
 import phanastrae.ywsanf.item.YWSaNFCreativeModeTabs;
@@ -43,6 +46,9 @@ public class YWSaNFNeoForge {
 
         // creative tabs
         modEventBus.addListener(this::buildCreativeModeTabContents);
+
+        // modify default components
+        modEventBus.addListener(this::modifyDefaultComponents);
     }
 
     public void setupGameBusEvents(IEventBus gameEventBus) {
@@ -110,6 +116,15 @@ public class YWSaNFNeoForge {
                 if(eventKey.equals(groupKey)) {
                     biConsumer.accept(event.getParameters(), event);
                 }
+            }
+        });
+    }
+
+    public void modifyDefaultComponents(ModifyDefaultComponentsEvent event) {
+        YWSaNF.modifyDataComponents(new YWSaNF.ComponentModificationHelper() {
+            @Override
+            public <T> void modifyComponentsMap(Item item, DataComponentType<T> type, T component) {
+                event.modify(item, builder -> builder.set(type, component));
             }
         });
     }

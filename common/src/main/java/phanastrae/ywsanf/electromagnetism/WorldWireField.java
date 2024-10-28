@@ -43,7 +43,12 @@ public class WorldWireField {
         SectionPos sectionPos = SectionPos.of(BlockPos.containing(position));
         if(this.sectionInfoMap.containsKey(sectionPos)) {
             SectionInfo sectionInfo = this.sectionInfoMap.get(sectionPos);
-            sectionInfo.forEach(wireLineHolder -> consumer.accept(wireLineHolder.wireLine));
+            sectionInfo.forEach(wireLineHolder -> {
+                WireLine wireLine = wireLineHolder.wireLine;
+                if(wireLine.canInfluencePoint(position)) {
+                    consumer.accept(wireLine);
+                }
+            });
         }
     }
 

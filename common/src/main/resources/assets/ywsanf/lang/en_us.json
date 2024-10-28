@@ -5,6 +5,10 @@
 
   "gui.ywsanf.magnetometer.field_strength_microtesla": "Magnetic Field Strength: %s µT",
 
+  "item.modifiers.ywsanf.equals.m": "%s m %s",
+  "item.modifiers.ywsanf.wire_line": "When attached to Hyphal Conductor:",
+  "item.modifiers.ywsanf.wire_line.max_wire_length": "Maximum Wire Length",
+  "item.modifiers.ywsanf.wire_line.radius_of_influence": "Range of Influence",
   "item.ywsanf.hyphaline": "Hyphaline",
   "item.ywsanf.keyed_disc": "Keyed Disc",
   "item.ywsanf.magnetometer": "Magnetometer",
