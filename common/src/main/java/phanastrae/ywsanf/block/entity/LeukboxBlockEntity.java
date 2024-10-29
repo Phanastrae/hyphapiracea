@@ -14,6 +14,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -22,14 +24,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.YWSaNF;
 import phanastrae.ywsanf.block.LeukboxBlock;
 import phanastrae.ywsanf.item.YWSaNFItems;
+import phanastrae.ywsanf.particle.YWSaNFParticleTypes;
 import phanastrae.ywsanf.structure.StructurePlacer;
 import phanastrae.ywsanf.util.Timer;
+
+import java.util.List;
 
 public class LeukboxBlockEntity extends BlockEntity implements Clearable, ContainerSingleItem.BlockContainerSingleItem {
     public static final String TAG_DISC_ITEM = "disc_item";
@@ -43,6 +50,10 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
     @Nullable
     private StructurePlacer structurePlacer = null;
+
+    private BoundingBox[] boxes = new BoundingBox[0];
+    private int currentSpawnTime;
+    private int currentMinSpawnTime;
 
     public LeukboxBlockEntity(BlockPos pos, BlockState blockState) {
         super(YWSaNFBlockEntityTypes.LEUKBOX, pos, blockState);
@@ -71,6 +82,33 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
                 this.progressPercent = p;
             }
         }
+        if(nbt.contains("box_data", Tag.TAG_INT_ARRAY)) {
+            int[] boxData = nbt.getIntArray("box_data");
+            if(boxData.length > 0 && boxData.length % 6 == 0) {
+                int boxCount = boxData.length / 6;
+                BoundingBox[] boxes = new BoundingBox[boxCount];
+                for(int i = 0; i < boxCount; i++) {
+                    int k = i * 6;
+                    int minX = boxData[k];
+                    int minY = boxData[k+1];
+                    int minZ = boxData[k+2];
+                    int maxX = boxData[k+3];
+                    int maxY = boxData[k+4];
+                    int maxZ = boxData[k+5];
+                    BoundingBox box = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+                    boxes[i] = box;
+                }
+                this.boxes = boxes;
+            }
+        }
+
+        if(nbt.contains("current_spawn_time", Tag.TAG_INT)) {
+            this.currentSpawnTime = nbt.getInt("current_spawn_time");
+        }
+
+        if(nbt.contains("current_min_spawn_time", Tag.TAG_INT)) {
+            this.currentMinSpawnTime = nbt.getInt("current_min_spawn_time");
+        }
     }
 
     @Override
@@ -83,8 +121,33 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
         CompoundTag nbtCompound = this.saveCustomOnly(registryLookup);
+        // TODO optimise, don't send the entire data every time
         nbtCompound.putString("stage", this.structurePlacer == null ? "idle" : this.structurePlacer.getStage().getId());
         nbtCompound.putInt("progress_percent", this.structurePlacer == null ? 0 : this.structurePlacer.getProgressPercent());
+
+        if(this.structurePlacer != null) {
+            List<StructurePiece> pieces = this.structurePlacer.getPiecesNoRemoval();
+            if (!pieces.isEmpty()) {
+                int[] boxCoords = new int[pieces.size() * 6];
+                for (int i = 0; i < pieces.size(); i++) {
+                    BoundingBox box = pieces.get(i).getBoundingBox();
+                    int k = i * 6;
+                    boxCoords[k] = box.minX();
+                    boxCoords[k + 1] = box.minY();
+                    boxCoords[k + 2] = box.minZ();
+                    boxCoords[k + 3] = box.maxX();
+                    boxCoords[k + 4] = box.maxY();
+                    boxCoords[k + 5] = box.maxZ();
+                }
+
+                nbtCompound.putIntArray("box_data", boxCoords);
+            }
+
+            if(this.structurePlacer.getStage() == StructurePlacer.Stage.PLACE_BLOCKS) {
+                nbtCompound.putInt("current_spawn_time", structurePlacer.getCurrentSpawnTime());
+                nbtCompound.putInt("current_min_spawn_time", structurePlacer.getCurrentMinSpawnTime());
+            }
+        }
 
         return nbtCompound;
     }
@@ -122,7 +185,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
                     level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.PARROT_IMITATE_GHAST, SoundSource.BLOCKS, 4.5F, 0.3F);
                 }
 
-                if(oldStage != StructurePlacer.Stage.COMPLETED) {
+                if(oldStage != StructurePlacer.Stage.PLACE_SPECIALS) {
                     // TODO remove logging
                     YWSaNF.LOGGER.info("Advanced Stage {} to stage {}, this took {}μs ({}ms)", oldStage.getId(), newStage.getId(), t.micro(), t.milli());
 
@@ -136,6 +199,61 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
             }
 
             blockEntity.markForUpdate(serverLevel); // TODO tweak this perhaps, is it needed?
+        }
+    }
+
+    public static void clientTick(Level level, BlockPos pos, BlockState state, LeukboxBlockEntity blockEntity) {
+        if(blockEntity.stage == StructurePlacer.Stage.PLACE_BLOCKS) {
+            for (BoundingBox box : blockEntity.boxes) {
+                int volume = box.getXSpan() * box.getYSpan() * box.getZSpan();
+                int particles = Mth.ceil(Math.min(Math.pow(volume, 0.6667), 30F / blockEntity.boxes.length));
+
+                if (particles > 0) {
+                    RandomSource random = level.getRandom();
+
+                    for (int i = 0; i < particles; i++) {
+                        level.addParticle(
+                                random.nextBoolean() ? ParticleTypes.WAX_ON : ParticleTypes.WAX_OFF,
+                                random.nextInt(8) == 0,
+                                box.minX() + box.getXSpan() * random.nextFloat(),
+                                box.minY() + box.getYSpan() * random.nextFloat(),
+                                box.minZ() + box.getZSpan() * random.nextFloat(),
+                                random.nextFloat() - 0.5,
+                                random.nextFloat() - 0.5,
+                                random.nextFloat() - 0.5
+                        );
+                    }
+                }
+            }
+        }
+
+        if(blockEntity.currentSpawnTime > blockEntity.currentMinSpawnTime) {
+            RandomSource random = level.random;
+            for(int i = 0; i < 120; i++) {
+                double dy = random.nextDouble() * 120 - 60;
+                double noise = random.nextDouble() * (StructurePlacer.MAX_NOISE_DELAY - 1);
+
+                double radius = (blockEntity.currentSpawnTime - StructurePlacer.CONVERSION_DELAY - 0.9F * -dy - noise * -4.5F) / 7.0F;
+
+                if(radius > 0) {
+                    double theta = random.nextDouble() * Math.TAU;
+                    double dx = Math.cos(theta) * radius;
+                    double dz = Math.sin(theta) * radius;
+
+                    level.addParticle(
+                            YWSaNFParticleTypes.ELECTROMAGNETIC_DUST,
+                            random.nextInt(3) == 0,
+                            pos.getX() + dx,
+                            pos.getY() + dy,
+                            pos.getZ() + dz,
+                            random.nextFloat() - 0.5,
+                            random.nextFloat() - 0.5,
+                            random.nextFloat() - 0.5
+                    );
+                }
+            }
+
+            blockEntity.currentSpawnTime--;
         }
     }
 

@@ -62,7 +62,9 @@ public class LeukboxBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : createTickerHelper(blockEntityType, YWSaNFBlockEntityTypes.LEUKBOX, LeukboxBlockEntity::serverTick);
+        return level.isClientSide
+                ? createTickerHelper(blockEntityType, YWSaNFBlockEntityTypes.LEUKBOX, LeukboxBlockEntity::clientTick)
+                : createTickerHelper(blockEntityType, YWSaNFBlockEntityTypes.LEUKBOX, LeukboxBlockEntity::serverTick);
     }
 
     @Override

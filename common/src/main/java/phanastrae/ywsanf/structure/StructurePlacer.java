@@ -50,6 +50,7 @@ public class StructurePlacer {
     @Nullable
     private BlockPos structureOrigin;
     private List<StructurePiece> pieces = new ObjectArrayList<>();
+    private List<StructurePiece> piecesNoRemoval = new ObjectArrayList<>();
 
     private int currentSpawnTime = 0;
     private int minSpawnTime = 0;
@@ -118,6 +119,18 @@ public class StructurePlacer {
         }
     }
 
+    public List<StructurePiece> getPiecesNoRemoval() {
+        return this.piecesNoRemoval;
+    }
+
+    public int getCurrentSpawnTime() {
+        return this.currentSpawnTime;
+    }
+
+    public int getCurrentMinSpawnTime() {
+        return this.minSpawnTime;
+    }
+
     // returns true if activity happened
     public boolean tick(ServerLevel serverLevel) {
         int wait = this.stage.wait;
@@ -157,6 +170,7 @@ public class StructurePlacer {
 
             this.structureStart = structureStart;
             this.pieces.addAll(structureStart.getPieces());
+            this.piecesNoRemoval.addAll(structureStart.getPieces());
             if(!this.pieces.isEmpty()) {
                 BoundingBox boundingBox = this.pieces.getFirst().getBoundingBox();
                 BlockPos boxCenter = boundingBox.getCenter();
@@ -258,6 +272,8 @@ public class StructurePlacer {
         } else if(this.stage == Stage.PLACE_SPECIALS && this.intermediateStructureStorage != null) {
             // place fragile structure storage, block entities, entities
             placeStoredStructureSpecials(this.intermediateStructureStorage, serverLevel);
+
+            this.piecesNoRemoval.clear();
 
             this.setStage(Stage.COMPLETED);
             return true;
