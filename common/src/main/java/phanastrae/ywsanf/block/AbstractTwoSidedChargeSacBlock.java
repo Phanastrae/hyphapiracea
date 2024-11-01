@@ -10,9 +10,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.block.entity.AbstractTwoSidedChargeSacBlockEntity;
-import phanastrae.ywsanf.electromagnetism.ChargeSac;
+import phanastrae.ywsanf.electromagnetism.CircuitNode;
 
-public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock implements ChargeSacContainer {
+public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock implements CircuitNodeHolder {
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
 
     public AbstractTwoSidedChargeSacBlock(Properties properties) {
@@ -47,15 +47,15 @@ public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock imp
 
     @Override
     @Nullable
-    public ChargeSac getChargeSac(Level level, BlockPos pos, BlockState state, Direction side) {
+    public CircuitNode getCircuitNode(Level level, BlockPos pos, BlockState state, Direction side) {
         if(state.hasProperty(FACING)) {
             Direction direction = state.getValue(FACING);
 
             if(level.getBlockEntity(pos) instanceof AbstractTwoSidedChargeSacBlockEntity blockEntity) {
                 if(direction == side) {
-                    return blockEntity.getChargeSac();
+                    return blockEntity.getPositiveCircuitNode();
                 } else if(direction == side.getOpposite()) {
-                    return blockEntity.getSecondaryChargeSac();
+                    return blockEntity.getNegativeCircuitNode();
                 } else {
                     return null;
                 }

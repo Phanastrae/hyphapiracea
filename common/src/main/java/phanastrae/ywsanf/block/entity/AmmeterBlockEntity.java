@@ -6,9 +6,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import phanastrae.ywsanf.electromagnetism.ChargeSac;
+import phanastrae.ywsanf.electromagnetism.CircuitNetwork;
 
 public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
+    public static final String KEY_CURRENT = "current";
 
     private float current;
 
@@ -19,15 +20,15 @@ public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.loadAdditional(nbt, registries);
-        if(nbt.contains("current", Tag.TAG_FLOAT)) {
-            this.current = nbt.getFloat("current");
+        if(nbt.contains(KEY_CURRENT, Tag.TAG_FLOAT)) {
+            this.current = nbt.getFloat(KEY_CURRENT);
         }
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
         CompoundTag nbt = super.getUpdateTag(registryLookup);
-        nbt.putFloat("current", this.current);
+        nbt.putFloat(KEY_CURRENT, this.current);
         return nbt;
     }
 
@@ -36,14 +37,13 @@ public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmeterBlockEntity blockEntity) {
-        long chargeDelta = ChargeSac.getChargeDeltaMilliCoulombs(blockEntity.secondaryChargeSac, blockEntity.primaryChargeSac, blockEntity.getInternalResistance());
-
-        if(chargeDelta != 0) {
-            blockEntity.pushCharge(chargeDelta);
+        CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
+        if(network != null) {
+            network.tick();
         }
 
-        float current = -chargeDelta * 20 / 1000F;
-        if(current != blockEntity.current) {
+        float current = (float)blockEntity.wire.getCurrent();
+        if(blockEntity.current != current) {
             blockEntity.current = current;
             blockEntity.sendUpdate();
         }

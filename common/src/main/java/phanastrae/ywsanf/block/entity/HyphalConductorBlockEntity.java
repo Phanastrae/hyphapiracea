@@ -23,12 +23,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.ywsanf.block.ChargeSacContainer;
+import phanastrae.ywsanf.block.CircuitNodeHolder;
 import phanastrae.ywsanf.block.HyphalConductorBlock;
 import phanastrae.ywsanf.block.state.ConductorStateProperty;
 import phanastrae.ywsanf.component.YWSaNFComponentTypes;
 import phanastrae.ywsanf.component.type.WireLineComponent;
-import phanastrae.ywsanf.electromagnetism.ChargeSac;
+import phanastrae.ywsanf.electromagnetism.CircuitNetwork;
+import phanastrae.ywsanf.electromagnetism.CircuitNode;
+import phanastrae.ywsanf.electromagnetism.CircuitWire;
 import phanastrae.ywsanf.electromagnetism.WireLine;
 import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
 import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
@@ -118,6 +120,10 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                 this.checkEndpointTimer = 0;
             }
         }
+
+        if(nbt.contains("current", Tag.TAG_FLOAT)) {
+            this.setCurrent(nbt.getFloat("current"));
+        }
     }
 
     @Override
@@ -139,6 +145,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
         CompoundTag compoundTag = this.saveCustomOnly(registryLookup);
+        compoundTag.putFloat("current", this.wireLine.getCurrent());
 
         // send non-empty tag to avoid issues
         compoundTag.putInt("dummy", 0);
@@ -152,7 +159,53 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    @Nullable
+    private CircuitWire wire;
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, HyphalConductorBlockEntity blockEntity) {
+        boolean wireValid = false;
+        if(blockEntity.linkedBlockPos != null && blockEntity.hasItem()) {
+            CircuitNode startNode = getSupportingNode(level, pos);
+            CircuitNode endNode = getSupportingNode(level, blockEntity.linkedBlockPos);
+            if(startNode != null && endNode != null) {
+                wireValid = true;
+
+                if(startNode.getNetwork() == null) {
+                    startNode.setNetwork(new CircuitNetwork());
+                }
+                if(endNode.getNetwork() == null) {
+                    endNode.setNetwork(new CircuitNetwork());
+                }
+                if(endNode.getNetwork() != startNode.getNetwork()) {
+                    endNode.getNetwork().merge(startNode.getNetwork());
+                }
+
+                if(blockEntity.wire == null) {
+                    blockEntity.wire = new CircuitWire(startNode, endNode, blockEntity.wireLine.getTotalResistance(), 0);
+                    startNode.getNetwork().addWire(blockEntity.wire);
+                }
+            }
+        }
+        if(!wireValid && blockEntity.wire != null) {
+            CircuitNetwork net = blockEntity.wire.getStartNode().getNetwork();
+            if(net != null) {
+                net.removeWire(blockEntity.wire);
+            }
+            blockEntity.wire = null;
+        }
+        if(blockEntity.wire != null) {
+            CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
+            if(network != null) {
+                network.tick();
+            }
+
+            float current = (float)(blockEntity.wire.getCurrent());
+            if(current != blockEntity.lastCurrent) {
+                blockEntity.setCurrent(current);
+                blockEntity.sendUpdate();
+            }
+        }
+
         Entity linkedEntity = blockEntity.linkedEntity;
         if(linkedEntity != null) {
             if(!blockEntity.canLinkTo(linkedEntity)) {
@@ -174,55 +227,17 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                 blockEntity.checkEndpointTimer--;
             }
         }
-
-        long chargeDelta = blockEntity.getChargeDeltaMilliCoulombs();
-        if(chargeDelta != 0 && blockEntity.linkedBlockPos != null) {
-            ChargeSac startSac = getSupportingSac(level, pos);
-            ChargeSac endSac = getSupportingSac(level, blockEntity.getLinkedBlockPos());
-            if(startSac != null && endSac != null) {
-                startSac.addCharge(chargeDelta);
-                endSac.addCharge(-chargeDelta);
-
-                startSac.sendUpdate();
-                endSac.sendUpdate();
-            }
-        }
-
-        float current = -chargeDelta * 20 / 1000F;
-        if(current != blockEntity.lastCurrent) {
-            blockEntity.setCurrent(current);
-        }
-    }
-
-    public static void clientTick(Level level, BlockPos pos, BlockState state, HyphalConductorBlockEntity blockEntity) {
-        long chargeDelta = blockEntity.getChargeDeltaMilliCoulombs();
-
-        float current = -chargeDelta * 20 / 1000F;
-        if(current != blockEntity.lastCurrent) {
-            blockEntity.setCurrent(current);
-        }
-    }
-
-    public long getChargeDeltaMilliCoulombs() {
-        if(this.hasItem() && this.linkedBlockPos != null && this.level != null) {
-            ChargeSac startSac = getSupportingSac(level, this.getBlockPos());
-            ChargeSac endSac = getSupportingSac(level, this.linkedBlockPos);
-
-            return ChargeSac.getChargeDeltaMilliCoulombs(startSac, endSac, this.wireLine.getTotalResistance());
-        }
-
-        return 0;
     }
 
     @Nullable
-    public static ChargeSac getSupportingSac(Level level, BlockPos coilPos) {
+    public static CircuitNode getSupportingNode(Level level, BlockPos coilPos) {
         BlockState state = level.getBlockState(coilPos);
         if(state.hasProperty(HyphalConductorBlock.FACING)) {
             Direction facing = state.getValue(HyphalConductorBlock.FACING);
             BlockPos supportPos = coilPos.offset(facing.getOpposite().getNormal());
             BlockState supportState = level.getBlockState(supportPos);
-            if(supportState.getBlock() instanceof ChargeSacContainer chargeSacContainer) {
-                return chargeSacContainer.getChargeSac(level, supportPos, supportState, facing);
+            if(supportState.getBlock() instanceof CircuitNodeHolder chargeSacContainer) {
+                return chargeSacContainer.getCircuitNode(level, supportPos, supportState, facing);
             }
         }
 
@@ -231,6 +246,9 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
     @Override
     public void setRemoved() {
+        if(this.wire != null && this.wire.getStartNode().getNetwork() != null) {
+            this.wire.getStartNode().getNetwork().removeWire(this.wire);
+        }
         if(this.linkedEntity != null) {
             YWSaNFEntityAttachment.getAttachment(this.linkedEntity).unlinkTo(this);
         }
@@ -356,6 +374,8 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                 }
             }
         }
+
+        this.setChanged();
     }
 
     public void linkTo(@Nullable Entity entity) {
@@ -370,6 +390,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
             YWSaNFEntityAttachment.getAttachment(this.linkedEntity).linkTo(this);
         }
 
+        this.setChanged();
         this.sendUpdate();
     }
 
@@ -401,6 +422,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         } else {
             this.wireLine.setEndPoint(blockPos.getCenter());
         }
+        this.setChanged();
         this.updateLevelListStatus(false);
     }
 
@@ -484,6 +506,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                 this.level.addFreshEntity(itementity);
             }
         }
+        this.setChanged();
     }
 
     public boolean hasItem() {
@@ -517,6 +540,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     public ItemStack splitTheItem(int amount) {
         ItemStack itemstack = this.item;
         this.setTheItem(ItemStack.EMPTY);
+        this.setChanged();
         return itemstack;
     }
 
@@ -540,6 +564,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         }
 
         this.updateLevelListStatus(needsAreaUpdate);
+        this.setChanged();
     }
 
     @Override

@@ -27,6 +27,20 @@ public abstract class AbstractTextDisplayerBlockEntityRenderer <T extends BlockE
     public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
     }
 
+    public void drawTexts(PoseStack poseStack, MultiBufferSource bufferSource, Component... texts) {
+        this.drawTexts(poseStack, bufferSource, new Vec3(0, 1.25, 0), new Vec3(0, 0.25, 0), texts);
+    }
+
+    public void drawTexts(PoseStack poseStack, MultiBufferSource bufferSource, Vec3 offset, Vec3 componentOffset, Component... texts) {
+        poseStack.pushPose();
+        poseStack.translate(offset.x, offset.y, offset.z);
+        for(int i = 0; i < texts.length; i++) {
+            Component component = texts[i];
+            drawText(component, poseStack, bufferSource, componentOffset.scale(texts.length - i - 1));
+        }
+        poseStack.popPose();
+    }
+
     public void drawText(Component text, PoseStack poseStack, MultiBufferSource bufferSource, Vec3 offset) {
         poseStack.pushPose();
 

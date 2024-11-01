@@ -12,9 +12,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.block.entity.GalvanocarpicBulbBlockEntity;
-import phanastrae.ywsanf.electromagnetism.ChargeSac;
+import phanastrae.ywsanf.electromagnetism.CircuitNode;
 
-public class GalvanocarpicBulbBlock extends BaseEntityBlock implements ChargeSacContainer {
+public class GalvanocarpicBulbBlock extends BaseEntityBlock implements CircuitNodeHolder {
     public static final MapCodec<GalvanocarpicBulbBlock> CODEC = simpleCodec(GalvanocarpicBulbBlock::new);
 
     @Override
@@ -45,9 +45,9 @@ public class GalvanocarpicBulbBlock extends BaseEntityBlock implements ChargeSac
 
     @Override
     @Nullable
-    public ChargeSac getChargeSac(Level level, BlockPos pos, BlockState state, Direction side) {
+    public CircuitNode getCircuitNode(Level level, BlockPos pos, BlockState state, Direction side) {
         if(level.getBlockEntity(pos) instanceof GalvanocarpicBulbBlockEntity blockEntity) {
-            return blockEntity.getChargeSac();
+            return blockEntity.getCircuitNode();
         } else {
             return null;
         }
