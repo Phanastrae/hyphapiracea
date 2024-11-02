@@ -1,6 +1,7 @@
 {
   "block.hyphapiracea.ammeter_block": "Hyphal Ammeter",
   "block.hyphapiracea.azimuldey_mass": "Azimuldey Mass",
+  "block.hyphapiracea.creative_cell": "Creative Cell",
   "block.hyphapiracea.piraceatic_tar": "Piraceatic TAR",
   "block.hyphapiracea.hyphal_node": "Hyphal Node",
   "block.hyphapiracea.hyphal_conductor": "Hyphal Conductor",
@@ -24,6 +25,7 @@
   "itemGroup.hyphapiracea": "HyphaPiracea",
 
   "hyphapiracea.displays.amp": "%s A",
+  "hyphapiracea.displays.infinity": "Infinity",
   "hyphapiracea.displays.joule": "%s J",
   "hyphapiracea.displays.millicoulomb": "%s mC",
   "hyphapiracea.displays.volt": "%s V",

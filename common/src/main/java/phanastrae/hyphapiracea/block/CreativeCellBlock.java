@@ -8,7 +8,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,17 +17,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.block.entity.StormsapCellBlockEntity;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 
-public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
+public class CreativeCellBlock extends AbstractTwoSidedChargeSacBlock {
     public static final MapCodec<StormsapCellBlock> CODEC = simpleCodec(StormsapCellBlock::new);
     public static final BooleanProperty ALWAYS_SHOW_INFO = HyphaPiraceaBlockProperties.ALWAYS_SHOW_INFO;
-    public static final IntegerProperty STORED_POWER = HyphaPiraceaBlockProperties.STORED_POWER;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     @Override
@@ -36,13 +33,12 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
         return CODEC;
     }
 
-    public StormsapCellBlock(Properties properties) {
+    public CreativeCellBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition
                         .any()
                         .setValue(ALWAYS_SHOW_INFO, false)
-                        .setValue(STORED_POWER, 0)
                         .setValue(POWERED, false)
         );
     }
@@ -50,13 +46,13 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(ALWAYS_SHOW_INFO, STORED_POWER, POWERED);
+        builder.add(ALWAYS_SHOW_INFO, POWERED);
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new StormsapCellBlockEntity(pos, state, false);
+        return new StormsapCellBlockEntity(pos, state, true);
     }
 
     @Nullable
@@ -65,20 +61,6 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
         return level.isClientSide
                 ? null
                 : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.STORMSAP_CELL, StormsapCellBlockEntity::serverTick);
-    }
-
-    @Override
-    protected boolean hasAnalogOutputSignal(BlockState state) {
-        return true;
-    }
-
-    @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        if(level.getBlockEntity(pos) instanceof StormsapCellBlockEntity blockEntity) {
-            return blockEntity.getComparatorOutput();
-        } else {
-            return 0;
-        }
     }
 
     @Override
@@ -97,19 +79,6 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(stack.is(Items.REDSTONE)) {
-            if (level.getBlockEntity(pos) instanceof StormsapCellBlockEntity blockEntity) {
-                if (!level.isClientSide) {
-                    stack.consume(1, player);
-                    blockEntity.addEnergy(100000);
-                    blockEntity.sendUpdate();
-
-                    level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.BLOCKS, 1.0F, 1.0F);
-                }
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
-            }
-        }
-
         if(player.getAbilities().mayBuild) {
             if(!level.isClientSide) {
                 level.setBlock(pos, state.setValue(ALWAYS_SHOW_INFO, !state.getValue(ALWAYS_SHOW_INFO)), 3);

@@ -17,7 +17,7 @@ public class HyphaPiraceaBlockEntityTypes {
     public static final BlockEntityType<HyphalNodeBlockEntity> HYPHAL_NODE = create("galvanocarpic_bulb", HyphalNodeBlockEntity::new, HyphaPiraceaBlocks.HYPHAL_NODE);
     public static final BlockEntityType<AmmeterBlockEntity> HYPHAL_AMMETER = create("ammeter_block", AmmeterBlockEntity::new, HyphaPiraceaBlocks.HYPHAL_AMMETER);
     public static final BlockEntityType<VoltmeterBlockEntity> HYPHAL_VOLTMETER = create("voltmeter_block", VoltmeterBlockEntity::new, HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
-    public static final BlockEntityType<StormsapCellBlockEntity> STORMSAP_CELL = create("stormsap_cell", StormsapCellBlockEntity::new, HyphaPiraceaBlocks.STORMSAP_CELL);
+    public static final BlockEntityType<StormsapCellBlockEntity> STORMSAP_CELL = create("stormsap_cell", StormsapCellBlockEntity::new, HyphaPiraceaBlocks.STORMSAP_CELL, HyphaPiraceaBlocks.CREATIVE_CELL);
 
     public static void init(BiConsumer<ResourceLocation, BlockEntityType<?>> r) {
         r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);

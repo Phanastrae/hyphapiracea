@@ -22,6 +22,7 @@ public class HyphaPiraceaItems {
     public static final BlockItem HYPHAL_VOLTMETER = ofBlock(HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
     public static final BlockItem STORMSAP_CELL = ofBlock(HyphaPiraceaBlocks.STORMSAP_CELL);
     public static final BlockItem AZIMULDEY_MASS = ofBlock(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+    public static final BlockItem CREATIVE_CELL = ofBlock(HyphaPiraceaBlocks.CREATIVE_CELL, properties().rarity(Rarity.EPIC));
 
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON));
     public static final Item HYPHALINE = new HyphalineItem(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40, 0.004F)));
@@ -44,6 +45,7 @@ public class HyphaPiraceaItems {
         rwt.accept("voltmeter_block", HYPHAL_VOLTMETER);
         rwt.accept("stormsap_cell", STORMSAP_CELL);
         rwt.accept("azimuldey_mass", AZIMULDEY_MASS);
+        rwt.accept("creative_cell", CREATIVE_CELL);
     }
 
     private static ResourceLocation id(String path) {
@@ -55,6 +57,10 @@ public class HyphaPiraceaItems {
     }
 
     private static BlockItem ofBlock(Block block) {
-        return new BlockItem(block, properties());
+        return ofBlock(block, properties());
+    }
+
+    private static BlockItem ofBlock(Block block, Item.Properties properties) {
+        return new BlockItem(block, properties);
     }
 }

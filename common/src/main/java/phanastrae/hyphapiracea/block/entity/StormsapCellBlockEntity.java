@@ -17,9 +17,15 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
     private int storedEnergy;
     private boolean active = false;
     private boolean powered;
+    private boolean isInfinite;
 
-    public StormsapCellBlockEntity(BlockPos pos, BlockState blockState) {
+    public StormsapCellBlockEntity(BlockPos pos, BlockState state) {
+        this(pos, state, false);
+    }
+
+    public StormsapCellBlockEntity(BlockPos pos, BlockState blockState, boolean isInfinite) {
         super(HyphaPiraceaBlockEntityTypes.STORMSAP_CELL, pos, blockState);
+        this.isInfinite = isInfinite;
 
         if(blockState.hasProperty(StormsapCellBlock.POWERED)) {
             this.powered = blockState.getValue(StormsapCellBlock.POWERED);
@@ -43,34 +49,36 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
     public static void serverTick(Level level, BlockPos pos, BlockState state, StormsapCellBlockEntity blockEntity) {
         AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
 
-        int dE = 0;
-        double efficiency = 0.95;
-        double current = blockEntity.wire.getCurrent();
-        double emf = blockEntity.active ? blockEntity.getGeneratedVoltage() : 0;
-        double powerUse = current * emf;
-        if(powerUse < 0) {
-            powerUse *= efficiency;
-        }
-        dE += Mth.floor(-powerUse / 20);
-        double powerGain = blockEntity.wire.getPower();
-        powerGain *= efficiency;
-        dE += Mth.floor(powerGain / 20);
+        if(!blockEntity.isInfinite) {
+            int dE = 0;
+            double efficiency = 0.95;
+            double current = blockEntity.wire.getCurrent();
+            double emf = blockEntity.active ? blockEntity.getGeneratedVoltage() : 0;
+            double powerUse = current * emf;
+            if (powerUse < 0) {
+                powerUse *= efficiency;
+            }
+            dE += Mth.floor(-powerUse / 20);
+            double powerGain = blockEntity.wire.getPower();
+            powerGain *= efficiency;
+            dE += Mth.floor(powerGain / 20);
 
-        if(dE != 0) {
-            blockEntity.addEnergy(dE);
-            blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
-            blockEntity.setChanged();
-            blockEntity.sendUpdate();
+            if (dE != 0) {
+                blockEntity.addEnergy(dE);
+                blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
+                blockEntity.setChanged();
+                blockEntity.sendUpdate();
+            }
         }
 
         CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
-        if(!blockEntity.active && !blockEntity.powered && blockEntity.storedEnergy > 0) {
+        if(!blockEntity.active && !blockEntity.powered && (blockEntity.storedEnergy > 0 || blockEntity.isInfinite)) {
             blockEntity.active = true;
             blockEntity.wire.setEmf(blockEntity.getGeneratedVoltage());
             if(network != null) {
                 network.markNeedsUpdate();
             }
-        } else if(blockEntity.active && (blockEntity.powered || blockEntity.storedEnergy <= 0)) {
+        } else if(blockEntity.active && (blockEntity.powered || (blockEntity.storedEnergy <= 0 && !blockEntity.isInfinite))) {
             blockEntity.active = false;
             blockEntity.wire.setEmf(0);
             if(network != null) {
@@ -78,7 +86,7 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
             }
         }
 
-        if(blockEntity.lastComparatorOutput == -1) {
+        if(blockEntity.lastComparatorOutput == -1 && !blockEntity.isInfinite) {
             blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
             blockEntity.setChanged();
         }
@@ -118,6 +126,10 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
 
     public int maxEnergyDeficit() {
         return -10000;
+    }
+
+    public boolean isInfinite() {
+        return isInfinite;
     }
 
     public int getStoredEnergy() {

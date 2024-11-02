@@ -1,0 +1,9 @@
+{
+  "parent": "hyphapiracea:block/cube_top_bottom_side",
+  "textures": {
+    "bottom": "hyphapiracea:block/creative_hyphal_negative_terminal",
+    "particle": "hyphapiracea:block/creative_cell_side",
+    "side": "hyphapiracea:block/creative_cell_side",
+    "top": "hyphapiracea:block/creative_hyphal_positive_terminal"
+  }
+}

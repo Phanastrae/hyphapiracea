@@ -29,8 +29,11 @@ public class HyphaPiraceaBlocks {
     public static final Block HYPHAL_NODE = new HyphalNodeBlock(properties());
     public static final Block HYPHAL_AMMETER = new AmmeterBlock(properties());
     public static final Block HYPHAL_VOLTMETER = new VoltmeterBlock(properties());
-    public static final Block STORMSAP_CELL = new StormsapCellBlock(properties());
+    public static final Block STORMSAP_CELL = new StormsapCellBlock(properties()
+            .lightLevel(blockState -> blockState.getValue(StormsapCellBlock.STORED_POWER)));
     public static final Block AZIMULDEY_MASS = new AzimuldeyMassBlock(properties());
+    public static final Block CREATIVE_CELL = new CreativeCellBlock(properties()
+            .lightLevel(blockState -> 12));
 
     public static void init(BiConsumer<ResourceLocation, Block> r) {
         r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);
@@ -42,6 +45,7 @@ public class HyphaPiraceaBlocks {
         r.accept(id("voltmeter_block"), HYPHAL_VOLTMETER);
         r.accept(id("stormsap_cell"), STORMSAP_CELL);
         r.accept(id("azimuldey_mass"), AZIMULDEY_MASS);
+        r.accept(id("creative_cell"), CREATIVE_CELL);
     }
 
     private static ResourceLocation id(String path) {

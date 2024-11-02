@@ -38,6 +38,7 @@ public class ModelProvider extends FabricModelProvider {
         this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
         this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_AMMETER);
         this.createCubeTopBottomSideWithTintedSides(BMG, HyphaPiraceaBlocks.STORMSAP_CELL);
+        this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.CREATIVE_CELL, HyphaPiracea.id("block/creative_hyphal_positive_terminal"), HyphaPiracea.id("block/creative_hyphal_negative_terminal"));
 
         this.createHyphalNode(BMG, HyphaPiraceaBlocks.AZIMULDEY_MASS);
         this.createHyphalNode(BMG, HyphaPiraceaBlocks.HYPHAL_NODE);
@@ -104,10 +105,14 @@ public class ModelProvider extends FabricModelProvider {
     public void createCubeTopBottomSide(BlockModelGenerators BMG, Block block) {
         ResourceLocation positiveTerminal = HyphaPiracea.id("block/hyphal_positive_terminal");
         ResourceLocation negativeTerminal = HyphaPiracea.id("block/hyphal_negative_terminal");
+        this.createCubeTopBottomSide(BMG, block, positiveTerminal, negativeTerminal);
+    }
+
+    public void createCubeTopBottomSide(BlockModelGenerators BMG, Block block, ResourceLocation top, ResourceLocation bottom) {
         TextureMapping verticalMapping = new TextureMapping()
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.BOTTOM, negativeTerminal)
-                .put(TextureSlot.TOP, positiveTerminal)
+                .put(TextureSlot.BOTTOM, bottom)
+                .put(TextureSlot.TOP, top)
                 .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
         ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CUBE_TOP_BOTTOM_SIDE.create(block, verticalMapping, BMG.modelOutput);
 
