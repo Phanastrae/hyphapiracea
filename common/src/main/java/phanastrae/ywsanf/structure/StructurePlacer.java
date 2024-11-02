@@ -2,6 +2,8 @@ package phanastrae.ywsanf.structure;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.*;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.YWSaNF;
 import phanastrae.ywsanf.block.YWSaNFBlocks;
 import phanastrae.ywsanf.mixin.StructureStartAccessor;
+import phanastrae.ywsanf.particle.YWSaNFParticleTypes;
 import phanastrae.ywsanf.util.IntNoise2D;
 
 import java.util.List;
@@ -466,6 +469,7 @@ public class StructurePlacer {
 
                                 BlockState oldState = level.getBlockState(mutableBlockPos);
                                 if(isStateSubsumed(oldState)) {
+                                    spawnDissolveParticles(level, mutableBlockPos, 0.3F);
                                     setBlock(level, mutableBlockPos, newState, true);
                                     tryUpdateSelf(level, mutableBlockPos, newState);
                                 }
@@ -480,6 +484,7 @@ public class StructurePlacer {
                                     continue;
                                 }
                                 if(isStateFeastable(oldState, level, mutableBlockPos)) {
+                                    spawnConsumeParticles(level, mutableBlockPos, oldState, 0.3F);
                                     setBlock(level, mutableBlockPos, feastingTAR, true);
                                 }
                             }
@@ -508,6 +513,7 @@ public class StructurePlacer {
 
                                 BlockState oldState = level.getBlockState(mutableBlockPos);
                                 if(isStateSubsumed(oldState)) {
+                                    spawnDissolveParticles(level, mutableBlockPos, 1F);
                                     setBlock(level, mutableBlockPos, state, false);
                                 }
                             }
@@ -568,6 +574,34 @@ public class StructurePlacer {
             BlockState newState = Block.updateFromNeighbourShapes(state, level, pos);
             if (!newState.equals(state)) {
                 level.setBlock(pos, newState, 20);
+            }
+        }
+    }
+
+    public static void spawnConsumeParticles(ServerLevel level, BlockPos pos, BlockState oldState, float probability) {
+        RandomSource random = level.getRandom();
+        if(random.nextFloat() < probability) {
+            float f = random.nextFloat();
+            if(f < 0.7) {
+                level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, oldState), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.9, 0.9, 0.9, 0.1);
+            } else if(f < 0.9) {
+                level.sendParticles(YWSaNFParticleTypes.FAIRY_FOG, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 9, 1.2, 1.2, 1.2, 1);
+            } else {
+                level.sendParticles(YWSaNFParticleTypes.ELECTROMAGNETIC_DUST, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3, 0.9, 0.9, 0.9, 1);
+            }
+        }
+    }
+
+    public static void spawnDissolveParticles(ServerLevel level, BlockPos pos, float probability) {
+        RandomSource random = level.getRandom();
+        if(random.nextFloat() < probability) {
+            float f = random.nextFloat();
+            if(f < 0.6) {
+                level.sendParticles(YWSaNFParticleTypes.PIRACITE_BUBBLE_POP, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.9, 0.9, 0.9, 0.1);
+            } else if(f < 0.9) {
+                level.sendParticles(YWSaNFParticleTypes.FAIRY_FOG, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 9, 1.2, 1.2, 1.2, 1);
+            } else {
+                level.sendParticles(YWSaNFParticleTypes.ELECTROMAGNETIC_DUST, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3, 0.9, 0.9, 0.9, 1);
             }
         }
     }

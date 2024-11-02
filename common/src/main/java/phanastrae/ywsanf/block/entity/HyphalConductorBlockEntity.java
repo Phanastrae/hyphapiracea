@@ -4,12 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +37,7 @@ import phanastrae.ywsanf.electromagnetism.CircuitNode;
 import phanastrae.ywsanf.electromagnetism.CircuitWire;
 import phanastrae.ywsanf.electromagnetism.WireLine;
 import phanastrae.ywsanf.entity.YWSaNFEntityAttachment;
+import phanastrae.ywsanf.particle.YWSaNFParticleTypes;
 import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
 
 import java.util.List;
@@ -238,6 +242,48 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
             if(current != blockEntity.wireLine.getCurrent()) {
                 blockEntity.setCurrent(current);
                 blockEntity.sendUpdate();
+            }
+        }
+    }
+
+    public static void clientTick(Level level, BlockPos pos, BlockState state, HyphalConductorBlockEntity blockEntity) {
+        if(blockEntity.hasItem() && blockEntity.linkedBlockPos != null) {
+            WireLineComponent wlc = blockEntity.getWireLineComponent();
+
+            if(wlc != null) {
+                RandomSource random = level.random;
+                Vec3 start = pos.getCenter();
+                Vec3 end = blockEntity.linkedBlockPos.getCenter();
+
+                double length = end.subtract(start).length();
+                double rpb = wlc.resistancePerBlock();
+                double resistance = rpb * length;
+                double current = blockEntity.wireLine.getCurrent();
+                double power = current * current * resistance;
+
+                int particleCount = Math.clamp(Mth.ceil(Math.sqrt(power * 0.1) * random.nextFloat() * random.nextFloat() - 0.01), 0, 2);
+
+                double dx = end.x - start.x;
+                double dy = end.y - start.y;
+                double dz = end.z - start.z;
+                for (int i = 0; i < particleCount; i++) {
+                    double t = random.nextFloat();
+                    double y = start.y + (dy > 0 ? dy * t * t : dy - dy * (1.0 - t) * (1.0 - t));
+
+                    double x = start.x + t * dx;
+                    double z = start.z + t * dz;
+
+                    double s = 0.001 + Math.min(Math.sqrt(power * 0.01) * random.nextFloat(), 3.0);
+                    s = (random.nextFloat() * 2.0 - 1.0) * s;
+                    float f = random.nextFloat();
+                    if(f > 0.3) {
+                        level.addParticle(YWSaNFParticleTypes.ZAPPY_GRIT, x, y, z, s, s, s);
+                    } else if(f > 0.1) {
+                        level.addParticle(ParticleTypes.FALLING_NECTAR, x, y, z, s * 0.3, -0.1, s * 0.3);
+                    } else {
+                        level.addParticle(YWSaNFParticleTypes.FAIRY_FOG, x, y, z, s * 0.3, s * 0.3, s * 0.3);
+                    }
+                }
             }
         }
     }

@@ -9,6 +9,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
@@ -31,7 +32,11 @@ public class YWSaNFClientNeoForge {
         // particles
         modEventBus.addListener(this::registerParticleProviders);
 
+        // render gui layers
         NeoForge.EVENT_BUS.addListener(this::renderGuiLayers);
+
+        // start client tick
+        NeoForge.EVENT_BUS.addListener(this::startClientTick);
     }
 
     public void onClientInit(FMLClientSetupEvent event) {
@@ -60,5 +65,9 @@ public class YWSaNFClientNeoForge {
                 YWSaNFClient.renderGuiOverlayItemName(event.getGuiGraphics());
             }
         }
+    }
+
+    public void startClientTick(ClientTickEvent event) {
+        YWSaNFClient.startClientTick();
     }
 }

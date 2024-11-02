@@ -1,5 +1,6 @@
 package phanastrae.ywsanf.item;
 
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -16,6 +17,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import phanastrae.ywsanf.particle.YWSaNFParticleTypes;
 import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
+
+import java.util.function.Consumer;
 
 public class MagnetometerItem extends Item {
 
@@ -63,6 +66,28 @@ public class MagnetometerItem extends Item {
     }
 
     public static void spawnFieldLine(Level level, Vec3 startPos, int length, double distance) {
+        spawnFieldLine(level, startPos, length, distance, vec3 -> {
+                    RandomSource random = level.random;
+                    float f = random.nextFloat();
+
+                    ParticleOptions particleOptions;
+                    if (f > 0.1) {
+                        particleOptions = YWSaNFParticleTypes.LINE_SPECK;
+                    } else if(f > 0.05) {
+                        particleOptions = YWSaNFParticleTypes.ZAPPY_GRIT;
+                    } else {
+                        particleOptions = YWSaNFParticleTypes.FAIRY_FOG;
+                    }
+                    level.addParticle(
+                            particleOptions, true,
+                            vec3.x, vec3.y, vec3.z,
+                            0, 0, 0
+                    );
+                }
+        );
+    }
+
+    public static void spawnFieldLine(Level level, Vec3 startPos, int length, double distance, Consumer<Vec3> particleSpawner) {
         Vec3 pos = startPos;
         YWSaNFLevelAttachment yla = YWSaNFLevelAttachment.getAttachment(level);
         for(int i = 0; i < length * 2; i++) {
@@ -78,9 +103,7 @@ public class MagnetometerItem extends Item {
             double oneByLength = 1 / magneticField.length();
             pos = pos.add(magneticField.scale(oneByLength * sign * d));
 
-            level.addParticle(YWSaNFParticleTypes.LINE_SPECK, true,
-                    pos.x, pos.y, pos.z,
-                    0, 0, 0);
+            particleSpawner.accept(pos);
         }
     }
 }

@@ -201,7 +201,7 @@ public class HyphalConductorBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
-                ? null
+                ? createTickerHelper(blockEntityType, YWSaNFBlockEntityTypes.HYPHAL_CONDUCTOR, HyphalConductorBlockEntity::clientTick)
                 : createTickerHelper(blockEntityType, YWSaNFBlockEntityTypes.HYPHAL_CONDUCTOR, HyphalConductorBlockEntity::serverTick);
     }
 

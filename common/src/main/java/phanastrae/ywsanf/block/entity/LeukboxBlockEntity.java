@@ -240,16 +240,20 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
                     double dx = Math.cos(theta) * radius;
                     double dz = Math.sin(theta) * radius;
 
-                    level.addParticle(
-                            YWSaNFParticleTypes.ELECTROMAGNETIC_DUST,
-                            random.nextInt(3) == 0,
-                            pos.getX() + dx,
-                            pos.getY() + dy,
-                            pos.getZ() + dz,
-                            random.nextFloat() - 0.5,
-                            random.nextFloat() - 0.5,
-                            random.nextFloat() - 0.5
-                    );
+                    BlockPos p = BlockPos.containing(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
+                    BlockState s = level.getBlockState(p);
+                    if(s.isAir() || s.canBeReplaced()) {
+                        level.addParticle(
+                                random.nextFloat() > 0.4 ? YWSaNFParticleTypes.LARGE_ELECTROMAGNETIC_DUST : YWSaNFParticleTypes.LARGE_FAIRY_FOG,
+                                random.nextInt(3) == 0,
+                                pos.getX() + dx,
+                                pos.getY() + dy,
+                                pos.getZ() + dz,
+                                random.nextFloat() - 0.5,
+                                random.nextFloat() - 0.5,
+                                random.nextFloat() - 0.5
+                        );
+                    }
                 }
             }
 

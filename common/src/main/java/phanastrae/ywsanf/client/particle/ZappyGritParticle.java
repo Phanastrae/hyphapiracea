@@ -5,15 +5,15 @@ import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 
-public class LineSpeckParticle extends TextureSheetParticle {
-    LineSpeckParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+public class ZappyGritParticle extends TextureSheetParticle {
+    ZappyGritParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.setSize(0.02F, 0.02F);
         this.quadSize = this.quadSize * (this.random.nextFloat() * 1.3F + 0.6F);
         this.xd *= 0.02F;
         this.yd *= 0.02F;
         this.zd *= 0.02F;
-        this.lifetime = (int)(40.0 / (Math.random() * 0.8 + 0.2));
+        this.lifetime = (int)(20.0 / (Math.random() * 0.8 + 0.2));
     }
 
     @Override
@@ -32,10 +32,25 @@ public class LineSpeckParticle extends TextureSheetParticle {
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
-        if (this.lifetime-- <= 0) {
+
+        double a = this.age / (float)this.lifetime;
+
+        double dx = ((random.nextFloat() * 2.0 - 1.0) * 0.02) * a * a;
+        double dy = ((random.nextFloat() * 2.0 - 1.0) * 0.02) * a * a + 0.01 * a;
+        double dz = ((random.nextFloat() * 2.0 - 1.0) * 0.02) * a * a;
+
+        this.xd += ((random.nextFloat() * 2.0 - 1.0) * 0.03) * a * a;
+        this.yd += ((random.nextFloat() * 2.0 - 1.0) * 0.03) * a * a + 0.003 * a;
+        this.zd += ((random.nextFloat() * 2.0 - 1.0) * 0.03) * a * a;
+
+        double oxd = this.xd;
+        this.xd += this.zd * 0.08 * a;
+        this.zd -= oxd * 0.08 * a;
+
+        if (this.age++ >= this.lifetime) {
             this.remove();
         } else {
-            this.move(this.xd, this.yd, this.zd);
+            this.move(this.xd + dx, this.yd + dy, this.zd + dz);
             this.xd *= 0.99;
             this.yd *= 0.99;
             this.zd *= 0.99;
@@ -66,25 +81,25 @@ public class LineSpeckParticle extends TextureSheetParticle {
         }
 
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            LineSpeckParticle lineSpeckParticle = new LineSpeckParticle(level, x, y, z, xSpeed, ySpeed, zSpeed);
-            lineSpeckParticle.pickSprite(this.sprite);
+            ZappyGritParticle zappyGritParticle = new ZappyGritParticle(level, x, y, z, xSpeed, ySpeed, zSpeed);
+            zappyGritParticle.pickSprite(this.sprite);
 
             RandomSource random = level.getRandom();
 
-            float f = random.nextFloat() * 0.1F + 0.2F;
-            int i = random.nextInt(3);
+            float f = random.nextFloat();
+            int i = random.nextInt(4);
             if(i == 0) {
-                // dark blue
-                lineSpeckParticle.setColor(0.2F + 0.3F * f, 0.2F + 0.3F * f, 0.3F + 0.4F * f);
+                // lime
+                zappyGritParticle.setColor(0.75F + 0.2F * f, 0.9F + 0.1F * f, 0.8F + 0.2F * f);
             } else if(i == 1) {
                 // pink
-                lineSpeckParticle.setColor(0.8F + 0.2F * f, 0.4F + 0.3F * f, 0.5F + 0.4F * f);
+                zappyGritParticle.setColor(0.9F + 0.1F * f, 0.75F + 0.2F * f, 0.8F + 0.2F * f);
             } else {
-                // turquoise
-                lineSpeckParticle.setColor(0.4F + 0.3F * f, 0.8F + 0.2F * f, 0.6F + 0.15F * f);
+                // yellow, twice as likely
+                zappyGritParticle.setColor(0.85F + 0.15F * f, 0.85F + 0.15F * f, 0.65F + 0.2F * f);
             }
 
-            return lineSpeckParticle;
+            return zappyGritParticle;
         }
     }
 }

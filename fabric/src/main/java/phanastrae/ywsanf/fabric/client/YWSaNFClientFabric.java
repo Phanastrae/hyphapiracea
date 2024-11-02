@@ -1,6 +1,7 @@
 package phanastrae.ywsanf.fabric.client;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -24,6 +25,11 @@ public class YWSaNFClientFabric implements ClientModInitializer {
             public <T extends ParticleOptions> void register(ParticleType<T> type, YWSaNFParticles.ParticleRegistration<T> registration) {
                 ParticleFactoryRegistry.getInstance().register(type, registration::create);
             }
+        });
+
+        // start client tick
+        ClientTickEvents.START_WORLD_TICK.register((minecraft) -> {
+            YWSaNFClient.startClientTick();
         });
     }
 }

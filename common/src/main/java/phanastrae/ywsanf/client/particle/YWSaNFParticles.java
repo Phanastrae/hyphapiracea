@@ -10,7 +10,12 @@ public class YWSaNFParticles {
 
     public static void init(ClientParticleRegistrar r) {
         r.register(YWSaNFParticleTypes.ELECTROMAGNETIC_DUST, ElectromagneticDustParticle.Provider::new);
+        r.register(YWSaNFParticleTypes.FAIRY_FOG, FairyFogParticle.Provider::new);
+        r.register(YWSaNFParticleTypes.LARGE_ELECTROMAGNETIC_DUST, ElectromagneticDustParticle.LargeProvider::new);
+        r.register(YWSaNFParticleTypes.LARGE_FAIRY_FOG, FairyFogParticle.LargeProvider::new);
         r.register(YWSaNFParticleTypes.LINE_SPECK, LineSpeckParticle.Provider::new);
+        r.register(YWSaNFParticleTypes.PIRACITE_BUBBLE_POP, PiraciticBubblePopParticle.Provider::new);
+        r.register(YWSaNFParticleTypes.ZAPPY_GRIT, ZappyGritParticle.Provider::new);
     }
 
     @FunctionalInterface

@@ -4,7 +4,10 @@ package phanastrae.ywsanf.client.particle;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
@@ -199,7 +202,7 @@ public class ElectromagneticDustParticle extends TextureSheetParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public ElectromagneticDustParticle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             ElectromagneticDustParticle emDustParticle = new ElectromagneticDustParticle(level, x, y, z, xSpeed, ySpeed, zSpeed);
             emDustParticle.pickSprite(this.sprite);
 
@@ -230,6 +233,26 @@ public class ElectromagneticDustParticle extends TextureSheetParticle {
             emDustParticle.setMass(0.0001F);
 
             return emDustParticle;
+        }
+    }
+
+    public static class LargeProvider extends ElectromagneticDustParticle.Provider {
+
+        public LargeProvider(SpriteSet sprites) {
+            super(sprites);
+        }
+
+        @Nullable
+        @Override
+        public ElectromagneticDustParticle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+            ElectromagneticDustParticle electromagneticDustParticle = super.createParticle(type, level, x, y, z, xSpeed, ySpeed, z);
+            if(electromagneticDustParticle != null) {
+                electromagneticDustParticle.quadSize *= 4;
+                electromagneticDustParticle.lifetime = electromagneticDustParticle.lifetime * 2;
+                electromagneticDustParticle.mass *= 3;
+            }
+
+            return electromagneticDustParticle;
         }
     }
 }

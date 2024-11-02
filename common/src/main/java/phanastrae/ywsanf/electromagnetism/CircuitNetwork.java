@@ -112,6 +112,7 @@ public class CircuitNetwork {
     }
 
     public void recalculate() {
+        // TODO general optimisations
         if(this.wires.isEmpty()) {
             return;
         }
@@ -129,6 +130,7 @@ public class CircuitNetwork {
             wireWrappers.add(wireWrapper);
         }
         HashSet<NodeWrapper> nodeWrappers = new HashSet<>(map.values());
+
 
         // combine any nodes connected by a wire with no resistance
         Queue<WireWrapper> wireQueue = new LinkedList<>(wireWrappers);
@@ -167,6 +169,7 @@ public class CircuitNetwork {
             }
         }
 
+        // TODO cull leafs and then calculate their values accordingly
         // combine wires together into series and parallel circuits where possible
         Queue<NodeWrapper> nodeQueue = new LinkedList<>(nodeWrappers);
         while(!nodeQueue.isEmpty()) {
