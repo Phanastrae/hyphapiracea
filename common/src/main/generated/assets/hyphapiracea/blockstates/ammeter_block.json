@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "hyphapiracea:block/ammeter_block",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "hyphapiracea:block/ammeter_block",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "hyphapiracea:block/ammeter_block",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "hyphapiracea:block/ammeter_block",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "hyphapiracea:block/ammeter_block"
+    },
+    "facing=west": {
+      "model": "hyphapiracea:block/ammeter_block",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

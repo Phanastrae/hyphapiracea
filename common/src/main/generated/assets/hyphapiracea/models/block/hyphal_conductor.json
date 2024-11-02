@@ -1,0 +1,7 @@
+{
+  "parent": "hyphapiracea:block/template_conductor",
+  "textures": {
+    "all": "minecraft:block/polished_deepslate",
+    "particle": "minecraft:block/polished_deepslate"
+  }
+}

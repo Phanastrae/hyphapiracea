@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "hyphapiracea:item/magnetometer"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "hyphapiracea:off": 1
+      },
+      "model": "hyphapiracea:item/magnetometer_off"
+    }
+  ]
+}

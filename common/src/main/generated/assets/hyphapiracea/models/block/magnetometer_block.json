@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "hyphapiracea:block/magnetometer_block_bottom",
+    "east": "hyphapiracea:block/magnetometer_block_side",
+    "north": "hyphapiracea:block/magnetometer_block_side",
+    "particle": "hyphapiracea:block/magnetometer_block_side",
+    "south": "hyphapiracea:block/magnetometer_block_side",
+    "up": "hyphapiracea:block/magnetometer_block_top",
+    "west": "hyphapiracea:block/magnetometer_block_side"
+  }
+}

@@ -17,13 +17,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"phanastrae.ywsanf.fabric.YWSaNFFabric"
+			"phanastrae.hyphapiracea.fabric.HyphaPiraceaFabric"
 		],
 		"client": [
-			"phanastrae.ywsanf.fabric.client.YWSaNFClientFabric"
+			"phanastrae.hyphapiracea.fabric.client.HyphaPiraceaClientFabric"
 		],
 		"fabric-datagen": [
-			"phanastrae.ywsanf.fabric.data.YWSaNFDataGenerator"
+			"phanastrae.hyphapiracea.fabric.data.HyphaPiraceaDataGenerator"
 		]
 	},
 	"mixins": [

@@ -1,0 +1,41 @@
+{
+  "block.hyphapiracea.ammeter_block": "Ammeter Block",
+  "block.hyphapiracea.feasting_tar": "Feasting TAR",
+  "block.hyphapiracea.galvanocarpic_bulb": "Galvanocarpic Bulb",
+  "block.hyphapiracea.hyphal_conductor": "Hyphal Conductor",
+  "block.hyphapiracea.leukbox": "Leukbox",
+  "block.hyphapiracea.magnetometer_block": "Magnetometer Block",
+  "block.hyphapiracea.stormsap_cell": "Stormsap Cell",
+  "block.hyphapiracea.voltmeter_block": "Voltmeter Block",
+
+  "gui.hyphapiracea.magnetometer.field_strength_microtesla": "Magnetic Field Strength: %s µT",
+
+  "item.modifiers.hyphapiracea.equals.m": "%s m %s",
+  "item.modifiers.hyphapiracea.equals.ohm_per_meter": "%s Ω/m %s",
+  "item.modifiers.hyphapiracea.wire_line": "When attached to Hyphal Conductor:",
+  "item.modifiers.hyphapiracea.wire_line.max_wire_length": "Maximum Wire Length",
+  "item.modifiers.hyphapiracea.wire_line.radius_of_influence": "Range of Influence",
+  "item.modifiers.hyphapiracea.wire_line.resistance_per_block": "Resistance per Block",
+  "item.hyphapiracea.hyphaline": "Hyphaline",
+  "item.hyphapiracea.keyed_disc": "Keyed Disc",
+  "item.hyphapiracea.magnetometer": "Magnetometer",
+
+  "itemGroup.hyphapiracea": "HyphaPiracea",
+
+  "hyphapiracea.displays.amp": "%s A",
+  "hyphapiracea.displays.joule": "%s J",
+  "hyphapiracea.displays.millicoulomb": "%s mC",
+  "hyphapiracea.displays.volt": "%s V",
+
+  "hyphapiracea.leukbox.progress": "%s%%",
+  "hyphapiracea.leukbox.stage.completed": "[Completed!]",
+  "hyphapiracea.leukbox.stage.error": "[Error!]",
+  "hyphapiracea.leukbox.stage.place_blocks": "[We Feast]",
+  "hyphapiracea.leukbox.stage.fill_storage_pieces": "[Assembling a Model]",
+  "hyphapiracea.leukbox.stage.fill_storage_after": "[Finalising Construction]",
+  "hyphapiracea.leukbox.stage.place_specials": "[Concluding the Meal]",
+  "hyphapiracea.leukbox.stage.get_structure": "[Reading Disc]",
+  "hyphapiracea.leukbox.stage.get_structure_start": "[Generating Blueprints]",
+  "hyphapiracea.leukbox.stage.idle": "[Awaiting Instructions]",
+  "hyphapiracea.leukbox.stage.post_process": "[Preparing to Feast]"
+}

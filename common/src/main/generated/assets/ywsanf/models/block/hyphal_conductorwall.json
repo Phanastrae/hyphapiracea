@@ -1,7 +1,0 @@
-{
-  "parent": "ywsanf:block/template_conductor_wall",
-  "textures": {
-    "all": "minecraft:block/polished_deepslate",
-    "particle": "minecraft:block/polished_deepslate"
-  }
-}

@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "hyphapiracea:block/hyphal_conductor",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "hyphapiracea:block/hyphal_conductorwall",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "hyphapiracea:block/hyphal_conductorwall"
+    },
+    "facing=south": {
+      "model": "hyphapiracea:block/hyphal_conductorwall",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "hyphapiracea:block/hyphal_conductor"
+    },
+    "facing=west": {
+      "model": "hyphapiracea:block/hyphal_conductorwall",
+      "y": 270
+    }
+  }
+}
