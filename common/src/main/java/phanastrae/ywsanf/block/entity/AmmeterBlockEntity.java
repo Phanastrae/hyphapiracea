@@ -7,9 +7,11 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
+public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity implements ClientHighlightReactingBlockEntity {
     public static final String KEY_CURRENT = "current";
 
+    public long lastHighlightTime = -1;
+    private int lastComparatorOutput = -1;
     private double current;
 
     public AmmeterBlockEntity(BlockPos pos, BlockState blockState) {
@@ -39,9 +41,43 @@ public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
         AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
 
         double current = blockEntity.wire.getCurrent();
-        if(blockEntity.current != current) {
+        if(blockEntity.current != current || blockEntity.lastComparatorOutput == -1) {
             blockEntity.current = current;
+            blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
             blockEntity.sendUpdate();
+            blockEntity.setChanged();
+        }
+    }
+
+    public int calculateComparatorOutput() {
+        int comparatorOutput = 0;
+        double strengthToBeat = 0.25;
+        double current = Math.abs(this.current);
+        for(int i = 0; i < 15; i++) {
+            if(current >= strengthToBeat) {
+                strengthToBeat *= 2;
+                comparatorOutput += 1;
+            } else {
+                break;
+            }
+        }
+
+        return comparatorOutput;
+    }
+
+    public int getComparatorOutput() {
+        if(this.lastComparatorOutput == -1) {
+            this.lastComparatorOutput = this.calculateComparatorOutput();
+            this.setChanged();
+        }
+
+        return this.lastComparatorOutput;
+    }
+
+    @Override
+    public void onHighlight() {
+        if(this.getLevel() != null) {
+            this.lastHighlightTime = this.getLevel().getGameTime();
         }
     }
 }

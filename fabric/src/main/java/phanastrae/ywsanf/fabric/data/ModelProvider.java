@@ -2,13 +2,11 @@ package phanastrae.ywsanf.fabric.data;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.core.Direction;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.data.models.blockstates.PropertyDispatch;
 import net.minecraft.data.models.blockstates.Variant;
-import net.minecraft.data.models.blockstates.VariantProperties;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
@@ -17,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import phanastrae.ywsanf.YWSaNF;
 import phanastrae.ywsanf.block.YWSaNFBlocks;
 import phanastrae.ywsanf.item.YWSaNFItems;
 
@@ -39,9 +38,9 @@ public class ModelProvider extends FabricModelProvider {
 
         this.createTopSideBottom(BMG, YWSaNFBlocks.MAGNETOMETER_BLOCK);
 
-        this.createDirectionalBlock(BMG, YWSaNFBlocks.VOLTMETER_BLOCK);
-        this.createDirectionalBlock(BMG, YWSaNFBlocks.AMMETER_BLOCK);
-        this.createDirectionalBlock(BMG, YWSaNFBlocks.STORMSAP_CELL);
+        this.createCubeTopBottomSide(BMG, YWSaNFBlocks.VOLTMETER_BLOCK);
+        this.createCubeTopBottomSide(BMG, YWSaNFBlocks.AMMETER_BLOCK);
+        this.createCubeTopBottomSideWithTintedSides(BMG, YWSaNFBlocks.STORMSAP_CELL);
 
         createConductorBlock(BMG, YWSaNFBlocks.HYPHAL_CONDUCTOR);
     }
@@ -102,26 +101,15 @@ public class ModelProvider extends FabricModelProvider {
         BMG.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(block, ModelTemplates.CUBE.create(block, textureMapping, BMG.modelOutput)));
     }
 
-    public void createDirectionalBlock(BlockModelGenerators BMG, Block block) {
-        TextureMapping horizontalMapping = new TextureMapping()
-                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_front"))
-                .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_back"))
-                .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
-        ResourceLocation horizontalModel = ModelTemplates.CUBE.create(block, horizontalMapping, BMG.modelOutput);
-
+    public void createCubeTopBottomSide(BlockModelGenerators BMG, Block block) {
+        ResourceLocation positiveTerminal = YWSaNF.id("block/hyphal_positive_terminal");
+        ResourceLocation negativeTerminal = YWSaNF.id("block/hyphal_negative_terminal");
         TextureMapping verticalMapping = new TextureMapping()
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_back"))
-                .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_front"))
-                .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
-                .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
-        ResourceLocation verticalModel = ModelTemplates.CUBE.createWithSuffix(block, "_vertical", verticalMapping, BMG.modelOutput);
+                .put(TextureSlot.BOTTOM, negativeTerminal)
+                .put(TextureSlot.TOP, positiveTerminal)
+                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
+        ResourceLocation verticalModel = YWSaNFModelTemplates.CUBE_TOP_BOTTOM_SIDE.create(block, verticalMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
                 .accept(
@@ -129,15 +117,57 @@ public class ModelProvider extends FabricModelProvider {
                                 .with(
                                         PropertyDispatch.property(BlockStateProperties.FACING)
                                                 .select(
-                                                        Direction.DOWN, Variant.variant().with(VariantProperties.MODEL, verticalModel).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180)
+                                                        DOWN, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R180)
                                                 )
-                                                .select(Direction.UP, Variant.variant().with(VariantProperties.MODEL, verticalModel))
-                                                .select(Direction.NORTH, Variant.variant().with(VariantProperties.MODEL, horizontalModel))
-                                                .select(Direction.EAST, Variant.variant().with(VariantProperties.MODEL, horizontalModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90))
+                                                .select(UP, Variant.variant().with(MODEL, verticalModel))
                                                 .select(
-                                                        Direction.SOUTH, Variant.variant().with(VariantProperties.MODEL, horizontalModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
+                                                        NORTH, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90)
                                                 )
-                                                .select(Direction.WEST, Variant.variant().with(VariantProperties.MODEL, horizontalModel).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
+                                                .select(
+                                                        SOUTH, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90).with(Y_ROT, R180)
+                                                )
+                                                .select(
+                                                        EAST, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90).with(Y_ROT, R90)
+                                                )
+                                                .select(
+                                                        WEST, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90).with(Y_ROT, R270)
+                                                )
+                                )
+                );
+    }
+
+    public void createCubeTopBottomSideWithTintedSides(BlockModelGenerators BMG, Block block) {
+        ResourceLocation positiveTerminal = YWSaNF.id("block/hyphal_positive_terminal");
+        ResourceLocation negativeTerminal = YWSaNF.id("block/hyphal_negative_terminal");
+        TextureMapping verticalMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.BOTTOM, negativeTerminal)
+                .put(TextureSlot.TOP, positiveTerminal)
+                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"))
+                .put(YWSaNFModelTemplates.TINT_SIDE, TextureMapping.getBlockTexture(block, "_side_tint"));
+        ResourceLocation verticalModel = YWSaNFModelTemplates.CUBE_TOP_BOTTOM_SIDE_TINTED_SIDES.create(block, verticalMapping, BMG.modelOutput);
+
+        BMG.blockStateOutput
+                .accept(
+                        MultiVariantGenerator.multiVariant(block)
+                                .with(
+                                        PropertyDispatch.property(BlockStateProperties.FACING)
+                                                .select(
+                                                        DOWN, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R180)
+                                                )
+                                                .select(UP, Variant.variant().with(MODEL, verticalModel))
+                                                .select(
+                                                        NORTH, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90)
+                                                )
+                                                .select(
+                                                        SOUTH, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90).with(Y_ROT, R180)
+                                                )
+                                                .select(
+                                                        EAST, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90).with(Y_ROT, R90)
+                                                )
+                                                .select(
+                                                        WEST, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90).with(Y_ROT, R270)
+                                                )
                                 )
                 );
     }

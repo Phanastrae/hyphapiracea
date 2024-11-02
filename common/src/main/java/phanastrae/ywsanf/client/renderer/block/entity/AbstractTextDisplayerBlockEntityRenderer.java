@@ -8,10 +8,15 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 public abstract class AbstractTextDisplayerBlockEntityRenderer <T extends BlockEntity> implements BlockEntityRenderer<T> {
 
@@ -41,6 +46,34 @@ public abstract class AbstractTextDisplayerBlockEntityRenderer <T extends BlockE
         poseStack.popPose();
     }
 
+    public void drawTextOnAllSides(Component text, PoseStack poseStack, MultiBufferSource bufferSource, Level level, BlockPos pos, double scale) {
+        poseStack.pushPose();
+        poseStack.translate(0.5, 0.5, 0.5);
+        for(Direction direction : Direction.values()) {
+            if(direction.getAxis().isHorizontal()) {
+                if(level != null) {
+                    BlockPos adjacentPos = pos.offset(direction.getNormal());
+                    BlockState adjacentBlockState = level.getBlockState(adjacentPos);
+                    if(!adjacentBlockState.isSolidRender(level, adjacentPos)) {
+                        drawTextOnSide(text, poseStack, bufferSource, direction, (float)scale);
+                    }
+                }
+            }
+        }
+        poseStack.popPose();
+    }
+
+    public void drawTextOnSide(Component text, PoseStack poseStack, MultiBufferSource bufferSource, Direction side, float scale) {
+        poseStack.pushPose();
+
+        poseStack.mulPose(new Quaternionf().rotateY(-(float)Math.toRadians(side.toYRot())));
+        poseStack.translate(0, 0, 0.5625);
+        poseStack.scale(scale, scale, scale);
+
+        drawTextBasic(text, poseStack, bufferSource, LightTexture.FULL_BRIGHT);
+        poseStack.popPose();
+    }
+
     public void drawText(Component text, PoseStack poseStack, MultiBufferSource bufferSource, Vec3 offset) {
         poseStack.pushPose();
 
@@ -65,5 +98,20 @@ public abstract class AbstractTextDisplayerBlockEntityRenderer <T extends BlockE
         this.font.drawInBatch(
                 text, x, y, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight
         );
+    }
+
+    public void drawTextBasic(Component text, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        poseStack.pushPose();
+        double width = font.width(text);
+        double size = Math.max(width, 40);
+        float f = (float)(1 / size) * 0.875F;
+        poseStack.scale(f, -f, f);
+
+        float x = (float)(-width / 2);
+        float y = (float)(-font.lineHeight) / 2;
+        this.font.drawInBatch(
+                text, x, y, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, packedLight
+        );
+        poseStack.popPose();
     }
 }

@@ -1,12 +1,10 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "ywsanf:block/cube_top_bottom_side_tinted_sides",
   "textures": {
-    "down": "ywsanf:block/stormsap_cell_side",
-    "east": "ywsanf:block/stormsap_cell_side",
-    "north": "ywsanf:block/stormsap_cell_front",
+    "bottom": "ywsanf:block/hyphal_negative_terminal",
     "particle": "ywsanf:block/stormsap_cell_side",
-    "south": "ywsanf:block/stormsap_cell_back",
-    "up": "ywsanf:block/stormsap_cell_side",
-    "west": "ywsanf:block/stormsap_cell_side"
+    "side": "ywsanf:block/stormsap_cell_side",
+    "tint_side": "ywsanf:block/stormsap_cell_side_tint",
+    "top": "ywsanf:block/hyphal_positive_terminal"
   }
 }

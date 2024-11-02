@@ -53,18 +53,6 @@ public class MagnetometerBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-        boolean flag = level.hasNeighborSignal(pos);
-        if (flag != state.getValue(POWERED)) {
-            if (flag) {
-                this.spawnFieldLine(null, level, pos);
-            }
-
-            level.setBlock(pos, state.setValue(POWERED, flag), 3);
-        }
-    }
-
-    @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
@@ -92,6 +80,18 @@ public class MagnetometerBlock extends BaseEntityBlock {
             return blockEntity.getComparatorOutput();
         } else {
             return 0;
+        }
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        boolean flag = level.hasNeighborSignal(pos);
+        if (flag != state.getValue(POWERED)) {
+            if (flag) {
+                this.spawnFieldLine(null, level, pos);
+            }
+
+            level.setBlock(pos, state.setValue(POWERED, flag), 3);
         }
     }
 

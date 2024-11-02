@@ -1,12 +1,9 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "ywsanf:block/cube_top_bottom_side",
   "textures": {
-    "down": "ywsanf:block/ammeter_block_side",
-    "east": "ywsanf:block/ammeter_block_side",
-    "north": "ywsanf:block/ammeter_block_front",
+    "bottom": "ywsanf:block/hyphal_negative_terminal",
     "particle": "ywsanf:block/ammeter_block_side",
-    "south": "ywsanf:block/ammeter_block_back",
-    "up": "ywsanf:block/ammeter_block_side",
-    "west": "ywsanf:block/ammeter_block_side"
+    "side": "ywsanf:block/ammeter_block_side",
+    "top": "ywsanf:block/hyphal_positive_terminal"
   }
 }

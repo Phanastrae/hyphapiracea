@@ -5,7 +5,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.state.BlockState;
 import phanastrae.ywsanf.block.entity.VoltmeterBlockEntity;
+import phanastrae.ywsanf.block.state.YWSaNFBlockProperties;
 
 public class VoltmeterBlockEntityRenderer extends AbstractTextDisplayerBlockEntityRenderer<VoltmeterBlockEntity> {
 
@@ -15,9 +17,39 @@ public class VoltmeterBlockEntityRenderer extends AbstractTextDisplayerBlockEnti
 
     @Override
     public void render(VoltmeterBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        double pd = blockEntity.getVoltage();
-        String formatted = String.format("%1$,.8f", pd);
-        Component voltage = Component.translatable("ywsanf.displays.volt", formatted).withStyle(ChatFormatting.GOLD);
-        drawTexts(poseStack, bufferSource, voltage);
+        if(blockEntity.getLevel() != null) {
+            long levelTime = blockEntity.getLevel().getGameTime();
+            double scale = getScaleForTime(levelTime, blockEntity.lastHighlightTime, partialTick, blockEntity.getBlockState());
+
+            if(scale > 0.0) {
+                double voltage = blockEntity.getVoltage();
+                String formatted = String.format("%1$,.2f", voltage);
+                Component voltageComponent = Component.translatable("ywsanf.displays.volt", formatted).withStyle(ChatFormatting.LIGHT_PURPLE);
+                drawTextOnAllSides(voltageComponent, poseStack, bufferSource, blockEntity.getLevel(), blockEntity.getBlockPos(), scale);
+            }
+        }
+    }
+
+    public static double getScaleForTime(long levelTime, long lastHighlightTime, float partialTick, BlockState thisState) {
+        if(thisState.hasProperty(YWSaNFBlockProperties.ALWAYS_SHOW_INFO)) {
+            if(thisState.getValue(YWSaNFBlockProperties.ALWAYS_SHOW_INFO)) {
+                return 1.0;
+            }
+        }
+
+        if(lastHighlightTime == -1) {
+            return 0.0;
+        } else if(levelTime <= lastHighlightTime) {
+            return 1.0;
+        } else {
+            long dt = levelTime - lastHighlightTime;
+            if(dt > 200) {
+                return 0.0;
+            } else {
+                float dtf = dt + partialTick - 1;
+                float t = Math.clamp(1 - dtf / 160, 0, 1);
+                return 1 - (1 - t) * (1 - t);
+            }
+        }
     }
 }

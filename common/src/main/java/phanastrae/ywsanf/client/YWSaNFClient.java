@@ -2,6 +2,7 @@ package phanastrae.ywsanf.client;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -16,9 +17,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import phanastrae.ywsanf.YWSaNF;
+import phanastrae.ywsanf.block.StormsapCellBlock;
+import phanastrae.ywsanf.block.YWSaNFBlocks;
+import phanastrae.ywsanf.block.entity.ClientHighlightReactingBlockEntity;
+import phanastrae.ywsanf.client.renderer.block.YWSaNFBlockRenderLayers;
 import phanastrae.ywsanf.client.renderer.block.entity.YWSaNFBlockEntityRenderers;
 import phanastrae.ywsanf.item.MagnetometerItem;
 import phanastrae.ywsanf.item.YWSaNFItems;
@@ -29,6 +37,9 @@ import phanastrae.ywsanf.world.YWSaNFLevelAttachment;
 public class YWSaNFClient {
 
     public static void init() {
+        // register block layers
+        YWSaNFBlockRenderLayers.init();
+
         // register block entity renderers
         YWSaNFBlockEntityRenderers.init();
 
@@ -87,6 +98,7 @@ public class YWSaNFClient {
             if(player != null) {
                 RandomSource randomSource = player.getRandom();
 
+                // spawn magnetic field particles
                 for(int i = 0; i < 3; i++) {
                     if (randomSource.nextFloat() > 0.5) {
                         double dx = (randomSource.nextFloat() * 2.0 - 1.0);
@@ -103,7 +115,7 @@ public class YWSaNFClient {
 
                         BlockPos bp = BlockPos.containing(pos);
                         BlockState s = level.getBlockState(bp);
-                        if(s.isAir() || s.canBeReplaced()) {
+                        if (s.isAir() || s.canBeReplaced()) {
                             Vec3 magField = YWSaNFLevelAttachment.getAttachment(level).getMagneticFieldAtPosition(pos);
                             double magFieldStrength = magField.length();
                             if (magFieldStrength > 2E-7) {
@@ -114,6 +126,14 @@ public class YWSaNFClient {
                                 }
                             }
                         }
+                    }
+                }
+
+                // update highlight influenced blocks
+                HitResult hitResult = client.hitResult;
+                if(hitResult instanceof BlockHitResult bhr) {
+                    if(level.getBlockEntity(bhr.getBlockPos()) instanceof ClientHighlightReactingBlockEntity chrbe) {
+                        chrbe.onHighlight();
                     }
                 }
             }
@@ -133,5 +153,35 @@ public class YWSaNFClient {
                     );
                 }
         );
+    }
+
+    public static void registerBlockColorHandlers(BlockColorHelper helper) {
+        helper.register(((state, level, pos, tintIndex) -> {
+            if(tintIndex == 0) {
+                if(state.hasProperty(StormsapCellBlock.STORED_POWER)) {
+                    int power = state.getValue(StormsapCellBlock.STORED_POWER);
+
+                    float powerAmount = power / 15F;
+
+                    Vec3 colorLow = new Vec3(0.35, 0.45, 0.5);
+                    Vec3 colorHigh = new Vec3(0.65, 0.95, 1);
+                    Vec3 lerp = colorLow.lerp(colorHigh, powerAmount);
+
+                    int r = ((int)(lerp.x * 255)) & 0xFF;
+                    int g = ((int)(lerp.y * 255)) & 0xFF;
+                    int b = ((int)(lerp.z * 255)) & 0xFF;
+                    return (r << 16) | (g << 8) | b;
+                } else {
+                    return -1;
+                }
+            } else {
+                return -1;
+            }
+        }), YWSaNFBlocks.STORMSAP_CELL);
+    }
+
+    @FunctionalInterface
+    public interface BlockColorHelper {
+        void register(BlockColor color, Block block);
     }
 }

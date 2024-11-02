@@ -9,10 +9,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 import phanastrae.ywsanf.YWSaNF;
@@ -25,6 +22,9 @@ public class YWSaNFClientNeoForge {
 
     public YWSaNFClientNeoForge(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::onClientInit);
+
+        // block color handlers
+        modEventBus.addListener(this::registerBlockColorHandlers);
 
         // entity model layers
         modEventBus.addListener(this::registerEntityModelLayers);
@@ -55,6 +55,10 @@ public class YWSaNFClientNeoForge {
                 event.registerSpriteSet(type, registration::create);
             }
         });
+    }
+
+    public void registerBlockColorHandlers(RegisterColorHandlersEvent.Block event) {
+        YWSaNFClient.registerBlockColorHandlers(event::register);
     }
 
     public void renderGuiLayers(RenderGuiLayerEvent.Post event) {

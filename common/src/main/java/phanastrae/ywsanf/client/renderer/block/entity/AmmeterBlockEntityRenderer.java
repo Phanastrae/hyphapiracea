@@ -15,7 +15,16 @@ public class AmmeterBlockEntityRenderer extends AbstractTextDisplayerBlockEntity
 
     @Override
     public void render(AmmeterBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        Component amperage = Component.translatable("ywsanf.displays.amp", blockEntity.getCurrent()).withStyle(ChatFormatting.YELLOW);
-        drawTexts(poseStack, bufferSource, amperage);
+        if(blockEntity.getLevel() != null) {
+            long levelTime = blockEntity.getLevel().getGameTime();
+            double scale = VoltmeterBlockEntityRenderer.getScaleForTime(levelTime, blockEntity.lastHighlightTime, partialTick, blockEntity.getBlockState());
+
+            if(scale > 0.0) {
+                double current = blockEntity.getCurrent();
+                String formatted = String.format("%1$,.2f", current);
+                Component currentComponent = Component.translatable("ywsanf.displays.amp", formatted).withStyle(ChatFormatting.YELLOW);
+                drawTextOnAllSides(currentComponent, poseStack, bufferSource, blockEntity.getLevel(), blockEntity.getBlockPos(), scale);
+            }
+        }
     }
 }

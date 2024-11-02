@@ -15,7 +15,16 @@ public class StormsapCellBlockEntityRenderer extends AbstractTextDisplayerBlockE
 
     @Override
     public void render(StormsapCellBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        Component energy3 = Component.translatable("ywsanf.displays.joule", blockEntity.getStoredEnergy()).withStyle(ChatFormatting.GREEN);
-        drawTexts(poseStack, bufferSource, energy3);
+        if(blockEntity.getLevel() != null) {
+            long levelTime = blockEntity.getLevel().getGameTime();
+            double scale = VoltmeterBlockEntityRenderer.getScaleForTime(levelTime, blockEntity.lastHighlightTime, partialTick, blockEntity.getBlockState());
+
+            if(scale > 0.0) {
+                double energy = blockEntity.getPositiveStoredEnergy();
+                String formatted = String.format("%1$,.0f", energy);
+                Component energyComponent = Component.translatable("ywsanf.displays.joule", formatted).withStyle(ChatFormatting.AQUA);
+                drawTextOnAllSides(energyComponent, poseStack, bufferSource, blockEntity.getLevel(), blockEntity.getBlockPos(), scale);
+            }
+        }
     }
 }

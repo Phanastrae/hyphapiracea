@@ -1,25 +1,29 @@
 {
   "variants": {
     "facing=down": {
-      "model": "ywsanf:block/stormsap_cell_vertical",
+      "model": "ywsanf:block/stormsap_cell",
       "x": 180
     },
     "facing=east": {
       "model": "ywsanf:block/stormsap_cell",
+      "x": 90,
       "y": 90
     },
     "facing=north": {
-      "model": "ywsanf:block/stormsap_cell"
+      "model": "ywsanf:block/stormsap_cell",
+      "x": 90
     },
     "facing=south": {
       "model": "ywsanf:block/stormsap_cell",
+      "x": 90,
       "y": 180
     },
     "facing=up": {
-      "model": "ywsanf:block/stormsap_cell_vertical"
+      "model": "ywsanf:block/stormsap_cell"
     },
     "facing=west": {
       "model": "ywsanf:block/stormsap_cell",
+      "x": 90,
       "y": 270
     }
   }

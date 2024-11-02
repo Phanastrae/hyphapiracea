@@ -6,16 +6,24 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import phanastrae.ywsanf.block.StormsapCellBlock;
 import phanastrae.ywsanf.electromagnetism.CircuitNetwork;
 
-public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
+public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntity implements ClientHighlightReactingBlockEntity {
     public static final String STORED_ENERGY_KEY = "stored_energy";
 
+    public long lastHighlightTime = -1;
+    private int lastComparatorOutput = -1;
     private int storedEnergy;
     private boolean active = false;
+    private boolean powered;
 
     public StormsapCellBlockEntity(BlockPos pos, BlockState blockState) {
         super(YWSaNFBlockEntityTypes.STORMSAP_CELL, pos, blockState);
+
+        if(blockState.hasProperty(StormsapCellBlock.POWERED)) {
+            this.powered = blockState.getValue(StormsapCellBlock.POWERED);
+        }
     }
 
     @Override
@@ -35,31 +43,44 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
     public static void serverTick(Level level, BlockPos pos, BlockState state, StormsapCellBlockEntity blockEntity) {
         AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
 
-        if(blockEntity.active) {
-            double current = blockEntity.wire.getCurrent();
-            double pd = blockEntity.getGeneratedVoltage();
-            double power = current * pd;
-            int dE = Mth.ceil(power / 20);
-            if(dE != 0) {
-                blockEntity.storedEnergy -= dE;
-                blockEntity.setChanged();
-                blockEntity.sendUpdate();
-            }
+        int dE = 0;
+        double efficiency = 0.95;
+        double current = blockEntity.wire.getCurrent();
+        double emf = blockEntity.active ? blockEntity.getGeneratedVoltage() : 0;
+        double powerUse = current * emf;
+        if(powerUse < 0) {
+            powerUse *= efficiency;
+        }
+        dE += Mth.floor(-powerUse / 20);
+        double powerGain = blockEntity.wire.getPower();
+        powerGain *= efficiency;
+        dE += Mth.floor(powerGain / 20);
+
+        if(dE != 0) {
+            blockEntity.addEnergy(dE);
+            blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
+            blockEntity.setChanged();
+            blockEntity.sendUpdate();
         }
 
         CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
-        if(!blockEntity.active && blockEntity.storedEnergy > 0) {
+        if(!blockEntity.active && !blockEntity.powered && blockEntity.storedEnergy > 0) {
             blockEntity.active = true;
             blockEntity.wire.setEmf(blockEntity.getGeneratedVoltage());
             if(network != null) {
                 network.markNeedsUpdate();
             }
-        } else if(blockEntity.active && blockEntity.storedEnergy <= 0) {
+        } else if(blockEntity.active && (blockEntity.powered || blockEntity.storedEnergy <= 0)) {
             blockEntity.active = false;
             blockEntity.wire.setEmf(0);
             if(network != null) {
                 network.markNeedsUpdate();
             }
+        }
+
+        if(blockEntity.lastComparatorOutput == -1) {
+            blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
+            blockEntity.setChanged();
         }
     }
 
@@ -67,6 +88,19 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
         if(this.level != null && !this.level.isClientSide && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
         }
+    }
+
+    public int calculateComparatorOutput() {
+        return Mth.clamp(Mth.ceil(this.storedEnergy / (float)this.maxEnergyStorage() * 15), 0, 15);
+    }
+
+    public int getComparatorOutput() {
+        if(this.lastComparatorOutput == -1) {
+            this.lastComparatorOutput = this.calculateComparatorOutput();
+            this.setChanged();
+        }
+
+        return this.lastComparatorOutput;
     }
 
     @Override
@@ -78,12 +112,52 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
         return 12F;
     }
 
+    public int maxEnergyStorage() {
+        return 1000000;
+    }
+
+    public int maxEnergyDeficit() {
+        return -10000;
+    }
+
     public int getStoredEnergy() {
         return this.storedEnergy;
     }
 
+    public int getPositiveStoredEnergy() {
+        if(this.storedEnergy < 0) {
+            return 0;
+        } else {
+            return this.storedEnergy;
+        }
+    }
+
     public void addEnergy(int energy) {
         this.storedEnergy += energy;
+        if(this.storedEnergy < this.maxEnergyDeficit()) {
+            this.storedEnergy = this.maxEnergyDeficit();
+        }
+        if(this.storedEnergy > this.maxEnergyStorage()) {
+            this.storedEnergy = this.maxEnergyStorage();
+        }
         this.setChanged();
+
+        double v = this.storedEnergy / 1000000F;
+        int energyLevel = Mth.clamp(Mth.ceil(v * 15), 0, 15);
+        BlockState newState = this.getBlockState().setValue(StormsapCellBlock.STORED_POWER, energyLevel);
+        if(this.level != null && !this.level.isClientSide && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
+            this.level.setBlock(this.getBlockPos(), newState, 3);
+        }
+    }
+
+    public void setPowered(boolean powered) {
+        this.powered = powered;
+    }
+
+    @Override
+    public void onHighlight() {
+        if(this.getLevel() != null) {
+            this.lastHighlightTime = this.getLevel().getGameTime();
+        }
     }
 }
