@@ -13,7 +13,7 @@ public class MagnetometerBlockEntity extends BlockEntity {
     private int lastComparatorOutput = -1;
 
     public MagnetometerBlockEntity(BlockPos pos, BlockState blockState) {
-        super(HyphaPiraceaBlockEntityTypes.MAGNETOMETER_BLOCK, pos, blockState);
+        super(HyphaPiraceaBlockEntityTypes.LEYFIELD_MAGNETOMETER_BLOCK, pos, blockState);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MagnetometerBlockEntity blockEntity) {

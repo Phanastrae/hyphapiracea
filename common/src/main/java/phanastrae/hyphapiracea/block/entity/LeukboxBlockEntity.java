@@ -56,7 +56,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     private int currentMinSpawnTime;
 
     public LeukboxBlockEntity(BlockPos pos, BlockState blockState) {
-        super(HyphaPiraceaBlockEntityTypes.LEUKBOX, pos, blockState);
+        super(HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, pos, blockState);
     }
 
     @Override

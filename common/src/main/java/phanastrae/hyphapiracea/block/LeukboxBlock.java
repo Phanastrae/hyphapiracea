@@ -63,8 +63,8 @@ public class LeukboxBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
-                ? createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.LEUKBOX, LeukboxBlockEntity::clientTick)
-                : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.LEUKBOX, LeukboxBlockEntity::serverTick);
+                ? createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, LeukboxBlockEntity::clientTick)
+                : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, LeukboxBlockEntity::serverTick);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class LeukboxBlock extends BaseEntityBlock {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         } else {
             BlockState blockstate = level.getBlockState(pos);
-            if (blockstate.is(HyphaPiraceaBlocks.LEUKBOX) && !blockstate.getValue(HAS_DISC)) {
+            if (blockstate.is(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX) && !blockstate.getValue(HAS_DISC)) {
                 if (!level.isClientSide) {
                     ItemStack itemstack = stack.consumeAndReturn(1, player);
                     if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {

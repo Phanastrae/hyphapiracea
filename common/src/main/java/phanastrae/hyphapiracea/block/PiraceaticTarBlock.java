@@ -12,16 +12,16 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-public class FeastingTarBlock extends TransparentBlock {
-    public static final MapCodec<FeastingTarBlock> CODEC = simpleCodec(FeastingTarBlock::new);
+public class PiraceaticTarBlock extends TransparentBlock {
+    public static final MapCodec<PiraceaticTarBlock> CODEC = simpleCodec(PiraceaticTarBlock::new);
     public static final IntegerProperty AGE = BlockStateProperties.AGE_7;
 
     @Override
-    public MapCodec<FeastingTarBlock> codec() {
+    public MapCodec<PiraceaticTarBlock> codec() {
         return CODEC;
     }
 
-    public FeastingTarBlock(Properties properties) {
+    public PiraceaticTarBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition

@@ -32,14 +32,14 @@ public class ModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockModelGenerators BMG) {
-        BMG.createTrivialCube(HyphaPiraceaBlocks.LEUKBOX);
-        BMG.createTrivialCube(HyphaPiraceaBlocks.FEASTING_TAR);
-        BMG.createTrivialCube(HyphaPiraceaBlocks.GALVANOCARPIC_BULB);
+        BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
+        BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_TAR);
+        BMG.createTrivialCube(HyphaPiraceaBlocks.HYPHAL_NODE);
 
-        this.createTopSideBottom(BMG, HyphaPiraceaBlocks.MAGNETOMETER_BLOCK);
+        this.createTopSideBottom(BMG, HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
 
-        this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.VOLTMETER_BLOCK);
-        this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.AMMETER_BLOCK);
+        this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
+        this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_AMMETER);
         this.createCubeTopBottomSideWithTintedSides(BMG, HyphaPiraceaBlocks.STORMSAP_CELL);
 
         createConductorBlock(BMG, HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);

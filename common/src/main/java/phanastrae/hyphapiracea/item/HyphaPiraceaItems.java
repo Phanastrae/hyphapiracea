@@ -14,17 +14,17 @@ import java.util.function.BiConsumer;
 
 public class HyphaPiraceaItems {
 
-    public static final BlockItem LEUKBOX = ofBlock(HyphaPiraceaBlocks.LEUKBOX);
+    public static final BlockItem PIRACEATIC_LEUKBOX = ofBlock(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
     public static final BlockItem HYPHAL_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
-    public static final BlockItem MAGNETOMETER_BLOCK = ofBlock(HyphaPiraceaBlocks.MAGNETOMETER_BLOCK);
-    public static final BlockItem GALVANOCARPIC_BULB = ofBlock(HyphaPiraceaBlocks.GALVANOCARPIC_BULB);
-    public static final BlockItem AMMETER_BLOCK = ofBlock(HyphaPiraceaBlocks.AMMETER_BLOCK);
-    public static final BlockItem VOLTMETER_BLOCK = ofBlock(HyphaPiraceaBlocks.VOLTMETER_BLOCK);
+    public static final BlockItem LEYFIELD_MAGNETOMETER_BLOCK = ofBlock(HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
+    public static final BlockItem HYPHAL_NODE = ofBlock(HyphaPiraceaBlocks.HYPHAL_NODE);
+    public static final BlockItem HYPHAL_AMMETER = ofBlock(HyphaPiraceaBlocks.HYPHAL_AMMETER);
+    public static final BlockItem HYPHAL_VOLTMETER = ofBlock(HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
     public static final BlockItem STORMSAP_CELL = ofBlock(HyphaPiraceaBlocks.STORMSAP_CELL);
 
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON));
     public static final Item HYPHALINE = new HyphalineItem(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40, 0.004F)));
-    public static final Item MAGNETOMETER = new MagnetometerItem(properties().stacksTo(1));
+    public static final Item LEYFIELD_MAGNETOMETER = new MagnetometerItem(properties().stacksTo(1));
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
         BiConsumer<String, Item> rwt = (s, i) -> { // register and add to creative mode tab
@@ -33,14 +33,14 @@ public class HyphaPiraceaItems {
         };
 
         rwt.accept("keyed_disc", KEYED_DISC);
-        rwt.accept("leukbox", LEUKBOX);
+        rwt.accept("piraceatic_leukbox", PIRACEATIC_LEUKBOX);
         rwt.accept("hyphal_conductor", HYPHAL_CONDUCTOR);
         rwt.accept("hyphaline", HYPHALINE);
-        rwt.accept("magnetometer", MAGNETOMETER);
-        rwt.accept("magnetometer_block", MAGNETOMETER_BLOCK);
-        rwt.accept("galvanocarpic_bulb", GALVANOCARPIC_BULB);
-        rwt.accept("ammeter_block", AMMETER_BLOCK);
-        rwt.accept("voltmeter_block", VOLTMETER_BLOCK);
+        rwt.accept("magnetometer", LEYFIELD_MAGNETOMETER);
+        rwt.accept("magnetometer_block", LEYFIELD_MAGNETOMETER_BLOCK);
+        rwt.accept("hyphal_node", HYPHAL_NODE);
+        rwt.accept("ammeter_block", HYPHAL_AMMETER);
+        rwt.accept("voltmeter_block", HYPHAL_VOLTMETER);
         rwt.accept("stormsap_cell", STORMSAP_CELL);
     }
 

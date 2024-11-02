@@ -11,21 +11,21 @@ import java.util.function.BiConsumer;
 
 public class HyphaPiraceaBlockEntityTypes {
 
-    public static final BlockEntityType<LeukboxBlockEntity> LEUKBOX = create("leukbox", LeukboxBlockEntity::new, HyphaPiraceaBlocks.LEUKBOX);
+    public static final BlockEntityType<LeukboxBlockEntity> PIRACEATIC_LEUKBOX = create("leukbox", LeukboxBlockEntity::new, HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
     public static final BlockEntityType<HyphalConductorBlockEntity> HYPHAL_CONDUCTOR = create("hyphal_conductor", HyphalConductorBlockEntity::new, HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
-    public static final BlockEntityType<MagnetometerBlockEntity> MAGNETOMETER_BLOCK = create("magnetometer_block", MagnetometerBlockEntity::new, HyphaPiraceaBlocks.MAGNETOMETER_BLOCK);
-    public static final BlockEntityType<GalvanocarpicBulbBlockEntity> GALVANOCARPIC_BULB = create("galvanocarpic_bulb", GalvanocarpicBulbBlockEntity::new, HyphaPiraceaBlocks.GALVANOCARPIC_BULB);
-    public static final BlockEntityType<AmmeterBlockEntity> AMMETER_BLOCK = create("ammeter_block", AmmeterBlockEntity::new, HyphaPiraceaBlocks.AMMETER_BLOCK);
-    public static final BlockEntityType<VoltmeterBlockEntity> VOLTMETER_BLOCK = create("voltmeter_block", VoltmeterBlockEntity::new, HyphaPiraceaBlocks.VOLTMETER_BLOCK);
+    public static final BlockEntityType<MagnetometerBlockEntity> LEYFIELD_MAGNETOMETER_BLOCK = create("magnetometer_block", MagnetometerBlockEntity::new, HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
+    public static final BlockEntityType<HyphalNodeBlockEntity> HYPHAL_NODE = create("galvanocarpic_bulb", HyphalNodeBlockEntity::new, HyphaPiraceaBlocks.HYPHAL_NODE);
+    public static final BlockEntityType<AmmeterBlockEntity> HYPHAL_AMMETER = create("ammeter_block", AmmeterBlockEntity::new, HyphaPiraceaBlocks.HYPHAL_AMMETER);
+    public static final BlockEntityType<VoltmeterBlockEntity> HYPHAL_VOLTMETER = create("voltmeter_block", VoltmeterBlockEntity::new, HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
     public static final BlockEntityType<StormsapCellBlockEntity> STORMSAP_CELL = create("stormsap_cell", StormsapCellBlockEntity::new, HyphaPiraceaBlocks.STORMSAP_CELL);
 
     public static void init(BiConsumer<ResourceLocation, BlockEntityType<?>> r) {
-        r.accept(id("leukbox"), LEUKBOX);
+        r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);
         r.accept(id("hyphal_conductor"), HYPHAL_CONDUCTOR);
-        r.accept(id("magnetometer_block"), MAGNETOMETER_BLOCK);
-        r.accept(id("galvanocarpic_bulb"), GALVANOCARPIC_BULB);
-        r.accept(id("ammeter_block"), AMMETER_BLOCK);
-        r.accept(id("voltmeter_block"), VOLTMETER_BLOCK);
+        r.accept(id("magnetometer_block"), LEYFIELD_MAGNETOMETER_BLOCK);
+        r.accept(id("hyphal_node"), HYPHAL_NODE);
+        r.accept(id("ammeter_block"), HYPHAL_AMMETER);
+        r.accept(id("voltmeter_block"), HYPHAL_VOLTMETER);
         r.accept(id("stormsap_cell"), STORMSAP_CELL);
     }
 

@@ -15,7 +15,7 @@ public class VoltmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity i
     private double voltage;
 
     public VoltmeterBlockEntity(BlockPos pos, BlockState blockState) {
-        super(HyphaPiraceaBlockEntityTypes.VOLTMETER_BLOCK, pos, blockState);
+        super(HyphaPiraceaBlockEntityTypes.HYPHAL_VOLTMETER, pos, blockState);
     }
 
     @Override

@@ -12,17 +12,17 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.block.entity.GalvanocarpicBulbBlockEntity;
+import phanastrae.hyphapiracea.block.entity.HyphalNodeBlockEntity;
 
-public class GalvanocarpicBulbBlock extends BaseEntityBlock implements MiniCircuitHolder {
-    public static final MapCodec<GalvanocarpicBulbBlock> CODEC = simpleCodec(GalvanocarpicBulbBlock::new);
+public class HyphalNodeBlock extends BaseEntityBlock implements MiniCircuitHolder {
+    public static final MapCodec<HyphalNodeBlock> CODEC = simpleCodec(HyphalNodeBlock::new);
 
     @Override
-    public MapCodec<GalvanocarpicBulbBlock> codec() {
+    public MapCodec<HyphalNodeBlock> codec() {
         return CODEC;
     }
 
-    public GalvanocarpicBulbBlock(Properties properties) {
+    public HyphalNodeBlock(Properties properties) {
         super(properties);
     }
 
@@ -34,7 +34,7 @@ public class GalvanocarpicBulbBlock extends BaseEntityBlock implements MiniCircu
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new GalvanocarpicBulbBlockEntity(pos, state);
+        return new HyphalNodeBlockEntity(pos, state);
     }
 
     @Nullable

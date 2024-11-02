@@ -226,7 +226,7 @@ public class StructurePlacer {
                 BoundingBox box = boxedContainer.getBox();
                 if(box != null) {
                     BoxedContainer fragilesContainer = new BoxedContainer();
-                    BlockState feastingTar = HyphaPiraceaBlocks.FEASTING_TAR.defaultBlockState();
+                    BlockState feastingTar = HyphaPiraceaBlocks.PIRACEATIC_TAR.defaultBlockState();
 
                     BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
                     int mx = sectionPos.minBlockX();
@@ -324,7 +324,7 @@ public class StructurePlacer {
     }
 
     public static boolean isStateSubsumed(BlockState state) {
-        return state.is(HyphaPiraceaBlocks.FEASTING_TAR);
+        return state.is(HyphaPiraceaBlocks.PIRACEATIC_TAR);
     }
 
     public static Optional<Structure> getStructure(RegistryAccess registryAccess, ResourceLocation resourceLocation) {
@@ -440,7 +440,7 @@ public class StructurePlacer {
 
     public static void placeStoredStructureStables(IntermediateStructureStorage intermediateStorage, int currentSpawnTime, BlockPos pos, ServerLevel level) {
         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
-        BlockState feastingTAR = HyphaPiraceaBlocks.FEASTING_TAR.defaultBlockState();
+        BlockState feastingTAR = HyphaPiraceaBlocks.PIRACEATIC_TAR.defaultBlockState();
         intermediateStorage.forEachContainer((sectionPos, boxedContainer) -> {
             BoundingBox box = boxedContainer.getBox();
             if(box == null) return;

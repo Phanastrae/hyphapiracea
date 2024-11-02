@@ -84,9 +84,9 @@ public class HyphaPiraceaClient {
 
     public static void registerItemProperties() {
         ItemPropertiesAccessor.invokeRegister(
-                HyphaPiraceaItems.MAGNETOMETER,
+                HyphaPiraceaItems.LEYFIELD_MAGNETOMETER,
                 HyphaPiracea.id("off"),
-                (stack, level, entity, i) -> entity instanceof Player player && player.getCooldowns().isOnCooldown(HyphaPiraceaItems.MAGNETOMETER) ? 1.0F : 0.0F
+                (stack, level, entity, i) -> entity instanceof Player player && player.getCooldowns().isOnCooldown(HyphaPiraceaItems.LEYFIELD_MAGNETOMETER) ? 1.0F : 0.0F
         );
     }
 

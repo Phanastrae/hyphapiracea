@@ -9,11 +9,11 @@ import phanastrae.hyphapiracea.mixin.client.BlockEntityRenderersAccessor;
 public class HyphaPiraceaBlockEntityRenderers {
 
     public static void init() {
-        register(HyphaPiraceaBlockEntityTypes.LEUKBOX, LeukboxBlockEntityRenderer::new);
+        register(HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, LeukboxBlockEntityRenderer::new);
         register(HyphaPiraceaBlockEntityTypes.HYPHAL_CONDUCTOR, HyphalConductorBlockEntityRenderer::new);
-        register(HyphaPiraceaBlockEntityTypes.GALVANOCARPIC_BULB, GalvanocarpicBulbBlockEntityRenderer::new);
-        register(HyphaPiraceaBlockEntityTypes.AMMETER_BLOCK, AmmeterBlockEntityRenderer::new);
-        register(HyphaPiraceaBlockEntityTypes.VOLTMETER_BLOCK, VoltmeterBlockEntityRenderer::new);
+        register(HyphaPiraceaBlockEntityTypes.HYPHAL_NODE, HyphalNodeBlockEntityRenderer::new);
+        register(HyphaPiraceaBlockEntityTypes.HYPHAL_AMMETER, AmmeterBlockEntityRenderer::new);
+        register(HyphaPiraceaBlockEntityTypes.HYPHAL_VOLTMETER, VoltmeterBlockEntityRenderer::new);
         register(HyphaPiraceaBlockEntityTypes.STORMSAP_CELL, StormsapCellBlockEntityRenderer::new);
     }
 

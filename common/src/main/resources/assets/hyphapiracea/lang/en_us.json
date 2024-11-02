@@ -1,12 +1,12 @@
 {
-  "block.hyphapiracea.ammeter_block": "Ammeter Block",
-  "block.hyphapiracea.feasting_tar": "Feasting TAR",
-  "block.hyphapiracea.galvanocarpic_bulb": "Galvanocarpic Bulb",
+  "block.hyphapiracea.ammeter_block": "Hyphal Ammeter",
+  "block.hyphapiracea.piraceatic_tar": "Piraceatic TAR",
+  "block.hyphapiracea.hyphal_node": "Hyphal Node",
   "block.hyphapiracea.hyphal_conductor": "Hyphal Conductor",
-  "block.hyphapiracea.leukbox": "Leukbox",
-  "block.hyphapiracea.magnetometer_block": "Magnetometer Block",
+  "block.hyphapiracea.piraceatic_leukbox": "Piraceatic Leukbox",
+  "block.hyphapiracea.magnetometer_block": "Leyfield Magnetometer Block",
   "block.hyphapiracea.stormsap_cell": "Stormsap Cell",
-  "block.hyphapiracea.voltmeter_block": "Voltmeter Block",
+  "block.hyphapiracea.voltmeter_block": "Hyphal Voltmeter",
 
   "gui.hyphapiracea.magnetometer.field_strength_microtesla": "Magnetic Field Strength: %s µT",
 
@@ -18,7 +18,7 @@
   "item.modifiers.hyphapiracea.wire_line.resistance_per_block": "Resistance per Block",
   "item.hyphapiracea.hyphaline": "Hyphaline",
   "item.hyphapiracea.keyed_disc": "Keyed Disc",
-  "item.hyphapiracea.magnetometer": "Magnetometer",
+  "item.hyphapiracea.magnetometer": "Leyfield Magnetometer",
 
   "itemGroup.hyphapiracea": "HyphaPiracea",
 

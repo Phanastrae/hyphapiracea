@@ -13,9 +13,9 @@ import java.util.function.BiConsumer;
 
 public class HyphaPiraceaBlocks {
 
-    public static final Block LEUKBOX = new LeukboxBlock(properties());
+    public static final Block PIRACEATIC_LEUKBOX = new LeukboxBlock(properties());
     public static final Block HYPHAL_CONDUCTOR = new HyphalConductorBlock(properties());
-    public static final Block FEASTING_TAR = new FeastingTarBlock(properties()
+    public static final Block PIRACEATIC_TAR = new PiraceaticTarBlock(properties()
             .emissiveRendering((state, blockGetter, blockPos) -> true)
             .lightLevel((blockState) -> 13)
             .isValidSpawn(HyphaPiraceaBlocks::never)
@@ -25,20 +25,20 @@ public class HyphaPiraceaBlocks {
             .noOcclusion()
             .randomTicks()
     );
-    public static final Block MAGNETOMETER_BLOCK = new MagnetometerBlock(properties());
-    public static final Block GALVANOCARPIC_BULB = new GalvanocarpicBulbBlock(properties());
-    public static final Block AMMETER_BLOCK = new AmmeterBlock(properties());
-    public static final Block VOLTMETER_BLOCK = new VoltmeterBlock(properties());
+    public static final Block LEYFIELD_MAGNETOMETER_BLOCK = new MagnetometerBlock(properties());
+    public static final Block HYPHAL_NODE = new HyphalNodeBlock(properties());
+    public static final Block HYPHAL_AMMETER = new AmmeterBlock(properties());
+    public static final Block HYPHAL_VOLTMETER = new VoltmeterBlock(properties());
     public static final Block STORMSAP_CELL = new StormsapCellBlock(properties());
 
     public static void init(BiConsumer<ResourceLocation, Block> r) {
-        r.accept(id("leukbox"), LEUKBOX);
+        r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);
         r.accept(id("hyphal_conductor"), HYPHAL_CONDUCTOR);
-        r.accept(id("feasting_tar"), FEASTING_TAR);
-        r.accept(id("magnetometer_block"), MAGNETOMETER_BLOCK);
-        r.accept(id("galvanocarpic_bulb"), GALVANOCARPIC_BULB);
-        r.accept(id("ammeter_block"), AMMETER_BLOCK);
-        r.accept(id("voltmeter_block"), VOLTMETER_BLOCK);
+        r.accept(id("piraceatic_tar"), PIRACEATIC_TAR);
+        r.accept(id("magnetometer_block"), LEYFIELD_MAGNETOMETER_BLOCK);
+        r.accept(id("hyphal_node"), HYPHAL_NODE);
+        r.accept(id("ammeter_block"), HYPHAL_AMMETER);
+        r.accept(id("voltmeter_block"), HYPHAL_VOLTMETER);
         r.accept(id("stormsap_cell"), STORMSAP_CELL);
     }
 

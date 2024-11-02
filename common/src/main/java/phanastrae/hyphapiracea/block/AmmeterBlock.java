@@ -57,7 +57,7 @@ public class AmmeterBlock extends AbstractTwoSidedChargeSacBlock {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
                 ? null
-                : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.AMMETER_BLOCK, AmmeterBlockEntity::serverTick);
+                : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.HYPHAL_AMMETER, AmmeterBlockEntity::serverTick);
     }
 
     @Override

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "hyphapiracea:block/leukbox"
+    "all": "hyphapiracea:block/hyphal_node"
   }
 }

@@ -12,12 +12,12 @@ import phanastrae.hyphapiracea.electromagnetism.CircuitNetwork;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNode;
 import phanastrae.hyphapiracea.electromagnetism.CircuitWire;
 
-public class GalvanocarpicBulbBlockEntity extends BlockEntity implements MiniCircuitHolder {
+public class HyphalNodeBlockEntity extends BlockEntity implements MiniCircuitHolder {
 
     protected final MiniCircuit miniCircuit;
 
-    public GalvanocarpicBulbBlockEntity(BlockPos pos, BlockState blockState) {
-        super(HyphaPiraceaBlockEntityTypes.GALVANOCARPIC_BULB, pos, blockState);
+    public HyphalNodeBlockEntity(BlockPos pos, BlockState blockState) {
+        super(HyphaPiraceaBlockEntityTypes.HYPHAL_NODE, pos, blockState);
 
         this.miniCircuit = new MiniCircuit();
         CircuitNetwork network = new CircuitNetwork();

@@ -15,7 +15,7 @@ public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity imp
     private double current;
 
     public AmmeterBlockEntity(BlockPos pos, BlockState blockState) {
-        super(HyphaPiraceaBlockEntityTypes.AMMETER_BLOCK, pos, blockState);
+        super(HyphaPiraceaBlockEntityTypes.HYPHAL_AMMETER, pos, blockState);
     }
 
     @Override

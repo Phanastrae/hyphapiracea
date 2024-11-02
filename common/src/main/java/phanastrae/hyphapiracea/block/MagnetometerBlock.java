@@ -66,7 +66,7 @@ public class MagnetometerBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.MAGNETOMETER_BLOCK, MagnetometerBlockEntity::serverTick);
+        return level.isClientSide ? null : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.LEYFIELD_MAGNETOMETER_BLOCK, MagnetometerBlockEntity::serverTick);
     }
 
     @Override
