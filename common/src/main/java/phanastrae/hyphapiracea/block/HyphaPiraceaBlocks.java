@@ -34,6 +34,7 @@ public class HyphaPiraceaBlocks {
     public static final Block AZIMULDEY_MASS = new AzimuldeyMassBlock(properties());
     public static final Block CREATIVE_CELL = new CreativeCellBlock(properties()
             .lightLevel(blockState -> 12));
+    public static final Block CIRCUIT_SWITCH = new CircuitSwitchBlock(properties());
 
     public static void init(BiConsumer<ResourceLocation, Block> r) {
         r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);
@@ -46,6 +47,7 @@ public class HyphaPiraceaBlocks {
         r.accept(id("stormsap_cell"), STORMSAP_CELL);
         r.accept(id("azimuldey_mass"), AZIMULDEY_MASS);
         r.accept(id("creative_cell"), CREATIVE_CELL);
+        r.accept(id("circuit_switch"), CIRCUIT_SWITCH);
     }
 
     private static ResourceLocation id(String path) {

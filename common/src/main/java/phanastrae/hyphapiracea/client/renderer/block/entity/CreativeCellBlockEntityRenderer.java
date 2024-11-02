@@ -7,9 +7,9 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.network.chat.Component;
 import phanastrae.hyphapiracea.block.entity.StormsapCellBlockEntity;
 
-public class StormsapCellBlockEntityRenderer extends AbstractTextDisplayerBlockEntityRenderer<StormsapCellBlockEntity> {
+public class CreativeCellBlockEntityRenderer extends AbstractTextDisplayerBlockEntityRenderer<StormsapCellBlockEntity> {
 
-    public StormsapCellBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+    public CreativeCellBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -20,9 +20,7 @@ public class StormsapCellBlockEntityRenderer extends AbstractTextDisplayerBlockE
             double scale = VoltmeterBlockEntityRenderer.getScaleForTime(levelTime, blockEntity.lastHighlightTime, partialTick, blockEntity.getBlockState());
 
             if(scale > 0.0) {
-                double energy = blockEntity.getPositiveStoredEnergy();
-                String formatted = String.format("%1$,.0f", energy);
-                Component energyComponent = Component.translatable("hyphapiracea.displays.joule", formatted).withStyle(ChatFormatting.AQUA);
+                Component energyComponent = Component.translatable("hyphapiracea.displays.joule", Component.translatable("hyphapiracea.displays.infinity")).withStyle(ChatFormatting.AQUA);
                 drawTextOnAllSides(energyComponent, poseStack, bufferSource, blockEntity.getLevel(), blockEntity.getBlockPos(), scale);
             }
         }

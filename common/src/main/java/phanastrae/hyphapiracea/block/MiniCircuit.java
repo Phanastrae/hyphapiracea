@@ -145,6 +145,10 @@ public class MiniCircuit {
         this.internalWires.add(wire);
     }
 
+    public void removeInternalWire(CircuitWire wire) {
+        this.internalWires.remove(wire);
+    }
+
     public static class WireConnection {
         private final MiniCircuit circuit1;
         private final MiniCircuit circuit2;

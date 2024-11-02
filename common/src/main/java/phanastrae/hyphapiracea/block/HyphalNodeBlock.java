@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.block.entity.HyphalNodeBlockEntity;
 
 import java.util.Map;
@@ -98,7 +99,9 @@ public class HyphalNodeBlock extends BaseEntityBlock implements MiniCircuitHolde
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return null;
+        return level.isClientSide
+                ? null
+                : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.HYPHAL_NODE, HyphalNodeBlockEntity::serverTick);
     }
 
     @Nullable

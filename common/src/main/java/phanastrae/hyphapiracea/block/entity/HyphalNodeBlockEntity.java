@@ -38,6 +38,12 @@ public class HyphalNodeBlockEntity extends BlockEntity implements MiniCircuitHol
         }
     }
 
+    public static void serverTick(Level level, BlockPos pos, BlockState state, HyphalNodeBlockEntity blockEntity) {
+        if(blockEntity.miniCircuit.needsUpdate()) {
+            MiniCircuitHolder.updateIfNeeded(level, pos, blockEntity.miniCircuit);
+        }
+    }
+
     public void addSide(Direction direction) {
         int index = direction.get3DDataValue();
         if(!this.directionFilled[index]) {

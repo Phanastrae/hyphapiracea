@@ -15,6 +15,7 @@ public class HyphaPiraceaBlockEntityRenderers {
         register(HyphaPiraceaBlockEntityTypes.HYPHAL_AMMETER, AmmeterBlockEntityRenderer::new);
         register(HyphaPiraceaBlockEntityTypes.HYPHAL_VOLTMETER, VoltmeterBlockEntityRenderer::new);
         register(HyphaPiraceaBlockEntityTypes.STORMSAP_CELL, StormsapCellBlockEntityRenderer::new);
+        register(HyphaPiraceaBlockEntityTypes.CREATIVE_CELL, CreativeCellBlockEntityRenderer::new);
     }
 
     public static <T extends BlockEntity> void register(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> factory) {

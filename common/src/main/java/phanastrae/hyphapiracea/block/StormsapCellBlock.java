@@ -56,7 +56,7 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new StormsapCellBlockEntity(pos, state, false);
+        return new StormsapCellBlockEntity(pos, state);
     }
 
     @Nullable

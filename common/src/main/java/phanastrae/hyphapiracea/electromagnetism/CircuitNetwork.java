@@ -7,7 +7,7 @@ import java.util.*;
 
 public class CircuitNetwork {
 
-    private Collection<CircuitWire> wires = new HashSet<>();
+    public Collection<CircuitWire> wires = new HashSet<>();
     private boolean needsRecalculation = true;
     private long lastUpdateTime = -1;
 

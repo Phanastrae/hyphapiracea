@@ -5,6 +5,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import phanastrae.hyphapiracea.block.StormsapCellBlock;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNetwork;
@@ -13,19 +14,17 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
     public static final String STORED_ENERGY_KEY = "stored_energy";
 
     public long lastHighlightTime = -1;
-    private int lastComparatorOutput = -1;
-    private int storedEnergy;
-    private boolean active = false;
-    private boolean powered;
-    private boolean isInfinite;
+    protected int lastComparatorOutput = -1;
+    protected int storedEnergy;
+    protected boolean active = false;
+    protected boolean powered;
 
-    public StormsapCellBlockEntity(BlockPos pos, BlockState state) {
-        this(pos, state, false);
+    public StormsapCellBlockEntity(BlockPos pos, BlockState blockState) {
+        this(HyphaPiraceaBlockEntityTypes.STORMSAP_CELL, pos, blockState);
     }
 
-    public StormsapCellBlockEntity(BlockPos pos, BlockState blockState, boolean isInfinite) {
-        super(HyphaPiraceaBlockEntityTypes.STORMSAP_CELL, pos, blockState);
-        this.isInfinite = isInfinite;
+    public StormsapCellBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+        super(type, pos, blockState);
 
         if(blockState.hasProperty(StormsapCellBlock.POWERED)) {
             this.powered = blockState.getValue(StormsapCellBlock.POWERED);
@@ -49,36 +48,34 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
     public static void serverTick(Level level, BlockPos pos, BlockState state, StormsapCellBlockEntity blockEntity) {
         AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
 
-        if(!blockEntity.isInfinite) {
-            int dE = 0;
-            double efficiency = 0.95;
-            double current = blockEntity.wire.getCurrent();
-            double emf = blockEntity.active ? blockEntity.getGeneratedVoltage() : 0;
-            double powerUse = current * emf;
-            if (powerUse < 0) {
-                powerUse *= efficiency;
-            }
-            dE += Mth.floor(-powerUse / 20);
-            double powerGain = blockEntity.wire.getPower();
-            powerGain *= efficiency;
-            dE += Mth.floor(powerGain / 20);
+        int dE = 0;
+        double efficiency = 0.95;
+        double current = blockEntity.wire.getCurrent();
+        double emf = blockEntity.active ? blockEntity.getGeneratedVoltage() : 0;
+        double powerUse = current * emf;
+        if (powerUse < 0) {
+            powerUse *= efficiency;
+        }
+        dE += Mth.floor(-powerUse / 20);
+        double powerGain = blockEntity.wire.getPower();
+        powerGain *= efficiency;
+        dE += Mth.floor(powerGain / 20);
 
-            if (dE != 0) {
-                blockEntity.addEnergy(dE);
-                blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
-                blockEntity.setChanged();
-                blockEntity.sendUpdate();
-            }
+        if (dE != 0) {
+            blockEntity.addEnergy(dE);
+            blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
+            blockEntity.setChanged();
+            blockEntity.sendUpdate();
         }
 
         CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
-        if(!blockEntity.active && !blockEntity.powered && (blockEntity.storedEnergy > 0 || blockEntity.isInfinite)) {
+        if(!blockEntity.active && !blockEntity.powered && blockEntity.storedEnergy > 0) {
             blockEntity.active = true;
             blockEntity.wire.setEmf(blockEntity.getGeneratedVoltage());
             if(network != null) {
                 network.markNeedsUpdate();
             }
-        } else if(blockEntity.active && (blockEntity.powered || (blockEntity.storedEnergy <= 0 && !blockEntity.isInfinite))) {
+        } else if(blockEntity.active && (blockEntity.powered || blockEntity.storedEnergy <= 0)) {
             blockEntity.active = false;
             blockEntity.wire.setEmf(0);
             if(network != null) {
@@ -86,7 +83,7 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
             }
         }
 
-        if(blockEntity.lastComparatorOutput == -1 && !blockEntity.isInfinite) {
+        if(blockEntity.lastComparatorOutput == -1) {
             blockEntity.lastComparatorOutput = blockEntity.calculateComparatorOutput();
             blockEntity.setChanged();
         }
@@ -128,10 +125,6 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
         return -10000;
     }
 
-    public boolean isInfinite() {
-        return isInfinite;
-    }
-
     public int getStoredEnergy() {
         return this.storedEnergy;
     }
@@ -156,9 +149,12 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
 
         double v = this.storedEnergy / 1000000F;
         int energyLevel = Mth.clamp(Mth.ceil(v * 15), 0, 15);
-        BlockState newState = this.getBlockState().setValue(StormsapCellBlock.STORED_POWER, energyLevel);
-        if(this.level != null && !this.level.isClientSide && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
-            this.level.setBlock(this.getBlockPos(), newState, 3);
+
+        if(this.getBlockState().hasProperty(StormsapCellBlock.STORED_POWER)) {
+            BlockState newState = this.getBlockState().setValue(StormsapCellBlock.STORED_POWER, energyLevel);
+            if (this.level != null && !this.level.isClientSide && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
+                this.level.setBlock(this.getBlockPos(), newState, 3);
+            }
         }
     }
 

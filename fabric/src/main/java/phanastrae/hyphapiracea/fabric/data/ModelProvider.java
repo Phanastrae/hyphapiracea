@@ -39,6 +39,7 @@ public class ModelProvider extends FabricModelProvider {
         this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_AMMETER);
         this.createCubeTopBottomSideWithTintedSides(BMG, HyphaPiraceaBlocks.STORMSAP_CELL);
         this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.CREATIVE_CELL, HyphaPiracea.id("block/creative_hyphal_positive_terminal"), HyphaPiracea.id("block/creative_hyphal_negative_terminal"));
+        this.createCircuitSwitch(BMG, HyphaPiraceaBlocks.CIRCUIT_SWITCH, HyphaPiracea.id("block/hyphal_positive_terminal"), HyphaPiracea.id("block/hyphal_negative_terminal"));
 
         this.createHyphalNode(BMG, HyphaPiraceaBlocks.AZIMULDEY_MASS);
         this.createHyphalNode(BMG, HyphaPiraceaBlocks.HYPHAL_NODE);
@@ -124,7 +125,9 @@ public class ModelProvider extends FabricModelProvider {
                                                 .select(
                                                         DOWN, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R180)
                                                 )
-                                                .select(UP, Variant.variant().with(MODEL, verticalModel))
+                                                .select(
+                                                        UP, Variant.variant().with(MODEL, verticalModel)
+                                                )
                                                 .select(
                                                         NORTH, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90)
                                                 )
@@ -136,6 +139,66 @@ public class ModelProvider extends FabricModelProvider {
                                                 )
                                                 .select(
                                                         WEST, Variant.variant().with(MODEL, verticalModel).with(X_ROT, R90).with(Y_ROT, R270)
+                                                )
+                                )
+                );
+    }
+
+    public void createCircuitSwitch(BlockModelGenerators BMG, Block block, ResourceLocation top, ResourceLocation bottom) {
+        TextureMapping offMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.BOTTOM, bottom)
+                .put(TextureSlot.TOP, top)
+                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
+        ResourceLocation offModel = HyphaPiraceaModelTemplates.CUBE_TOP_BOTTOM_SIDE.create(block, offMapping, BMG.modelOutput);
+
+        TextureMapping onMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side_on"))
+                .put(TextureSlot.BOTTOM, bottom)
+                .put(TextureSlot.TOP, top)
+                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side_on"));
+        ResourceLocation onModel = HyphaPiraceaModelTemplates.CUBE_TOP_BOTTOM_SIDE.createWithOverride(block, "_on", onMapping, BMG.modelOutput);
+
+        BMG.blockStateOutput
+                .accept(
+                        MultiVariantGenerator.multiVariant(block)
+                                .with(
+                                        PropertyDispatch.properties(BlockStateProperties.FACING, BlockStateProperties.POWERED)
+                                                .select(
+                                                        DOWN, false, Variant.variant().with(MODEL, offModel).with(X_ROT, R180)
+                                                )
+                                                .select(
+                                                        UP, false, Variant.variant().with(MODEL, offModel)
+                                                )
+                                                .select(
+                                                        NORTH, false, Variant.variant().with(MODEL, offModel).with(X_ROT, R90)
+                                                )
+                                                .select(
+                                                        SOUTH, false, Variant.variant().with(MODEL, offModel).with(X_ROT, R90).with(Y_ROT, R180)
+                                                )
+                                                .select(
+                                                        EAST, false, Variant.variant().with(MODEL, offModel).with(X_ROT, R90).with(Y_ROT, R90)
+                                                )
+                                                .select(
+                                                        WEST, false, Variant.variant().with(MODEL, offModel).with(X_ROT, R90).with(Y_ROT, R270)
+                                                )
+                                                .select(
+                                                        DOWN, true, Variant.variant().with(MODEL, onModel).with(X_ROT, R180)
+                                                )
+                                                .select(
+                                                        UP, true, Variant.variant().with(MODEL, onModel)
+                                                )
+                                                .select(
+                                                        NORTH, true, Variant.variant().with(MODEL, onModel).with(X_ROT, R90)
+                                                )
+                                                .select(
+                                                        SOUTH, true, Variant.variant().with(MODEL, onModel).with(X_ROT, R90).with(Y_ROT, R180)
+                                                )
+                                                .select(
+                                                        EAST, true, Variant.variant().with(MODEL, onModel).with(X_ROT, R90).with(Y_ROT, R90)
+                                                )
+                                                .select(
+                                                        WEST, true, Variant.variant().with(MODEL, onModel).with(X_ROT, R90).with(Y_ROT, R270)
                                                 )
                                 )
                 );
@@ -183,7 +246,11 @@ public class ModelProvider extends FabricModelProvider {
         BMG.blockStateOutput
                 .accept(
                         MultiPartGenerator.multiPart(block)
-                                .with(Condition.condition().term(BlockStateProperties.NORTH, true), Variant.variant().with(VariantProperties.MODEL, resourceLocation))
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.NORTH, true),
+                                        Variant.variant().with(
+                                                VariantProperties.MODEL, resourceLocation
+                                        ))
                                 .with(
                                         Condition.condition().term(BlockStateProperties.EAST, true),
                                         Variant.variant()
@@ -219,7 +286,11 @@ public class ModelProvider extends FabricModelProvider {
                                                 .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
                                                 .with(VariantProperties.UV_LOCK, false)
                                 )
-                                .with(Condition.condition().term(BlockStateProperties.NORTH, false), Variant.variant().with(VariantProperties.MODEL, resourceLocation2))
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.NORTH, false),
+                                        Variant.variant().with(
+                                                VariantProperties.MODEL, resourceLocation2)
+                                )
                                 .with(
                                         Condition.condition().term(BlockStateProperties.EAST, false),
                                         Variant.variant()
