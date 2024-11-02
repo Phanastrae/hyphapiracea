@@ -3,6 +3,7 @@ package phanastrae.hyphapiracea.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -56,9 +57,9 @@ public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock imp
     }
 
     @Override
-    public @Nullable MiniCircuit getMiniCircuit(Level level, BlockPos pos, BlockState state, Direction side) {
-        if(level.getBlockEntity(pos) instanceof MiniCircuitHolder cnh) {
-            return cnh.getMiniCircuit(level, pos, state, side);
+    public @Nullable MiniCircuit getMiniCircuit(BlockGetter blockGetter, BlockPos pos, BlockState state, Direction side) {
+        if(blockGetter.getBlockEntity(pos) instanceof MiniCircuitHolder cnh) {
+            return cnh.getMiniCircuit(blockGetter, pos, state, side);
         } else {
             return null;
         }

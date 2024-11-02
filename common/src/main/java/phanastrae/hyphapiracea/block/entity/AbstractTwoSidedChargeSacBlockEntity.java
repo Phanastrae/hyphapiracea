@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -90,7 +91,7 @@ public abstract class AbstractTwoSidedChargeSacBlockEntity extends BlockEntity i
     }
 
     @Override
-    public @Nullable MiniCircuit getMiniCircuit(Level level, BlockPos pos, BlockState state, Direction side) {
+    public @Nullable MiniCircuit getMiniCircuit(BlockGetter blockGetter, BlockPos pos, BlockState state, Direction side) {
         if(state.hasProperty(AbstractTwoSidedChargeSacBlock.FACING)) {
             Direction direction = state.getValue(AbstractTwoSidedChargeSacBlock.FACING);
 

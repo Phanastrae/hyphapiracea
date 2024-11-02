@@ -4,16 +4,14 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
-import net.minecraft.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.data.models.blockstates.PropertyDispatch;
-import net.minecraft.data.models.blockstates.Variant;
+import net.minecraft.data.models.blockstates.*;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
+import net.minecraft.data.models.model.TexturedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
@@ -34,7 +32,6 @@ public class ModelProvider extends FabricModelProvider {
     public void generateBlockStateModels(BlockModelGenerators BMG) {
         BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
         BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_TAR);
-        BMG.createTrivialCube(HyphaPiraceaBlocks.HYPHAL_NODE);
 
         this.createTopSideBottom(BMG, HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
 
@@ -42,7 +39,10 @@ public class ModelProvider extends FabricModelProvider {
         this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_AMMETER);
         this.createCubeTopBottomSideWithTintedSides(BMG, HyphaPiraceaBlocks.STORMSAP_CELL);
 
-        createConductorBlock(BMG, HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
+        this.createHyphalNode(BMG, HyphaPiraceaBlocks.AZIMULDEY_MASS);
+        this.createHyphalNode(BMG, HyphaPiraceaBlocks.HYPHAL_NODE);
+
+        this.createConductorBlock(BMG, HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
     }
 
     @Override
@@ -63,15 +63,15 @@ public class ModelProvider extends FabricModelProvider {
         IMG.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
     }
 
-    public static void createConductorBlock(BlockModelGenerators BMG, Block block) {
+    public void createConductorBlock(BlockModelGenerators BMG, Block block) {
         TextureMapping verticalMapping = new TextureMapping()
-                .put(PARTICLE, getBlockTexture(Blocks.POLISHED_DEEPSLATE))
-                .put(ALL, getBlockTexture(Blocks.POLISHED_DEEPSLATE));
+                .put(PARTICLE, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS))
+                .put(ALL, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS));
         ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CONDUCTOR.create(block, verticalMapping, BMG.modelOutput);
 
         TextureMapping horizontalMapping = new TextureMapping()
-                .put(PARTICLE, getBlockTexture(Blocks.POLISHED_DEEPSLATE))
-                .put(ALL, getBlockTexture(Blocks.POLISHED_DEEPSLATE));
+                .put(PARTICLE, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS))
+                .put(ALL, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS));
         ResourceLocation horizontalModel = HyphaPiraceaModelTemplates.CONDUCTOR_WALL.create(block, horizontalMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
@@ -170,6 +170,88 @@ public class ModelProvider extends FabricModelProvider {
                                                 )
                                 )
                 );
+    }
+
+    public void createHyphalNode(BlockModelGenerators BMG, Block block) {
+        ResourceLocation resourceLocation = ModelTemplates.SINGLE_FACE.createWithSuffix(block, "_open", TextureMapping.defaultTexture(TextureMapping.getBlockTexture(block, "_open")), BMG.modelOutput);
+        ResourceLocation resourceLocation2 = ModelTemplates.SINGLE_FACE.create(block, TextureMapping.defaultTexture(block), BMG.modelOutput);
+        BMG.blockStateOutput
+                .accept(
+                        MultiPartGenerator.multiPart(block)
+                                .with(Condition.condition().term(BlockStateProperties.NORTH, true), Variant.variant().with(VariantProperties.MODEL, resourceLocation))
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.EAST, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.SOUTH, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.WEST, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.UP, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.DOWN, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(Condition.condition().term(BlockStateProperties.NORTH, false), Variant.variant().with(VariantProperties.MODEL, resourceLocation2))
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.EAST, false),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation2)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.SOUTH, false),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation2)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.WEST, false),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation2)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.UP, false),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation2)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.DOWN, false),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation2)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                );
+        BMG.delegateItemModel(block, TexturedModel.CUBE.createWithSuffix(block, "_inventory", BMG.modelOutput));
     }
 
     public static Variant variant() {

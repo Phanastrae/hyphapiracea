@@ -16,10 +16,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -27,11 +27,13 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.hyphapiracea.block.entity.HyphalNodeBlockEntity;
+import phanastrae.hyphapiracea.electromagnetism.CircuitNode;
+import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
 
 import java.util.Map;
 
-public class HyphalNodeBlock extends BaseEntityBlock implements MiniCircuitHolder {
-    public static final MapCodec<HyphalNodeBlock> CODEC = simpleCodec(HyphalNodeBlock::new);
+public class AzimuldeyMassBlock extends Block {
+    public static final MapCodec<AzimuldeyMassBlock> CODEC = simpleCodec(AzimuldeyMassBlock::new);
     public static final BooleanProperty NORTH = PipeBlock.NORTH;
     public static final BooleanProperty EAST = PipeBlock.EAST;
     public static final BooleanProperty SOUTH = PipeBlock.SOUTH;
@@ -41,11 +43,11 @@ public class HyphalNodeBlock extends BaseEntityBlock implements MiniCircuitHolde
     public static final Map<Direction, BooleanProperty> PROPERTY_BY_DIRECTION = PipeBlock.PROPERTY_BY_DIRECTION;
 
     @Override
-    public MapCodec<HyphalNodeBlock> codec() {
+    public MapCodec<AzimuldeyMassBlock> codec() {
         return CODEC;
     }
 
-    public HyphalNodeBlock(Properties properties) {
+    public AzimuldeyMassBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition
@@ -84,39 +86,10 @@ public class HyphalNodeBlock extends BaseEntityBlock implements MiniCircuitHolde
                 .setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.DOWN)), state.getValue(DOWN));
     }
 
-    @Override
-    protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new HyphalNodeBlockEntity(pos, state);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return null;
-    }
-
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return AzimuldeyMassBlock.getPlacementState(context.getLevel(), context.getClickedPos(), this.defaultBlockState());
-    }
-
-    @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
-
-        for(Direction direction : Direction.values()) {
-            MiniCircuit mc = this.getMiniCircuit(level, pos, state, direction);
-            if(mc != null) {
-                mc.bindToNeighbors(level, pos);
-            }
-        }
     }
 
     @Override
@@ -143,17 +116,53 @@ public class HyphalNodeBlock extends BaseEntityBlock implements MiniCircuitHolde
                 level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
                 return ItemInteractionResult.sidedSuccess(level.isClientSide);
             }
+        } else {
+            if(player.mayBuild() && stack.is(HyphaPiraceaItems.HYPHALINE)) {
+                if (!level.isClientSide) {
+                    if (player instanceof ServerPlayer) {
+                        CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
+                    }
+
+                    BlockState newState = HyphaPiraceaBlocks.HYPHAL_NODE.defaultBlockState();
+                    for(Direction d : Direction.values()) {
+                        BooleanProperty prop = PROPERTY_BY_DIRECTION.get(d);
+                        newState = newState.setValue(prop, state.getValue(prop));
+                    }
+                    level.setBlock(pos, newState, 11);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
+
+                    stack.consume(1, player);
+                }
+                level.playSound(player, pos, SoundEvents.ITEM_FRAME_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            }
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
-    @Override
-    public @Nullable MiniCircuit getMiniCircuit(BlockGetter blockGetter, BlockPos pos, BlockState state, Direction side) {
-        if(blockGetter.getBlockEntity(pos) instanceof MiniCircuitHolder cnh) {
-            return cnh.getMiniCircuit(blockGetter, pos, state, side);
-        } else {
-            return null;
+    public static BlockState getPlacementState(BlockGetter blockGetter, BlockPos thisPos, BlockState thisState) {
+        for(Direction direction : Direction.values()) {
+            BlockPos adjPos = thisPos.offset(direction.getNormal());
+            BlockState adjState = blockGetter.getBlockState(adjPos);
+            if(adjState.getBlock() instanceof MiniCircuitHolder mch) {
+                MiniCircuit mc = mch.getMiniCircuit(blockGetter, adjPos, adjState, direction.getOpposite());
+                if(mc != null) {
+                    CircuitNode node = mc.getNode(direction.getOpposite());
+                    if(node != null) {
+                        thisState = thisState.setValue(PROPERTY_BY_DIRECTION.get(direction), true);
+                    }
+                }
+            } else if(adjState.getBlock() instanceof AzimuldeyMassBlock) {
+                BooleanProperty dirProp = PROPERTY_BY_DIRECTION.get(direction.getOpposite());
+                if(adjState.hasProperty(dirProp)) {
+                    if(adjState.getValue(dirProp)) {
+                        thisState = thisState.setValue(PROPERTY_BY_DIRECTION.get(direction), true);
+                    }
+                }
+            }
         }
+
+        return thisState;
     }
 }

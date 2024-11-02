@@ -1,5 +1,5 @@
 {
-  "parent": "hyphapiracea:block/template_conductor",
+  "parent": "hyphapiracea:block/template_conductor_wall",
   "textures": {
     "all": "hyphapiracea:block/azimuldey_mass",
     "particle": "hyphapiracea:block/azimuldey_mass"

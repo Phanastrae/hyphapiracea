@@ -2,6 +2,7 @@ package phanastrae.hyphapiracea.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +13,7 @@ import java.util.Queue;
 public interface MiniCircuitHolder {
 
     @Nullable
-    MiniCircuit getMiniCircuit(Level level, BlockPos pos, BlockState state, Direction side);
+    MiniCircuit getMiniCircuit(BlockGetter level, BlockPos pos, BlockState state, Direction side);
 
     static void updateIfNeeded(Level level, BlockPos thisPos, Direction side) {
         BlockState thisState = level.getBlockState(thisPos);

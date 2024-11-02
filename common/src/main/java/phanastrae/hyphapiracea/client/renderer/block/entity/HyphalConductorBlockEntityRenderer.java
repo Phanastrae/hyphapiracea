@@ -70,7 +70,6 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
             }
         }
         if(wireLineComponent != null) {
-
             // render link
             if (level != null && isSource) {
                 Vec3 linkPos = getLinkPosition(blockEntity, partialTick);
@@ -116,6 +115,7 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
                 }
 
                 poseStack.scale(-1.0F, -1.0F, 1.0F);
+                poseStack.scale(1.0625F, 1.0625F, 1.0625F);
 
                 VertexConsumer vertexconsumer = bufferSource.getBuffer(useModel.renderType(wireLineComponent.getTextureFull()));
                 useModel.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);

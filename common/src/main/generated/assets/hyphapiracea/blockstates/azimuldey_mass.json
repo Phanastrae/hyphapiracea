@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node_open"
+        "model": "hyphapiracea:block/azimuldey_mass_open"
       },
       "when": {
         "north": "true"
@@ -10,7 +10,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node_open",
+        "model": "hyphapiracea:block/azimuldey_mass_open",
         "uvlock": false,
         "y": 90
       },
@@ -20,7 +20,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node_open",
+        "model": "hyphapiracea:block/azimuldey_mass_open",
         "uvlock": false,
         "y": 180
       },
@@ -30,7 +30,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node_open",
+        "model": "hyphapiracea:block/azimuldey_mass_open",
         "uvlock": false,
         "y": 270
       },
@@ -40,7 +40,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node_open",
+        "model": "hyphapiracea:block/azimuldey_mass_open",
         "uvlock": false,
         "x": 270
       },
@@ -50,7 +50,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node_open",
+        "model": "hyphapiracea:block/azimuldey_mass_open",
         "uvlock": false,
         "x": 90
       },
@@ -60,7 +60,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node"
+        "model": "hyphapiracea:block/azimuldey_mass"
       },
       "when": {
         "north": "false"
@@ -68,7 +68,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/azimuldey_mass",
         "uvlock": false,
         "y": 90
       },
@@ -78,7 +78,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/azimuldey_mass",
         "uvlock": false,
         "y": 180
       },
@@ -88,7 +88,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/azimuldey_mass",
         "uvlock": false,
         "y": 270
       },
@@ -98,7 +98,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/azimuldey_mass",
         "uvlock": false,
         "x": 270
       },
@@ -108,7 +108,7 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/azimuldey_mass",
         "uvlock": false,
         "x": 90
       },
