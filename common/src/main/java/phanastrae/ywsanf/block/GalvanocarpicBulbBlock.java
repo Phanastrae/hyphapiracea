@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -12,9 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import phanastrae.ywsanf.block.entity.GalvanocarpicBulbBlockEntity;
-import phanastrae.ywsanf.electromagnetism.CircuitNode;
 
-public class GalvanocarpicBulbBlock extends BaseEntityBlock implements CircuitNodeHolder {
+public class GalvanocarpicBulbBlock extends BaseEntityBlock implements MiniCircuitHolder {
     public static final MapCodec<GalvanocarpicBulbBlock> CODEC = simpleCodec(GalvanocarpicBulbBlock::new);
 
     @Override
@@ -44,10 +44,21 @@ public class GalvanocarpicBulbBlock extends BaseEntityBlock implements CircuitNo
     }
 
     @Override
-    @Nullable
-    public CircuitNode getCircuitNode(Level level, BlockPos pos, BlockState state, Direction side) {
-        if(level.getBlockEntity(pos) instanceof GalvanocarpicBulbBlockEntity blockEntity) {
-            return blockEntity.getCircuitNode();
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+
+        for(Direction direction : Direction.values()) {
+            MiniCircuit mc = this.getMiniCircuit(level, pos, state, direction);
+            if(mc != null) {
+                mc.bindToNeighbors(level, pos);
+            }
+        }
+    }
+
+    @Override
+    public @Nullable MiniCircuit getMiniCircuit(Level level, BlockPos pos, BlockState state, Direction side) {
+        if(level.getBlockEntity(pos) instanceof MiniCircuitHolder cnh) {
+            return cnh.getMiniCircuit(level, pos, state, side);
         } else {
             return null;
         }

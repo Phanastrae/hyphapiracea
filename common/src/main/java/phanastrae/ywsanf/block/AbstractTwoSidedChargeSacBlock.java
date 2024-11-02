@@ -9,10 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.ywsanf.block.entity.AbstractTwoSidedChargeSacBlockEntity;
-import phanastrae.ywsanf.electromagnetism.CircuitNode;
 
-public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock implements CircuitNodeHolder {
+public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock implements MiniCircuitHolder {
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
 
     public AbstractTwoSidedChargeSacBlock(Properties properties) {
@@ -46,22 +44,23 @@ public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock imp
     }
 
     @Override
-    @Nullable
-    public CircuitNode getCircuitNode(Level level, BlockPos pos, BlockState state, Direction side) {
-        if(state.hasProperty(FACING)) {
-            Direction direction = state.getValue(FACING);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
 
-            if(level.getBlockEntity(pos) instanceof AbstractTwoSidedChargeSacBlockEntity blockEntity) {
-                if(direction == side) {
-                    return blockEntity.getPositiveCircuitNode();
-                } else if(direction == side.getOpposite()) {
-                    return blockEntity.getNegativeCircuitNode();
-                } else {
-                    return null;
-                }
+        for(Direction direction : Direction.values()) {
+            MiniCircuit mc = this.getMiniCircuit(level, pos, state, direction);
+            if(mc != null) {
+                mc.bindToNeighbors(level, pos);
             }
         }
+    }
 
-        return null;
+    @Override
+    public @Nullable MiniCircuit getMiniCircuit(Level level, BlockPos pos, BlockState state, Direction side) {
+        if(level.getBlockEntity(pos) instanceof MiniCircuitHolder cnh) {
+            return cnh.getMiniCircuit(level, pos, state, side);
+        } else {
+            return null;
+        }
     }
 }

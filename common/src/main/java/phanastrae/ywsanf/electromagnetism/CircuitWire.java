@@ -31,6 +31,14 @@ public class CircuitWire {
         this.power = power;
     }
 
+    public CircuitNode getOtherNode(CircuitNode node) {
+        if(node == this.startNode) {
+            return this.endNode;
+        } else {
+            return this.startNode;
+        }
+    }
+
     public CircuitNode getStartNode() {
         return startNode;
     }

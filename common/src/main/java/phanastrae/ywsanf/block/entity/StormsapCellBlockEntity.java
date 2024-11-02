@@ -33,6 +33,8 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, StormsapCellBlockEntity blockEntity) {
+        AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
+
         if(blockEntity.active) {
             double current = blockEntity.wire.getCurrent();
             double pd = blockEntity.getGeneratedVoltage();
@@ -58,10 +60,6 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
             if(network != null) {
                 network.markNeedsUpdate();
             }
-        }
-
-        if(network != null) {
-            network.tick();
         }
     }
 

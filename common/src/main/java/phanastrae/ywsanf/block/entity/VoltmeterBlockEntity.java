@@ -6,12 +6,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import phanastrae.ywsanf.electromagnetism.CircuitNetwork;
 
 public class VoltmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
     public static final String KEY_VOLTAGE = "voltage";
 
-    private float voltage;
+    private double voltage;
 
     public VoltmeterBlockEntity(BlockPos pos, BlockState blockState) {
         super(YWSaNFBlockEntityTypes.VOLTMETER_BLOCK, pos, blockState);
@@ -20,29 +19,26 @@ public class VoltmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         super.loadAdditional(nbt, registries);
-        if(nbt.contains(KEY_VOLTAGE, Tag.TAG_FLOAT)) {
-            this.voltage = nbt.getFloat(KEY_VOLTAGE);
+        if(nbt.contains(KEY_VOLTAGE, Tag.TAG_DOUBLE)) {
+            this.voltage = nbt.getDouble(KEY_VOLTAGE);
         }
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
         CompoundTag nbt = super.getUpdateTag(registryLookup);
-        nbt.putFloat(KEY_VOLTAGE, this.voltage);
+        nbt.putDouble(KEY_VOLTAGE, this.voltage);
         return nbt;
     }
 
-    public float getVoltage() {
+    public double getVoltage() {
         return this.voltage;
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, VoltmeterBlockEntity blockEntity) {
-        CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
-        if(network != null) {
-            network.tick();
-        }
+        AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
 
-        float voltage = (float)blockEntity.wire.getVoltage();
+        double voltage = blockEntity.wire.getVoltage();
         if(blockEntity.voltage != voltage) {
             blockEntity.voltage = voltage;
             blockEntity.sendUpdate();

@@ -23,8 +23,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.ywsanf.block.CircuitNodeHolder;
 import phanastrae.ywsanf.block.HyphalConductorBlock;
+import phanastrae.ywsanf.block.MiniCircuit;
+import phanastrae.ywsanf.block.MiniCircuitHolder;
 import phanastrae.ywsanf.block.state.ConductorStateProperty;
 import phanastrae.ywsanf.component.YWSaNFComponentTypes;
 import phanastrae.ywsanf.component.type.WireLineComponent;
@@ -56,8 +57,6 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
     private boolean hasObservedEndpoint = true;
     private int checkEndpointTimer = 0;
-
-    private int lastCurrent = 0;
 
     public HyphalConductorBlockEntity(BlockPos pos, BlockState blockState) {
         super(YWSaNFBlockEntityTypes.HYPHAL_CONDUCTOR, pos, blockState);
@@ -163,49 +162,6 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     private CircuitWire wire;
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, HyphalConductorBlockEntity blockEntity) {
-        boolean wireValid = false;
-        if(blockEntity.linkedBlockPos != null && blockEntity.hasItem()) {
-            CircuitNode startNode = getSupportingNode(level, pos);
-            CircuitNode endNode = getSupportingNode(level, blockEntity.linkedBlockPos);
-            if(startNode != null && endNode != null) {
-                wireValid = true;
-
-                if(startNode.getNetwork() == null) {
-                    startNode.setNetwork(new CircuitNetwork());
-                }
-                if(endNode.getNetwork() == null) {
-                    endNode.setNetwork(new CircuitNetwork());
-                }
-                if(endNode.getNetwork() != startNode.getNetwork()) {
-                    endNode.getNetwork().merge(startNode.getNetwork());
-                }
-
-                if(blockEntity.wire == null) {
-                    blockEntity.wire = new CircuitWire(startNode, endNode, blockEntity.wireLine.getTotalResistance(), 0);
-                    startNode.getNetwork().addWire(blockEntity.wire);
-                }
-            }
-        }
-        if(!wireValid && blockEntity.wire != null) {
-            CircuitNetwork net = blockEntity.wire.getStartNode().getNetwork();
-            if(net != null) {
-                net.removeWire(blockEntity.wire);
-            }
-            blockEntity.wire = null;
-        }
-        if(blockEntity.wire != null) {
-            CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
-            if(network != null) {
-                network.tick();
-            }
-
-            float current = (float)(blockEntity.wire.getCurrent());
-            if(current != blockEntity.lastCurrent) {
-                blockEntity.setCurrent(current);
-                blockEntity.sendUpdate();
-            }
-        }
-
         Entity linkedEntity = blockEntity.linkedEntity;
         if(linkedEntity != null) {
             if(!blockEntity.canLinkTo(linkedEntity)) {
@@ -227,6 +183,63 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                 blockEntity.checkEndpointTimer--;
             }
         }
+
+        boolean wireValid = false;
+        if(blockEntity.linkedBlockPos != null && blockEntity.hasItem()) {
+            CircuitNode startNode = getSupportingNode(level, pos);
+            CircuitNode endNode = getSupportingNode(level, blockEntity.linkedBlockPos);
+            if(startNode != null && endNode != null && (blockEntity.wire == null || (blockEntity.wire.getStartNode() == startNode && blockEntity.wire.getEndNode() == endNode))) {
+                wireValid = true;
+
+                if(blockEntity.wire == null) {
+                    for(Direction direction : Direction.values()) {
+                        BlockPos neighborPos1 = pos.offset(direction.getNormal());
+                        BlockPos neighborPos2 = blockEntity.linkedBlockPos.offset(direction.getNormal());
+                        MiniCircuitHolder.updateIfNeeded(level, neighborPos1, direction.getOpposite());
+                        MiniCircuitHolder.updateIfNeeded(level, neighborPos2, direction.getOpposite());
+                    }
+
+                    if(startNode.getNetwork() == null) {
+                        startNode.setNetwork(new CircuitNetwork());
+                    }
+                    if(endNode.getNetwork() == null) {
+                        endNode.setNetwork(new CircuitNetwork());
+                    }
+                    if(endNode.getNetwork() != startNode.getNetwork()) {
+                        CircuitNetwork network = endNode.getNetwork();
+                        network.merge(startNode.getNetwork());
+                        startNode.setNetwork(network);
+                    }
+
+                    blockEntity.wire = new CircuitWire(startNode, endNode, blockEntity.wireLine.getTotalResistance(), 0);
+                    startNode.getNetwork().addWire(blockEntity.wire);
+                }
+            }
+        }
+        if(!wireValid && blockEntity.wire != null) {
+            CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
+            CircuitNetwork network2 = blockEntity.wire.getEndNode().getNetwork();
+            if(network != null) {
+                network.removeWire(blockEntity.wire);
+            }
+            if(network != network2 && network2 != null) {
+                network2.removeWire(blockEntity.wire);
+            }
+            blockEntity.wire = null;
+        }
+
+        if(blockEntity.wire != null) {
+            CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
+            if(network != null) {
+                network.tick(level.getGameTime());
+            }
+
+            float current = (float)(blockEntity.wire.getCurrent());
+            if(current != blockEntity.wireLine.getCurrent()) {
+                blockEntity.setCurrent(current);
+                blockEntity.sendUpdate();
+            }
+        }
     }
 
     @Nullable
@@ -236,8 +249,13 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
             Direction facing = state.getValue(HyphalConductorBlock.FACING);
             BlockPos supportPos = coilPos.offset(facing.getOpposite().getNormal());
             BlockState supportState = level.getBlockState(supportPos);
-            if(supportState.getBlock() instanceof CircuitNodeHolder chargeSacContainer) {
-                return chargeSacContainer.getCircuitNode(level, supportPos, supportState, facing);
+            if(supportState.getBlock() instanceof MiniCircuitHolder mch) {
+                MiniCircuit miniCircuit = mch.getMiniCircuit(level, supportPos, supportState, facing);
+                if(miniCircuit != null) {
+                    return miniCircuit.getNode(facing);
+                } else {
+                    return null;
+                }
             }
         }
 
