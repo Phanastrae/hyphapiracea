@@ -3,18 +3,15 @@ package phanastrae.hyphapiracea.block.entity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
@@ -24,39 +21,36 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.LeukboxBlock;
-import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
+import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
+import phanastrae.hyphapiracea.component.type.KeyedDiscComponent;
 import phanastrae.hyphapiracea.particle.HyphaPiraceaParticleTypes;
 import phanastrae.hyphapiracea.structure.StructurePlacer;
-import phanastrae.hyphapiracea.util.Timer;
-
-import java.util.List;
+import phanastrae.hyphapiracea.structure.leubox_stages.*;
+import phanastrae.hyphapiracea.structure.leubox_stages.AbstractLeukboxStage.LeukboxStage;
+import phanastrae.hyphapiracea.world.HyphaPiraceaLevelAttachment;
 
 public class LeukboxBlockEntity extends BlockEntity implements Clearable, ContainerSingleItem.BlockContainerSingleItem {
     public static final String TAG_DISC_ITEM = "disc_item";
+    public static final String TAG_DISC_RECOVERABLE = "disc_recoverable";
+    public static final String TAG_PROGRESS = "progress";
+    public static final String TAG_STAGE_PROGRESS = "stage_progress";
+    public static final String TAG_STAGE_DATA = "stage_data";
 
     private ItemStack item = ItemStack.EMPTY;
+    private boolean discRecoverable = true;
 
-    private int timer = 0;
-
-    private StructurePlacer.Stage stage = StructurePlacer.Stage.IDLE;
-    private int progressPercent = 0;
-
-    @Nullable
-    private StructurePlacer structurePlacer = null;
-
-    private BoundingBox[] boxes = new BoundingBox[0];
-    private int currentSpawnTime;
-    private int currentMinSpawnTime;
+    private AbstractLeukboxStage leukboxStage;
+    private int progress = 0;
+    private int stageProgress = 0;
 
     public LeukboxBlockEntity(BlockPos pos, BlockState blockState) {
         super(HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, pos, blockState);
+
+        this.leukboxStage = new IdleLeukboxStage(pos);
     }
 
     @Override
@@ -66,48 +60,56 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         } else {
             this.item = ItemStack.EMPTY;
         }
+        if(nbt.contains(TAG_DISC_ITEM, Tag.TAG_BYTE)) {
+            this.discRecoverable = nbt.getBoolean(TAG_DISC_ITEM);
+        }
+        if(nbt.contains(TAG_PROGRESS, Tag.TAG_INT)) {
+            this.progress = nbt.getInt(TAG_PROGRESS);
+        }
+        if(nbt.contains(TAG_STAGE_PROGRESS, Tag.TAG_INT)) {
+            this.progress = nbt.getInt(TAG_STAGE_PROGRESS);
+        }
 
-        if(nbt.contains("stage", Tag.TAG_STRING)) {
-            String s = nbt.getString("stage");
-            for(StructurePlacer.Stage st : StructurePlacer.Stage.values()) {
-                if(s.equals(st.getId())) {
-                    this.stage = st;
-                    break;
+
+        // TODO implement leukbox stage data serialization, currently reloading the leukbox will lose its structure spawning progress
+        if(nbt.contains(TAG_STAGE_DATA, Tag.TAG_COMPOUND)) {
+            CompoundTag stageData = nbt.getCompound(TAG_STAGE_DATA);
+
+            // for now, assume the data is for a fake client stage since serialization is not implemented
+            LeukboxStage fakeStage = LeukboxStage.IDLE;
+            int currentSpawnTime = 0;
+            int minSpawnTime = 0;
+            String errorId = "";
+
+            if(stageData.contains(AbstractLeukboxStage.TAG_FAKE_STAGE_ID, Tag.TAG_STRING)) {
+                String s = stageData.getString(AbstractLeukboxStage.TAG_FAKE_STAGE_ID);
+                for(LeukboxStage st : AbstractLeukboxStage.LeukboxStage.values()) {
+                    if(s.equals(st.getId())) {
+                        fakeStage = st;
+                        break;
+                    }
                 }
             }
-        }
-        if(nbt.contains("progress_percent", Tag.TAG_INT)) {
-            int p = nbt.getInt("progress_percent");
-            if(0 <= p && p <= 100) {
-                this.progressPercent = p;
+            if(stageData.contains(AbstractLeukboxStage.TAG_CURRENT_SPAWN_TIME, Tag.TAG_INT)) {
+                currentSpawnTime = stageData.getInt(AbstractLeukboxStage.TAG_CURRENT_SPAWN_TIME);
             }
-        }
-        if(nbt.contains("box_data", Tag.TAG_INT_ARRAY)) {
-            int[] boxData = nbt.getIntArray("box_data");
-            if(boxData.length > 0 && boxData.length % 6 == 0) {
-                int boxCount = boxData.length / 6;
-                BoundingBox[] boxes = new BoundingBox[boxCount];
-                for(int i = 0; i < boxCount; i++) {
-                    int k = i * 6;
-                    int minX = boxData[k];
-                    int minY = boxData[k+1];
-                    int minZ = boxData[k+2];
-                    int maxX = boxData[k+3];
-                    int maxY = boxData[k+4];
-                    int maxZ = boxData[k+5];
-                    BoundingBox box = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-                    boxes[i] = box;
-                }
-                this.boxes = boxes;
+            if(stageData.contains(AbstractLeukboxStage.TAG_MIN_SPAWN_TIME, Tag.TAG_INT)) {
+                minSpawnTime = stageData.getInt(AbstractLeukboxStage.TAG_MIN_SPAWN_TIME);
             }
-        }
+            if(stageData.contains(AbstractLeukboxStage.TAG_ERROR_ID, Tag.TAG_STRING)) {
+                errorId = stageData.getString(AbstractLeukboxStage.TAG_ERROR_ID);
+            }
 
-        if(nbt.contains("current_spawn_time", Tag.TAG_INT)) {
-            this.currentSpawnTime = nbt.getInt("current_spawn_time");
-        }
-
-        if(nbt.contains("current_min_spawn_time", Tag.TAG_INT)) {
-            this.currentMinSpawnTime = nbt.getInt("current_min_spawn_time");
+            FakeClientStage fakeClientStage = new FakeClientStage(
+                    this.getBlockPos(),
+                    fakeStage,
+                    1,
+                    currentSpawnTime,
+                    minSpawnTime,
+                    errorId
+            );
+            fakeClientStage.loadAdditional(stageData, registryLookup);
+            this.leukboxStage = fakeClientStage;
         }
     }
 
@@ -116,38 +118,28 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         if (!this.getTheItem().isEmpty()) {
             nbt.put(TAG_DISC_ITEM, this.getTheItem().save(registryLookup));
         }
+        nbt.putBoolean(TAG_DISC_RECOVERABLE, this.discRecoverable);
+        nbt.putInt(TAG_PROGRESS, this.progress);
+        nbt.putInt(TAG_STAGE_PROGRESS, this.stageProgress);
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
-        CompoundTag nbtCompound = this.saveCustomOnly(registryLookup);
-        // TODO optimise, don't send the entire data every time
-        nbtCompound.putString("stage", this.structurePlacer == null ? "idle" : this.structurePlacer.getStage().getId());
-        nbtCompound.putInt("progress_percent", this.structurePlacer == null ? 0 : this.structurePlacer.getProgressPercent());
+        CompoundTag nbtCompound = new CompoundTag();
 
-        if(this.structurePlacer != null) {
-            List<StructurePiece> pieces = this.structurePlacer.getPiecesNoRemoval();
-            if (!pieces.isEmpty()) {
-                int[] boxCoords = new int[pieces.size() * 6];
-                for (int i = 0; i < pieces.size(); i++) {
-                    BoundingBox box = pieces.get(i).getBoundingBox();
-                    int k = i * 6;
-                    boxCoords[k] = box.minX();
-                    boxCoords[k + 1] = box.minY();
-                    boxCoords[k + 2] = box.minZ();
-                    boxCoords[k + 3] = box.maxX();
-                    boxCoords[k + 4] = box.maxY();
-                    boxCoords[k + 5] = box.maxZ();
-                }
-
-                nbtCompound.putIntArray("box_data", boxCoords);
-            }
-
-            if(this.structurePlacer.getStage() == StructurePlacer.Stage.PLACE_BLOCKS) {
-                nbtCompound.putInt("current_spawn_time", structurePlacer.getCurrentSpawnTime());
-                nbtCompound.putInt("current_min_spawn_time", structurePlacer.getCurrentMinSpawnTime());
-            }
-        }
+        nbtCompound.putInt(TAG_PROGRESS, this.progress);
+        nbtCompound.putInt(TAG_STAGE_PROGRESS, this.stageProgress);
+        FakeClientStage fakeClientStage = new FakeClientStage(
+                this.getBlockPos(),
+                this.getStage(),
+                this.leukboxStage.getRequiredOperations(),
+                this.getCurrentSpawnTime(),
+                this.getCurrentMinSpawnTime(),
+                this.getErrorId()
+        );
+        CompoundTag fakeClientStageData = new CompoundTag();
+        fakeClientStage.saveAdditional(fakeClientStageData, registryLookup);
+        nbtCompound.put(TAG_STAGE_DATA, fakeClientStageData);
 
         return nbtCompound;
     }
@@ -158,143 +150,226 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    public void markForUpdate(ServerLevel world) {
-        world.getChunkSource().blockChanged(this.getBlockPos());
-    }
-
     public static void serverTick(Level level, BlockPos pos, BlockState state, LeukboxBlockEntity blockEntity) {
         if(!(level instanceof ServerLevel serverLevel)) return;
 
-        StructurePlacer structurePlacer = blockEntity.structurePlacer;
-        if(structurePlacer != null) {
-            StructurePlacer.Stage oldStage = structurePlacer.getStage();
-            if(level.getGameTime() % 10 == 0) {
-                serverLevel.sendParticles(ParticleTypes.MYCELIUM, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 20, 0.3, 0.0, 0.3, 1.5);
+        if(blockEntity.getStage() == LeukboxStage.IDLE) {
+            if(!blockEntity.item.isEmpty()) {
+                if (!blockEntity.discIsRecoverable()) {
+                    blockEntity.setTheItem(ItemStack.EMPTY);
+                    blockEntity.setDiscRecoverable(true);
+                }
             }
+        }
 
+        AbstractLeukboxStage.LeukboxStage oldStage = blockEntity.getStage();
+        if(blockEntity.tickProgress()) {
+            blockEntity.setChanged();
 
-            Timer t = new Timer();
-            boolean didAdvance = structurePlacer.tick(serverLevel);
-            t.stop();
+            Vec3 magneticField = HyphaPiraceaLevelAttachment.getAttachment(level).getMagneticFieldAtPosition(pos.getCenter());
 
-            if(didAdvance) {
-                StructurePlacer.Stage newStage = structurePlacer.getStage();
-                if(oldStage == StructurePlacer.Stage.POST_PROCESS && newStage == StructurePlacer.Stage.PLACE_BLOCKS) {
+            //Timer t = new Timer();
+            boolean stageChanged = blockEntity.tickPlacement(serverLevel, magneticField);
+            //t.stop();
+            LeukboxStage newStage = blockEntity.getStage();
+            //HyphaPiracea.LOGGER.info("Advanced LeukboxStage {} to stage {}, this took {}μs ({}ms)", oldStage.getId(), newStage.getId(), t.micro(), t.milli());
+
+            if(stageChanged) {
+                // play effects on feasting start
+                if(oldStage == AbstractLeukboxStage.LeukboxStage.POST_PROCESS && newStage == AbstractLeukboxStage.LeukboxStage.PLACE_BLOCKS) {
                     serverLevel.sendParticles(ParticleTypes.MYCELIUM, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 600, 0.4, 0, 0.4, 10.4);
                     serverLevel.sendParticles(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 0.2, pos.getZ() + 0.5, 150, 0.5, 0.2, 0.5, 4.5);
                     level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.PARROT_IMITATE_GHAST, SoundSource.BLOCKS, 4.5F, 0.3F);
+
+                    blockEntity.setDiscRecoverable(false);
                 }
 
-                if(oldStage != StructurePlacer.Stage.PLACE_SPECIALS) {
-                    // TODO remove logging
-                    HyphaPiracea.LOGGER.info("Advanced Stage {} to stage {}, this took {}μs ({}ms)", oldStage.getId(), newStage.getId(), t.micro(), t.milli());
-
+                // play progress particles
+                if(newStage != LeukboxStage.COMPLETED) {
                     serverLevel.sendParticles(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 0.2, pos.getZ() + 0.5, oldStage.getWait() * 2, 0.5, 0.2, 0.5, 0.9);
-                } else {
-                    blockEntity.structurePlacer = null;
-                    blockEntity.stage = StructurePlacer.Stage.IDLE;
+                }
 
+                blockEntity.sendUpdate();
+            } else if(oldStage == LeukboxStage.ERROR) {
+                // stop error after a bit if item has been consumed
+                if (!blockEntity.discIsRecoverable() || blockEntity.item.isEmpty()) {
+                    blockEntity.stopGeneratingStructure();
                     blockEntity.setTheItem(ItemStack.EMPTY);
                 }
+                blockEntity.sendUpdate();
             }
-
-            blockEntity.markForUpdate(serverLevel); // TODO tweak this perhaps, is it needed?
         }
     }
 
     public static void clientTick(Level level, BlockPos pos, BlockState state, LeukboxBlockEntity blockEntity) {
-        if(blockEntity.stage == StructurePlacer.Stage.PLACE_BLOCKS) {
-            for (BoundingBox box : blockEntity.boxes) {
-                int volume = box.getXSpan() * box.getYSpan() * box.getZSpan();
-                int particles = Mth.ceil(Math.min(Math.pow(volume, 0.6667), 30F / blockEntity.boxes.length));
+        if(blockEntity.tickProgress()) {
+            if(blockEntity.leukboxStage instanceof FakeClientStage fakeClientStage) {
+                fakeClientStage.advanceStage();
+            }
+        }
 
-                if (particles > 0) {
-                    RandomSource random = level.getRandom();
+        RandomSource random = level.getRandom();
 
-                    for (int i = 0; i < particles; i++) {
-                        level.addParticle(
-                                random.nextBoolean() ? ParticleTypes.WAX_ON : ParticleTypes.WAX_OFF,
-                                random.nextInt(8) == 0,
-                                box.minX() + box.getXSpan() * random.nextFloat(),
-                                box.minY() + box.getYSpan() * random.nextFloat(),
-                                box.minZ() + box.getZSpan() * random.nextFloat(),
-                                random.nextFloat() - 0.5,
-                                random.nextFloat() - 0.5,
-                                random.nextFloat() - 0.5
-                        );
-                    }
+        AbstractLeukboxStage.LeukboxStage oldStage = blockEntity.getStage();
+        if(oldStage != LeukboxStage.IDLE) {
+            if (level.getGameTime() % 10 == 0) {
+                for(int i = 0; i < 20; i++) {
+                    level.addParticle(
+                            ParticleTypes.MYCELIUM,
+                            pos.getX() + 0.5 + (random.nextFloat() * 2.0 - 1.0) * 0.3,
+                            pos.getY() + 0.5 + (random.nextFloat() * 2.0 - 1.0) * 0.3,
+                            pos.getZ() + 0.5 + (random.nextFloat() * 2.0 - 1.0) * 0.3,
+                            (random.nextFloat() * 2.0 - 1.0) * 1.5,
+                            (random.nextFloat() * 2.0 - 1.0) * 1.5,
+                            (random.nextFloat() * 2.0 - 1.0) * 1.5
+                    );
                 }
             }
         }
 
-        if(blockEntity.currentSpawnTime > blockEntity.currentMinSpawnTime) {
-            RandomSource random = level.random;
-            for(int i = 0; i < 120; i++) {
-                double dy = random.nextDouble() * 120 - 60;
-                double noise = random.nextDouble() * (StructurePlacer.MAX_NOISE_DELAY - 1);
-
-                double radius = (blockEntity.currentSpawnTime - StructurePlacer.CONVERSION_DELAY - 0.9F * -dy - noise * -4.5F) / 7.0F;
-
-                if(radius > 0) {
-                    double theta = random.nextDouble() * Math.TAU;
-                    double dx = Math.cos(theta) * radius;
-                    double dz = Math.sin(theta) * radius;
-
-                    BlockPos p = BlockPos.containing(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
-                    BlockState s = level.getBlockState(p);
-                    if(s.isAir() || s.canBeReplaced()) {
-                        level.addParticle(
-                                random.nextFloat() > 0.4 ? HyphaPiraceaParticleTypes.LARGE_ELECTROMAGNETIC_DUST : HyphaPiraceaParticleTypes.LARGE_FAIRY_FOG,
-                                random.nextInt(3) == 0,
-                                pos.getX() + dx,
-                                pos.getY() + dy,
-                                pos.getZ() + dz,
-                                random.nextFloat() - 0.5,
-                                random.nextFloat() - 0.5,
-                                random.nextFloat() - 0.5
-                        );
-                    }
-                }
-            }
-
-            blockEntity.currentSpawnTime--;
+        if(blockEntity.getCurrentSpawnTime() > blockEntity.getCurrentMinSpawnTime()) {
+            spawnSwirlingParticles(level.getRandom(), blockEntity.getCurrentSpawnTime(), pos, level);
         }
     }
 
-    public void startGeneratingStructure(ResourceLocation structureRL, BlockPos pos, ServerLevel serverLevel) {
-        this.structurePlacer = new StructurePlacer(structureRL, pos);
-        this.markForUpdate(serverLevel); // TODO is this needed
+    public boolean tickProgress() {
+        // return true if a new action should be taken
+        int wait = this.getStage().getWait();
+        if(wait == -1) return false;
+
+        this.progress++;
+        this.stageProgress++;
+        if(this.stageProgress >= wait) {
+            this.stageProgress = 0;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean tickPlacement(ServerLevel serverLevel, Vec3 magneticField) {
+        KeyedDiscComponent discComponent = this.getDiscComponent();
+        if(discComponent == null) {
+            return false;
+        }
+
+        // return true if the stage changed
+        AbstractLeukboxStage next = this.leukboxStage.advanceStage(serverLevel, magneticField, discComponent.maxOperatingRadius(), discComponent.minOperatingTesla());
+        if (next != this.leukboxStage) {
+            this.leukboxStage = next;
+            this.progress = 0;
+            return true;
+        }
+        return false;
+    }
+
+    public void sendUpdate() {
+        if(this.level != null && !this.level.isClientSide && this.level.getBlockState(this.getBlockPos()) == this.getBlockState()) {
+            this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 2);
+        }
+    }
+
+    public static void spawnSwirlingParticles(RandomSource random, int currentSpawnTime, BlockPos pos, Level level) {
+        for(int i = 0; i < 45; i++) {
+            double dy = random.nextDouble() * 120 - 60;
+            double noise = random.nextDouble() * (StructurePlacer.MAX_NOISE_DELAY - 1);
+
+            double radius = (currentSpawnTime - StructurePlacer.CONVERSION_DELAY - 0.9F * -dy - noise * -4.5F) / 7.0F;
+
+            if(radius > 0) {
+                double theta = random.nextDouble() * Math.TAU;
+                double dx = Math.cos(theta) * radius;
+                double dz = Math.sin(theta) * radius;
+
+                BlockPos p = BlockPos.containing(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
+                BlockState s = level.getBlockState(p);
+                if(s.isAir() || s.canBeReplaced()) {
+                    level.addParticle(
+                            random.nextFloat() > 0.4 ? HyphaPiraceaParticleTypes.LARGE_ELECTROMAGNETIC_DUST : HyphaPiraceaParticleTypes.LARGE_FAIRY_FOG,
+                            random.nextInt(3) == 0,
+                            pos.getX() + dx,
+                            pos.getY() + dy,
+                            pos.getZ() + dz,
+                            random.nextFloat() - 0.5,
+                            random.nextFloat() - 0.5,
+                            random.nextFloat() - 0.5
+                    );
+                }
+            }
+        }
+    }
+
+    public void startGeneratingStructure(ResourceLocation structureRL, BlockPos pos) {
+        this.leukboxStage = new GetStructureStage(pos, structureRL);
+    }
+
+    public void stopGeneratingStructure() {
+        this.leukboxStage = new IdleLeukboxStage(this.getBlockPos());
     }
 
     public Component getTopText() {
-        String langKey = "hyphapiracea.leukbox.stage." + this.stage.getId();
-        MutableComponent component = Component.translatable(langKey);
-        switch(this.stage) {
-            case PLACE_BLOCKS, PLACE_SPECIALS -> component.withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
-            case COMPLETED -> component.withStyle(ChatFormatting.GREEN);
-            case ERROR -> component.withStyle(ChatFormatting.RED);
-        }
-
-        return component;
+        LeukboxStage stage = this.getStage();
+        String langKey = "hyphapiracea.leukbox.stage." + stage.getId();
+        return Component.translatable(langKey).withStyle(stage.getFormats());
     }
 
     @Nullable
     public Component getBottomText() {
-        if(this.stage.shouldShowProgress()) {
-            return Component.translatable("hyphapiracea.leukbox.progress", this.progressPercent).withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC);
+        if(this.getStage() == LeukboxStage.ERROR) {
+            return Component.translatable("hyphapiracea.leukbox.error." + this.getErrorId()).withStyle(ChatFormatting.RED);
         } else {
-            return null;
+            if (this.getStage().shouldShowProgress()) {
+                return Component.translatable("hyphapiracea.leukbox.progress", this.getProgressPercent()).withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC);
+            } else {
+                return null;
+            }
         }
     }
 
-    public boolean discIsRecoverable() {
-        if(this.structurePlacer == null) {
-            return true;
+    public AbstractLeukboxStage.LeukboxStage getStage() {
+        return this.leukboxStage.getStage();
+    }
+
+    public int getProgressPercent() {
+        int maxProgress = this.getStage().getWait() * this.leukboxStage.getRequiredOperations();
+        if(maxProgress <= 0) {
+            return 100;
+        } else {
+            float progressFraction = this.progress / (float)maxProgress;
+            return Math.clamp(Math.round(progressFraction * 100), 0, 100);
         }
-        return switch (this.structurePlacer.getStage()) {
-            case PLACE_BLOCKS, PLACE_SPECIALS, COMPLETED -> false;
-            default -> true;
-        };
+    }
+
+    public int getCurrentSpawnTime() {
+        if(this.leukboxStage instanceof SpawnTimeHolder sth) {
+            return sth.getCurrentSpawnTime();
+        } else {
+            return 0;
+        }
+    }
+
+    public int getCurrentMinSpawnTime() {
+        if(this.leukboxStage instanceof SpawnTimeHolder sth) {
+            return sth.getMinSpawnTime();
+        } else {
+            return 0;
+        }
+    }
+
+    public String getErrorId() {
+        if(this.leukboxStage instanceof ErrorIdHolder eih) {
+            return eih.getErrorId();
+        } else {
+            return "";
+        }
+    }
+
+    public void setDiscRecoverable(boolean recoverable) {
+        this.discRecoverable = recoverable;
+        this.setChanged();
+    }
+
+    public boolean discIsRecoverable() {
+        return this.discRecoverable;
     }
 
     public void popOutTheItem() {
@@ -303,6 +378,8 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
             ItemStack itemstack = this.getTheItem();
             if (!itemstack.isEmpty()) {
                 this.removeTheItem();
+                this.stopGeneratingStructure();
+                this.setChanged();
 
                 if(discIsRecoverable()) {
                     Vec3 vec3 = Vec3.atLowerCornerWithOffset(blockpos, 0.5, 1.01, 0.5).offsetRandom(this.level.random, 0.7F);
@@ -322,6 +399,15 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
     }
 
+    @Nullable
+    public KeyedDiscComponent getDiscComponent() {
+        if(this.item.has(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT)) {
+            return this.item.get(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public ItemStack getTheItem() {
         return this.item;
@@ -329,6 +415,8 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
     @Override
     public ItemStack splitTheItem(int amount) {
+        this.setChanged();
+
         ItemStack itemstack = this.item;
         this.setTheItem(ItemStack.EMPTY);
         return itemstack;
@@ -336,19 +424,16 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
     @Override
     public void setTheItem(ItemStack item) {
+        this.setChanged();
+
         this.item = item;
         boolean flag = !this.item.isEmpty();
         this.notifyItemChanged(flag);
-        // TODO
-        Component component = item.get(DataComponents.CUSTOM_NAME);
+
+        KeyedDiscComponent component = item.get(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
         if(component != null) {
-            String s = component.getString();
-            ResourceLocation rl = ResourceLocation.tryParse(s);
-            if(rl != null) {
-                if(level instanceof ServerLevel serverLevel) {
-                    this.startGeneratingStructure(rl, this.getBlockPos(), serverLevel);
-                }
-            }
+            this.startGeneratingStructure(component.structureId(), this.getBlockPos());
+            this.setChanged();
         }
     }
 
@@ -364,12 +449,17 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        // TODO change
-        return stack.is(HyphaPiraceaItems.KEYED_DISC);
+        return stack.has(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
     }
 
     @Override
     public boolean canTakeItem(Container target, int slot, ItemStack stack) {
+        if(!this.discIsRecoverable()) {
+            return false;
+        }
+        if(this.getStage() != LeukboxStage.IDLE && this.getStage() != LeukboxStage.ERROR) {
+            return false;
+        }
         return target.hasAnyMatching(ItemStack::isEmpty);
     }
 }

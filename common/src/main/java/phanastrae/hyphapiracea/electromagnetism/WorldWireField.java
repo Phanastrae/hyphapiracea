@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,10 +40,24 @@ public class WorldWireField {
         }
     }
 
-    public void forEachWireAffectingPosition(Vec3 position, Consumer<WireLine> consumer) {
+    @Nullable
+    public SectionInfo getSectionInfoForPosition(Vec3 position) {
         SectionPos sectionPos = SectionPos.of(BlockPos.containing(position));
+        return this.getSectionInfoForPosition(sectionPos);
+    }
+
+    @Nullable
+    public SectionInfo getSectionInfoForPosition(SectionPos sectionPos) {
         if(this.sectionInfoMap.containsKey(sectionPos)) {
-            SectionInfo sectionInfo = this.sectionInfoMap.get(sectionPos);
+            return this.sectionInfoMap.get(sectionPos);
+        }
+
+        return null;
+    }
+
+    public void forEachWireAffectingPosition(Vec3 position, Consumer<WireLine> consumer) {
+        SectionInfo sectionInfo = this.getSectionInfoForPosition(position);
+        if(sectionInfo != null) {
             sectionInfo.forEach(wireLineHolder -> {
                 WireLine wireLine = wireLineHolder.wireLine;
                 if(wireLine.canInfluencePoint(position)) {
@@ -54,7 +69,7 @@ public class WorldWireField {
 
     public static class WireLineHolder {
 
-        private final WireLine wireLine;
+        public final WireLine wireLine;
         private final Map<SectionPos, SectionInfo> sectionInfoMap;
         private BlockBox blockBox;
 

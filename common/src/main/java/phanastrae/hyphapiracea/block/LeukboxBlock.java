@@ -24,10 +24,11 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.block.entity.LeukboxBlockEntity;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
+import phanastrae.hyphapiracea.block.entity.LeukboxBlockEntity;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
-import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
+import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
+import phanastrae.hyphapiracea.structure.leubox_stages.AbstractLeukboxStage;
 
 public class LeukboxBlock extends BaseEntityBlock {
     public static final MapCodec<LeukboxBlock> CODEC = simpleCodec(LeukboxBlock::new);
@@ -90,7 +91,8 @@ public class LeukboxBlock extends BaseEntityBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (state.getValue(HAS_DISC)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            ItemInteractionResult iteminteractionresult = tryRemoveItem(level, pos, player);
+            return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
         } else {
             ItemStack itemstack = player.getItemInHand(hand);
             ItemInteractionResult iteminteractionresult = tryInsertItem(level, pos, itemstack, player);
@@ -98,8 +100,29 @@ public class LeukboxBlock extends BaseEntityBlock {
         }
     }
 
+    public static ItemInteractionResult tryRemoveItem(Level level, BlockPos pos, Player player) {
+        BlockState blockstate = level.getBlockState(pos);
+        if (blockstate.is(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX) && blockstate.getValue(HAS_DISC)) {
+            if (!level.isClientSide) {
+                if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
+                    if(blockEntity.discIsRecoverable() || blockEntity.getStage() == AbstractLeukboxStage.LeukboxStage.ERROR) {
+                        blockEntity.popOutTheItem();
+                        blockEntity.setDiscRecoverable(true);
+
+                        level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.SCAFFOLDING_BREAK, SoundSource.BLOCKS, 1.5F, 0.2F);
+                        level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, blockstate));
+                    }
+                }
+            }
+
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        } else {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+    }
+
     public static ItemInteractionResult tryInsertItem(Level level, BlockPos pos, ItemStack stack, Player player) {
-        if (!stack.is(HyphaPiraceaItems.KEYED_DISC)) { // TODO tweak criteria
+        if (!stack.has(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         } else {
             BlockState blockstate = level.getBlockState(pos);
@@ -108,6 +131,8 @@ public class LeukboxBlock extends BaseEntityBlock {
                     ItemStack itemstack = stack.consumeAndReturn(1, player);
                     if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
                         blockEntity.setTheItem(itemstack);
+                        blockEntity.setDiscRecoverable(true);
+
                         level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 1.5F, 0.2F);
                         level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, blockstate));
                     }

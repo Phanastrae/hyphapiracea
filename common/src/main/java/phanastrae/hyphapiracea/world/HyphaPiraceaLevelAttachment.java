@@ -2,6 +2,7 @@ package phanastrae.hyphapiracea.world;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import phanastrae.hyphapiracea.duck.LevelDuckInterface;
 import phanastrae.hyphapiracea.electromagnetism.Electromagnetism;
 import phanastrae.hyphapiracea.electromagnetism.WireLine;
@@ -38,10 +39,30 @@ public class HyphaPiraceaLevelAttachment {
         this.worldWireField.forEachWireAffectingPosition(pos, line -> Electromagnetism.calculateMagneticFieldFromWireAtPoint(line, pos, magneticField));
 
         Vec3 magField = magneticField.toVec3();
-
         magField = addNoise(magField);
 
         return magField;
+    }
+
+    public Vec3 getMagneticFieldAtPosition(Vec3 pos, @Nullable WorldWireField.SectionInfo sectionInfo) {
+        Vec3Mutable magneticField = new Vec3Mutable();
+        if(sectionInfo != null) {
+            sectionInfo.forEach(wireLineHolder -> {
+                WireLine wireLine = wireLineHolder.wireLine;
+                if (wireLine.canInfluencePoint(pos)) {
+                    Electromagnetism.calculateMagneticFieldFromWireAtPoint(wireLine, pos, magneticField);
+                }
+            });
+        }
+
+        Vec3 magField = magneticField.toVec3();
+        magField = addNoise(magField);
+
+        return magField;
+    }
+
+    public WorldWireField getWorldWireField() {
+        return this.worldWireField;
     }
 
     public Vec3 addNoise(Vec3 magField) {

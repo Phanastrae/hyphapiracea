@@ -27,6 +27,7 @@ public abstract class ItemStackMixin implements DataComponentHolder {
 
     @Inject(method = "getTooltipLines", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;addAttributeTooltips(Ljava/util/function/Consumer;Lnet/minecraft/world/entity/player/Player;)V"))
     private void hyphapiracea$addWireLineTooltips(Item.TooltipContext tooltipContext, Player player, TooltipFlag tooltipFlag, CallbackInfoReturnable<List<Component>> cir, @Local(ordinal = 0) Consumer<Component> componentConsumer) {
+        this.addToTooltip(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
         this.addToTooltip(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
     }
 }
