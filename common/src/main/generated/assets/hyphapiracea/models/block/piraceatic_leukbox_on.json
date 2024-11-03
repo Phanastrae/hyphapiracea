@@ -3,10 +3,10 @@
   "textures": {
     "down": "hyphapiracea:block/piraceatic_leukbox_bottom",
     "east": "hyphapiracea:block/piraceatic_leukbox_side",
-    "north": "hyphapiracea:block/piraceatic_leukbox_front",
-    "particle": "hyphapiracea:block/piraceatic_leukbox_front",
+    "north": "hyphapiracea:block/piraceatic_leukbox_front_on",
+    "particle": "hyphapiracea:block/piraceatic_leukbox_front_on",
     "south": "hyphapiracea:block/piraceatic_leukbox_back",
-    "up": "hyphapiracea:block/piraceatic_leukbox_top",
+    "up": "hyphapiracea:block/piraceatic_leukbox_top_on",
     "west": "hyphapiracea:block/piraceatic_leukbox_side"
   }
 }

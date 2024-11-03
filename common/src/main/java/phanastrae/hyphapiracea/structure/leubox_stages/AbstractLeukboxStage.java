@@ -52,25 +52,34 @@ public abstract class AbstractLeukboxStage {
     }
 
     public enum LeukboxStage {
-        ERROR("error", 200, false, ChatFormatting.DARK_RED, ChatFormatting.BOLD, ChatFormatting.UNDERLINE),
-        IDLE("idle", -1, false),
-        GET_STRUCTURE("get_structure", 20, true),
-        GET_STRUCTURE_START("get_structure_start", 20, true),
-        FILL_STORAGE_PIECES("fill_storage_pieces", 1, true),
-        FILL_STORAGE_AFTER("fill_storage_after", 30, true),
-        POST_PROCESS("post_process", 1, true),
-        PLACE_BLOCKS("place_blocks",1, true, ChatFormatting.GOLD, ChatFormatting.BOLD),
-        PLACE_SPECIALS("place_specials", 20, true, ChatFormatting.GOLD, ChatFormatting.BOLD),
-        COMPLETED("completed", 60, false, ChatFormatting.GREEN),
-        FAKE_CLIENT_STAGE("fake_client_stage", -1, false, ChatFormatting.LIGHT_PURPLE);
+        ERROR("error", false, 1, 200, false, ChatFormatting.DARK_RED, ChatFormatting.BOLD, ChatFormatting.UNDERLINE),
+        INTRO_SCREEN("intro_screen", false, 0, 60, false),
+        INTRO_INITIALISING("intro_initialising", false, 0, 47, true),
+        INTRO_LOADING("intro_loading", false, 0, 18, true),
+        INTRO_WELCOME("intro_welcome", false, 0, 200, false),
+        IDLE("idle", false, 0, -1, false),
+        GET_STRUCTURE("get_structure", true, 5, 20, true),
+        GET_STRUCTURE_START("get_structure_start", true, 6, 20, true),
+        FILL_STORAGE_PIECES("fill_storage_pieces", true, 7, 1, true),
+        FILL_STORAGE_AFTER("fill_storage_after", true, 8, 30, true),
+        POST_PROCESS("post_process", true, 9, 1, true),
+        INSUFFICIENT_MAGNETIC_FIELD("insufficient_magnetic_field", true, 10, 10, false),
+        PLACE_BLOCKS("place_blocks", true, 13, 1, true, ChatFormatting.GOLD, ChatFormatting.BOLD),
+        PLACE_SPECIALS("place_specials", true, 14, 20, true, ChatFormatting.GOLD, ChatFormatting.BOLD),
+        COMPLETED("completed", false, 3, 60, false, ChatFormatting.GREEN),
+        FAKE_CLIENT_STAGE("fake_client_stage", false, 0, -1, false, ChatFormatting.LIGHT_PURPLE);
 
         private final String id;
+        private boolean isActive;
+        private final int comparatorValue;
         private final int wait;
         private final boolean showProgress;
         private final ChatFormatting[] formats;
 
-        LeukboxStage(String id, int wait, boolean showProgress, ChatFormatting... formats) {
+        LeukboxStage(String id, boolean isActive, int comparatorValue, int wait, boolean showProgress, ChatFormatting... formats) {
             this.id = id;
+            this.isActive = isActive;
+            this.comparatorValue = comparatorValue;
             this.wait = wait;
             this.showProgress = showProgress;
             this.formats = formats;
@@ -78,6 +87,14 @@ public abstract class AbstractLeukboxStage {
 
         public String getId() {
             return this.id;
+        }
+
+        public boolean isActive() {
+            return this.isActive;
+        }
+
+        public int getComparatorValue() {
+            return this.comparatorValue;
         }
 
         public int getWait() {

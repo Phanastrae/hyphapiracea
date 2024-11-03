@@ -1,8 +1,7 @@
 {
-  "parent": "hyphapiracea:block/cube_top_bottom_side_tinted_sides",
+  "parent": "hyphapiracea:block/cube_bottom_top_tinted_sides",
   "textures": {
     "bottom": "hyphapiracea:block/hyphal_negative_terminal",
-    "particle": "hyphapiracea:block/stormsap_cell_side",
     "side": "hyphapiracea:block/stormsap_cell_side",
     "tint_side": "hyphapiracea:block/stormsap_cell_side_tint",
     "top": "hyphapiracea:block/hyphal_positive_terminal"

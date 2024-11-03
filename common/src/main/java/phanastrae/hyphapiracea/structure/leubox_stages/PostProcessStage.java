@@ -78,7 +78,11 @@ public class PostProcessStage extends AbstractLeukboxStage {
             int currentSpawnTime = Math.min(timesBox[1], timesSphere[1]);
             int minSpawnTime = Math.max(timesBox[0], timesSphere[0]);
 
-            return new PlaceBlocksStage(this.leukboxPos, this.intermediateStructureStorage, currentSpawnTime, minSpawnTime);
+            if(magneticField.length() >= minOperatingTesla) {
+                return new PlaceBlocksStage(this.leukboxPos, this.intermediateStructureStorage, currentSpawnTime, minSpawnTime);
+            } else {
+                return new InsufficientMagneticFieldStage(this.leukboxPos, this.intermediateStructureStorage, currentSpawnTime, minSpawnTime);
+            }
         } else {
             return this;
         }

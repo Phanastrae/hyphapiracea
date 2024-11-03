@@ -18,12 +18,13 @@ import phanastrae.hyphapiracea.util.CodecUtil;
 
 import java.util.function.Consumer;
 
-public record KeyedDiscComponent(ResourceLocation structureId, float maxOperatingRadius, float minOperatingTesla, boolean showInTooltip) implements TooltipProvider {
+public record KeyedDiscComponent(ResourceLocation structureId, float maxOperatingRadius, float minOperatingTesla, float requiredPower, boolean showInTooltip) implements TooltipProvider {
     public static final Codec<KeyedDiscComponent> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                             ResourceLocation.CODEC.fieldOf("structure_id").forGetter(KeyedDiscComponent::structureId),
                             ExtraCodecs.POSITIVE_FLOAT.optionalFieldOf("max_operating_radius", 16F).forGetter(KeyedDiscComponent::maxOperatingRadius),
                             CodecUtil.NON_NEGATIVE_FLOAT.optionalFieldOf("min_operating_tesla", 0.000001F).forGetter(KeyedDiscComponent::minOperatingTesla),
+                            Codec.FLOAT.optionalFieldOf("required_power", 1F).forGetter(KeyedDiscComponent::requiredPower),
                             Codec.BOOL.optionalFieldOf("show_in_tooltip", true).forGetter(KeyedDiscComponent::showInTooltip)
                     )
                     .apply(instance, KeyedDiscComponent::new)
@@ -35,13 +36,15 @@ public record KeyedDiscComponent(ResourceLocation structureId, float maxOperatin
             KeyedDiscComponent::maxOperatingRadius,
             ByteBufCodecs.FLOAT,
             KeyedDiscComponent::minOperatingTesla,
+            ByteBufCodecs.FLOAT,
+            KeyedDiscComponent::requiredPower,
             ByteBufCodecs.BOOL,
             KeyedDiscComponent::showInTooltip,
             KeyedDiscComponent::new
     );
 
-    public KeyedDiscComponent(ResourceLocation structureId, float maxOperatingRadius, float minOperatingTesla) {
-        this(structureId, maxOperatingRadius, minOperatingTesla, true);
+    public KeyedDiscComponent(ResourceLocation structureId, float maxOperatingRadius, float minOperatingTesla, float requiredPower) {
+        this(structureId, maxOperatingRadius, minOperatingTesla, requiredPower, true);
     }
 
     @Override
@@ -80,6 +83,18 @@ public record KeyedDiscComponent(ResourceLocation structureId, float maxOperatin
                                             "item.modifiers.hyphapiracea.equals.microtesla",
                                             ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(this.minOperatingTesla * 1000000),
                                             Component.translatable("item.modifiers.hyphapiracea.keyed_disc.min_operating_tesla")
+                                    )
+                            )
+                            .withStyle(ChatFormatting.AQUA)
+            );
+
+            tooltipAdder.accept(
+                    CommonComponents.space()
+                            .append(
+                                    Component.translatable(
+                                            "item.modifiers.hyphapiracea.equals.watt",
+                                            ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(this.requiredPower),
+                                            Component.translatable("item.modifiers.hyphapiracea.keyed_disc.required_power")
                                     )
                             )
                             .withStyle(ChatFormatting.AQUA)

@@ -1,8 +1,7 @@
 {
-  "parent": "hyphapiracea:block/cube_top_bottom_side",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
     "bottom": "hyphapiracea:block/hyphal_negative_terminal",
-    "particle": "hyphapiracea:block/ammeter_block_side",
     "side": "hyphapiracea:block/ammeter_block_side",
     "top": "hyphapiracea:block/hyphal_positive_terminal"
   }

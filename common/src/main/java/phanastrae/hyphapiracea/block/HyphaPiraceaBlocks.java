@@ -13,8 +13,12 @@ import java.util.function.BiConsumer;
 
 public class HyphaPiraceaBlocks {
 
-    public static final Block PIRACEATIC_LEUKBOX = new LeukboxBlock(properties());
+    public static final Block PIRACEATIC_LEUKBOX = new LeukboxBlock(properties()
+            .lightLevel(blockState -> blockState.getValue(LeukboxBlock.HAS_DISC) ? 11 : 2)
+    );
+
     public static final Block HYPHAL_CONDUCTOR = new HyphalConductorBlock(properties());
+
     public static final Block PIRACEATIC_TAR = new PiraceaticTarBlock(properties()
             .emissiveRendering((state, blockGetter, blockPos) -> true)
             .lightLevel((blockState) -> 13)
@@ -25,16 +29,26 @@ public class HyphaPiraceaBlocks {
             .noOcclusion()
             .randomTicks()
     );
+
     public static final Block LEYFIELD_MAGNETOMETER_BLOCK = new MagnetometerBlock(properties());
+
     public static final Block HYPHAL_NODE = new HyphalNodeBlock(properties());
+
     public static final Block HYPHAL_AMMETER = new AmmeterBlock(properties());
+
     public static final Block HYPHAL_VOLTMETER = new VoltmeterBlock(properties());
+
     public static final Block STORMSAP_CELL = new StormsapCellBlock(properties()
             .lightLevel(blockState -> blockState.getValue(StormsapCellBlock.STORED_POWER)));
+
     public static final Block AZIMULDEY_MASS = new AzimuldeyMassBlock(properties());
+
     public static final Block CREATIVE_CELL = new CreativeCellBlock(properties()
             .lightLevel(blockState -> 12));
-    public static final Block CIRCUIT_SWITCH = new CircuitSwitchBlock(properties());
+
+    public static final Block CIRCUIT_SWITCH = new CircuitSwitchBlock(properties()
+            .lightLevel(blockState -> blockState.getValue(CircuitSwitchBlock.POWERED) ? 4 : 0)
+    );
 
     public static void init(BiConsumer<ResourceLocation, Block> r) {
         r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);

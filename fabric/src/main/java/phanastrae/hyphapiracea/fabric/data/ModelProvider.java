@@ -15,9 +15,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
+import phanastrae.hyphapiracea.block.LeukboxBlock;
+import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
 
 import static net.minecraft.core.Direction.*;
+import static net.minecraft.data.models.BlockModelGenerators.createHorizontalFacingDispatch;
 import static net.minecraft.data.models.blockstates.VariantProperties.*;
 import static net.minecraft.data.models.blockstates.VariantProperties.Rotation.*;
 import static net.minecraft.data.models.model.TextureSlot.ALL;
@@ -30,7 +33,6 @@ public class ModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockModelGenerators BMG) {
-        BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
         BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_TAR);
 
         this.createTopSideBottom(BMG, HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
@@ -45,6 +47,8 @@ public class ModelProvider extends FabricModelProvider {
         this.createHyphalNode(BMG, HyphaPiraceaBlocks.HYPHAL_NODE);
 
         this.createConductorBlock(BMG, HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
+
+        this.createLeukbox(BMG, HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
     }
 
     @Override
@@ -115,7 +119,7 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.BOTTOM, bottom)
                 .put(TextureSlot.TOP, top)
                 .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
-        ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CUBE_TOP_BOTTOM_SIDE.create(block, verticalMapping, BMG.modelOutput);
+        ResourceLocation verticalModel = ModelTemplates.CUBE_BOTTOM_TOP.create(block, verticalMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
                 .accept(
@@ -150,14 +154,14 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.BOTTOM, bottom)
                 .put(TextureSlot.TOP, top)
                 .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
-        ResourceLocation offModel = HyphaPiraceaModelTemplates.CUBE_TOP_BOTTOM_SIDE.create(block, offMapping, BMG.modelOutput);
+        ResourceLocation offModel = ModelTemplates.CUBE_BOTTOM_TOP.create(block, offMapping, BMG.modelOutput);
 
         TextureMapping onMapping = new TextureMapping()
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side_on"))
                 .put(TextureSlot.BOTTOM, bottom)
                 .put(TextureSlot.TOP, top)
                 .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side_on"));
-        ResourceLocation onModel = HyphaPiraceaModelTemplates.CUBE_TOP_BOTTOM_SIDE.createWithOverride(block, "_on", onMapping, BMG.modelOutput);
+        ResourceLocation onModel = ModelTemplates.CUBE_BOTTOM_TOP.createWithOverride(block, "_on", onMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
                 .accept(
@@ -213,7 +217,7 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.TOP, positiveTerminal)
                 .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"))
                 .put(HyphaPiraceaModelTemplates.TINT_SIDE, TextureMapping.getBlockTexture(block, "_side_tint"));
-        ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CUBE_TOP_BOTTOM_SIDE_TINTED_SIDES.create(block, verticalMapping, BMG.modelOutput);
+        ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CUBE_BOTTOM_TOP_TINTED_SIDES.create(block, verticalMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
                 .accept(
@@ -328,6 +332,35 @@ public class ModelProvider extends FabricModelProvider {
                                 )
                 );
         BMG.delegateItemModel(block, TexturedModel.CUBE.createWithSuffix(block, "_inventory", BMG.modelOutput));
+    }
+
+    public void createLeukbox(BlockModelGenerators BMG, Block block) {
+        TextureMapping offMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_front"))
+                .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_bottom"))
+                .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_top"))
+                .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_front"))
+                .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_back"))
+                .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
+        ResourceLocation emptyModel = ModelTemplates.CUBE.create(block, offMapping, BMG.modelOutput);
+
+        TextureMapping onMapping = new TextureMapping()
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_front_on"))
+                .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_bottom"))
+                .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_top_on"))
+                .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_front_on"))
+                .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_back"))
+                .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
+                .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_side"));
+        ResourceLocation fullModel = ModelTemplates.CUBE.createWithSuffix(block, "_on", onMapping, BMG.modelOutput);
+
+        BMG.blockStateOutput
+                .accept(
+                        MultiVariantGenerator.multiVariant(block)
+                                .with(BlockModelGenerators.createBooleanModelDispatch(LeukboxBlock.HAS_DISC, fullModel, emptyModel))
+                                .with(createHorizontalFacingDispatch())
+                );
     }
 
     public static Variant variant() {

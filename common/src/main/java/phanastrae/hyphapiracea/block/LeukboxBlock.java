@@ -2,6 +2,7 @@ package phanastrae.hyphapiracea.block;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -11,16 +12,18 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -30,9 +33,10 @@ import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
 import phanastrae.hyphapiracea.structure.leubox_stages.AbstractLeukboxStage;
 
-public class LeukboxBlock extends BaseEntityBlock {
+public class LeukboxBlock extends BaseEntityBlock implements MiniCircuitHolder {
     public static final MapCodec<LeukboxBlock> CODEC = simpleCodec(LeukboxBlock::new);
     public static final BooleanProperty HAS_DISC = HyphaPiraceaBlockProperties.HAS_DISC;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     @Override
     public MapCodec<LeukboxBlock> codec() {
@@ -41,12 +45,25 @@ public class LeukboxBlock extends BaseEntityBlock {
 
     public LeukboxBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(HAS_DISC, Boolean.valueOf(false)));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(HAS_DISC, false)
+                .setValue(FACING, Direction.NORTH)
+        );
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(HAS_DISC);
+        builder.add(HAS_DISC, FACING);
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
@@ -69,11 +86,30 @@ public class LeukboxBlock extends BaseEntityBlock {
     }
 
     @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+    }
+
+    @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         CustomData data = stack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
         if (data.contains(LeukboxBlockEntity.TAG_DISC_ITEM)) {
             level.setBlock(pos, state.setValue(HAS_DISC, true), 2);
+        }
+    }
+
+    @Override
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
+        if(level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
+            return blockEntity.getStage().getComparatorValue();
+        } else {
+            return 1;
         }
     }
 
@@ -142,6 +178,16 @@ public class LeukboxBlock extends BaseEntityBlock {
             } else {
                 return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
+        }
+    }
+
+    @Override
+    @Nullable
+    public MiniCircuit getMiniCircuit(BlockGetter blockGetter, BlockPos pos, BlockState state, Direction side) {
+        if(blockGetter.getBlockEntity(pos) instanceof MiniCircuitHolder mch) {
+            return mch.getMiniCircuit(blockGetter, pos, state, side);
+        } else {
+            return null;
         }
     }
 }

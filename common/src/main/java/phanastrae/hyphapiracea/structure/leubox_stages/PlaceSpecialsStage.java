@@ -68,11 +68,11 @@ public class PlaceSpecialsStage extends AbstractLeukboxStage {
         // place block entities
         this.intermediateStructureStorage.forEachBlockEntity(((blockPos, blockEntity) -> {
             if(isPositionInRange(blockPos, this.leukboxPos, maxOperatingRadius)) {
-            BlockState state = this.intermediateStructureStorage.getFragileBlockState(blockPos);
-            BlockState entityState = blockEntity.getBlockState();
-            if(state.getBlock().equals(entityState.getBlock())) {
-                level.getChunkAt(blockPos).addAndRegisterBlockEntity(blockEntity);
-            }
+                BlockState state = level.getBlockState(blockPos);
+                BlockState desiredState = this.intermediateStructureStorage.getFragileBlockState(blockPos);
+                if(state.equals(desiredState)) {
+                    level.getChunkAt(blockPos).addAndRegisterBlockEntity(blockEntity);
+                }
             }
         }));
         // update blocks

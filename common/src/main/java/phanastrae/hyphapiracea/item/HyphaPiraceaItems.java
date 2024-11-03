@@ -26,7 +26,7 @@ public class HyphaPiraceaItems {
     public static final BlockItem CREATIVE_CELL = ofBlock(HyphaPiraceaBlocks.CREATIVE_CELL, properties().rarity(Rarity.EPIC));
     public static final BlockItem CIRCUIT_SWITCH = ofBlock(HyphaPiraceaBlocks.CIRCUIT_SWITCH);
 
-    public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON).component(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, new KeyedDiscComponent(ResourceLocation.fromNamespaceAndPath("minecraft", "fortress"), 48.0F, 0.000001F)));
+    public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON).component(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, new KeyedDiscComponent(ResourceLocation.fromNamespaceAndPath("minecraft", "fortress"), 48.0F, 0.000001F, 8)));
     public static final Item HYPHALINE = new HyphalineItem(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40, 0.004F)));
     public static final Item LEYFIELD_MAGNETOMETER = new MagnetometerItem(properties().stacksTo(1));
 

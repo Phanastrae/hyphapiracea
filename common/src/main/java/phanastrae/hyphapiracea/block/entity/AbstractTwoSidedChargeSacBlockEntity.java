@@ -63,7 +63,7 @@ public abstract class AbstractTwoSidedChargeSacBlockEntity extends BlockEntity i
         }
 
         CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
-        CircuitNetwork network2 = blockEntity.wire.getStartNode().getNetwork();
+        CircuitNetwork network2 = blockEntity.wire.getEndNode().getNetwork();
         if(network != null) {
             network.tick(level.getGameTime());
         }
