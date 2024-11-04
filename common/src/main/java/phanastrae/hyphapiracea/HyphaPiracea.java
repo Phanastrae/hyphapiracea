@@ -3,9 +3,13 @@ package phanastrae.hyphapiracea;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.block.DispenserBlock;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -72,5 +76,19 @@ public class HyphaPiracea {
     @FunctionalInterface
     public interface ComponentModificationHelper {
         <T> void modifyComponentsMap(Item item, DataComponentType<T> type, T component);
+    }
+
+    public static void addTooltips(ItemStack stack, Item.TooltipContext tooltipContext, Consumer<Component> componentConsumer, TooltipFlag tooltipFlag) {
+        addToTooltip(stack, HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
+        addToTooltip(stack, HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
+    }
+
+    private static <T extends TooltipProvider> void addToTooltip(
+            ItemStack stack, DataComponentType<T> component, Item.TooltipContext context, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag
+    ) {
+        T tooltipProvider = (T)stack.get(component);
+        if (tooltipProvider != null) {
+            tooltipProvider.addToTooltip(context, tooltipAdder, tooltipFlag);
+        }
     }
 }

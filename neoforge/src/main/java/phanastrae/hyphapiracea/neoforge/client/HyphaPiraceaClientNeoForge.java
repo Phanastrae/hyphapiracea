@@ -79,7 +79,7 @@ public class HyphaPiraceaClientNeoForge {
         }
     }
 
-    public void startClientTick(ClientTickEvent event) {
+    public void startClientTick(ClientTickEvent.Pre event) {
         HyphaPiraceaClient.startClientTick();
     }
 }

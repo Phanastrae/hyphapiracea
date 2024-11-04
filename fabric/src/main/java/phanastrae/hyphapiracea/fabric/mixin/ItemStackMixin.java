@@ -1,4 +1,4 @@
-package phanastrae.hyphapiracea.mixin;
+package phanastrae.hyphapiracea.fabric.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.component.DataComponentHolder;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
+import phanastrae.hyphapiracea.HyphaPiracea;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,7 +27,6 @@ public abstract class ItemStackMixin implements DataComponentHolder {
 
     @Inject(method = "getTooltipLines", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;addAttributeTooltips(Ljava/util/function/Consumer;Lnet/minecraft/world/entity/player/Player;)V"))
     private void hyphapiracea$addWireLineTooltips(Item.TooltipContext tooltipContext, Player player, TooltipFlag tooltipFlag, CallbackInfoReturnable<List<Component>> cir, @Local(ordinal = 0) Consumer<Component> componentConsumer) {
-        this.addToTooltip(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
-        this.addToTooltip(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
+        HyphaPiracea.addTooltips((ItemStack)(Object)this, tooltipContext, componentConsumer, tooltipFlag);
     }
 }

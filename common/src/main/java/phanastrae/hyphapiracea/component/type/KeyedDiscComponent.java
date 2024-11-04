@@ -48,6 +48,28 @@ public record KeyedDiscComponent(ResourceLocation structureId, float maxOperatin
     }
 
     @Override
+    public boolean equals(Object o) {
+        if(o instanceof KeyedDiscComponent other) {
+            return this.structureId.equals(other.structureId)
+                    && this.maxOperatingRadius == other.maxOperatingRadius
+                    && this.minOperatingTesla == other.minOperatingTesla
+                    && this.requiredPower == other.requiredPower
+                    && this.showInTooltip == other.showInTooltip;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.structureId.hashCode()
+                ^ Float.floatToIntBits(this.maxOperatingRadius)
+                ^ Float.floatToIntBits(this.minOperatingTesla + 1.23F)
+                ^ Float.floatToIntBits(this.requiredPower + 4.56F)
+                ^ (this.showInTooltip ? 0x87654321 : 12345678);
+    }
+
+    @Override
     public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
         if(this.showInTooltip) {
             tooltipAdder.accept(CommonComponents.EMPTY);
@@ -58,7 +80,7 @@ public record KeyedDiscComponent(ResourceLocation structureId, float maxOperatin
                             .append(
                                     Component.translatable(
                                             "item.modifiers.hyphapiracea.keyed_disc.structure_id",
-                                            this.structureId
+                                            this.structureId.toString()
                                     )
                             )
                             .withStyle(ChatFormatting.YELLOW)

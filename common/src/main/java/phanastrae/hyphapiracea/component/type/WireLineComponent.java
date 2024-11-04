@@ -71,6 +71,24 @@ public class WireLineComponent implements TooltipProvider {
         this(maxWireLength, rangeOfInfluence, resistancePerBlock, wardingRadius, textureOf("hyphaline"), new Vector3f(0.7F, 0.7F, 0.5F), new Vector3f(0.49F, 0.49F, 0.35F));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof WireLineComponent other) {
+            return this.wireStats.equals(other.wireStats)
+                    && this.wireVisuals == other.wireVisuals
+                    && this.showInTooltip == other.showInTooltip;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.wireStats.hashCode()
+                ^ this.wireVisuals.hashCode()
+                ^ (this.showInTooltip ? 0x87654321 : 12345678);
+    }
+
     public static ResourceLocation textureOf(String name) {
         return HyphaPiracea.id("entity/hyphal_coil/" + name);
     }
@@ -202,6 +220,26 @@ public class WireLineComponent implements TooltipProvider {
                 WireStats::wardingRadius,
                 WireStats::new
         );
+
+        @Override
+        public boolean equals(Object o) {
+            if(o instanceof WireStats other) {
+                return this.maxWireLength == other.maxWireLength
+                        && this.rangeOfInfluence == other.rangeOfInfluence
+                        && this.resistancePerBlock == other.resistancePerBlock
+                        && this.wardingRadius == other.wardingRadius;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return Float.floatToIntBits(this.maxWireLength)
+                    ^ Float.floatToIntBits(this.rangeOfInfluence + 1.23F)
+                    ^ Float.floatToIntBits(this.resistancePerBlock + 4.56F)
+                    ^ Float.floatToIntBits(this.wardingRadius + 7.89F);
+        }
     }
 
     public static class WireVisuals {
@@ -249,6 +287,24 @@ public class WireLineComponent implements TooltipProvider {
 
         public Vector3f darkColor() {
             return this.darkColor;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if(o instanceof WireVisuals other) {
+                return this.texture.equals(other.texture)
+                        && this.lightColor.equals(other.lightColor)
+                        && this.darkColor.equals(other.darkColor);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return this.texture.hashCode()
+                    ^ this.lightColor.hashCode()
+                    ^ this.darkColor.hashCode();
         }
     }
 }

@@ -17,6 +17,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import phanastrae.hyphapiracea.HyphaPiracea;
@@ -65,6 +66,7 @@ public class HyphaPiraceaNeoForge {
     }
 
     public void setupGameBusEvents(IEventBus gameEventBus) {
+        gameEventBus.addListener(this::addTooltips);
     }
 
     public void commonInit(FMLCommonSetupEvent event) {
@@ -145,5 +147,9 @@ public class HyphaPiraceaNeoForge {
                 event.modify(item, builder -> builder.set(type, component));
             }
         });
+    }
+
+    public void addTooltips(ItemTooltipEvent event) {
+        HyphaPiracea.addTooltips(event.getItemStack(), event.getContext(), event.getToolTip()::add, event.getFlags());
     }
 }
