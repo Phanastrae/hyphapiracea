@@ -26,6 +26,7 @@ import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
 import phanastrae.hyphapiracea.block.StormsapCellBlock;
 import phanastrae.hyphapiracea.block.entity.ClientHighlightReactingBlockEntity;
+import phanastrae.hyphapiracea.client.renderer.LeyfieldEnvironmentEffects;
 import phanastrae.hyphapiracea.client.renderer.block.HyphaPiraceaBlockRenderLayers;
 import phanastrae.hyphapiracea.client.renderer.block.entity.HyphaPiraceaBlockEntityRenderers;
 import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
@@ -105,6 +106,9 @@ public class HyphaPiraceaClient {
         Minecraft client = Minecraft.getInstance();
         ClientLevel level = client.level;
         Player player = client.player;
+
+        LeyfieldEnvironmentEffects.update(level, client.cameraEntity);
+
         if(level != null) {
             if(player != null) {
                 RandomSource randomSource = player.getRandom();
@@ -196,5 +200,9 @@ public class HyphaPiraceaClient {
     @FunctionalInterface
     public interface BlockColorHelper {
         void register(BlockColor color, Block block);
+    }
+
+    public static void onClientStop(Minecraft client) {
+        LeyfieldEnvironmentEffects.close();
     }
 }

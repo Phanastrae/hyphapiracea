@@ -1,6 +1,7 @@
 package phanastrae.hyphapiracea.neoforge.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
@@ -12,11 +13,15 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.GameShuttingDownEvent;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.client.HyphaPiraceaClient;
 import phanastrae.hyphapiracea.client.particle.HyphaPiraceaParticles;
+import phanastrae.hyphapiracea.client.renderer.LeyfieldEnvironmentEffects;
 import phanastrae.hyphapiracea.client.renderer.entity.HyphaPiraceaEntityRenderers;
 import phanastrae.hyphapiracea.client.renderer.entity.model.HyphaPiraceaEntityModelLayers;
+
+import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_SKY;
 
 @Mod(value = HyphaPiracea.MOD_ID, dist = Dist.CLIENT)
 public class HyphaPiraceaClientNeoForge {
@@ -35,6 +40,13 @@ public class HyphaPiraceaClientNeoForge {
 
         // particles
         modEventBus.addListener(this::registerParticleProviders);
+
+
+        // client shutdown
+        NeoForge.EVENT_BUS.addListener(this::onGameShutdown);
+
+        // render leyfield effects
+        NeoForge.EVENT_BUS.addListener(this::renderLevel);
 
         // render gui layers
         NeoForge.EVENT_BUS.addListener(this::renderGuiLayers);
@@ -81,5 +93,18 @@ public class HyphaPiraceaClientNeoForge {
 
     public void startClientTick(ClientTickEvent.Pre event) {
         HyphaPiraceaClient.startClientTick();
+    }
+
+    public void onGameShutdown(GameShuttingDownEvent event) {
+        HyphaPiraceaClient.onClientStop(Minecraft.getInstance());
+    }
+
+    public void renderLevel(RenderLevelStageEvent event) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if(level == null) return;
+
+        if(event.getStage().equals(AFTER_SKY)) {
+            LeyfieldEnvironmentEffects.renderSky(event.getModelViewMatrix(), event.getPartialTick(), Minecraft.getInstance().gameRenderer, event.getCamera(), level, event.getProjectionMatrix());
+        }
     }
 }
