@@ -2,6 +2,7 @@ package phanastrae.hyphapiracea.block;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -52,6 +53,11 @@ public class CircuitSwitchBlock extends AbstractTwoSidedChargeSacBlock {
         return level.isClientSide
                 ? null
                 : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.CIRCUIT_SWITCH, AbstractTwoSidedChargeSacBlockEntity::serverTick);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite()).setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
     }
 
     @Override

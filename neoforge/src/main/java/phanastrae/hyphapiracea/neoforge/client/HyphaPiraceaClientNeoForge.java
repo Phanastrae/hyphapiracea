@@ -15,6 +15,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.client.HyphaPiraceaClient;
 import phanastrae.hyphapiracea.client.particle.HyphaPiraceaParticles;
+import phanastrae.hyphapiracea.client.renderer.entity.HyphaPiraceaEntityRenderers;
 import phanastrae.hyphapiracea.client.renderer.entity.model.HyphaPiraceaEntityModelLayers;
 
 @Mod(value = HyphaPiracea.MOD_ID, dist = Dist.CLIENT)
@@ -25,6 +26,9 @@ public class HyphaPiraceaClientNeoForge {
 
         // block color handlers
         modEventBus.addListener(this::registerBlockColorHandlers);
+
+        // entity renderers
+        modEventBus.addListener(this::registerEntityRenderers);
 
         // entity model layers
         modEventBus.addListener(this::registerEntityModelLayers);
@@ -42,6 +46,10 @@ public class HyphaPiraceaClientNeoForge {
     public void onClientInit(FMLClientSetupEvent event) {
         // everything here needs to be multithread safe
         event.enqueueWork(HyphaPiraceaClient::init);
+    }
+
+    public void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        HyphaPiraceaEntityRenderers.init(event::registerEntityRenderer);
     }
 
     public void registerEntityModelLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {

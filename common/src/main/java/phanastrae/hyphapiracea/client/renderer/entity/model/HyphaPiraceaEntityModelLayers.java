@@ -12,10 +12,12 @@ public class HyphaPiraceaEntityModelLayers {
 
     public static final ModelLayerLocation HYPHALINE_COIL = createMainLayer("hyphaline_coil");
     public static final ModelLayerLocation HYPHALINE_COIL_SMALL = createMainLayer("hyphaline_coil_small");
+    public static final ModelLayerLocation CHARGEBALL = createMainLayer("chargeball");
 
     public static void init(BiConsumer<ModelLayerLocation, Supplier<LayerDefinition>> r) {
         r.accept(HYPHALINE_COIL, HyphalConductorBlockEntityRenderer::createTallCoilBodyLayer);
         r.accept(HYPHALINE_COIL_SMALL, HyphalConductorBlockEntityRenderer::createSmallCoilBodyLayer);
+        r.accept(CHARGEBALL, ChargeBallModel::createBodyLayer);
     }
 
     private static ModelLayerLocation createMainLayer(String id) {

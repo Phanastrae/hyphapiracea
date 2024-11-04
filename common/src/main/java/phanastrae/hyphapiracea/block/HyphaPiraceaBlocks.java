@@ -50,6 +50,8 @@ public class HyphaPiraceaBlocks {
             .lightLevel(blockState -> blockState.getValue(CircuitSwitchBlock.POWERED) ? 4 : 0)
     );
 
+    public static final Block ELECTROMAGNETIC_DUST_BOX = new ElectromagneticDustBoxBlock(properties());
+
     public static void init(BiConsumer<ResourceLocation, Block> r) {
         r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);
         r.accept(id("hyphal_conductor"), HYPHAL_CONDUCTOR);
@@ -62,6 +64,7 @@ public class HyphaPiraceaBlocks {
         r.accept(id("azimuldey_mass"), AZIMULDEY_MASS);
         r.accept(id("creative_cell"), CREATIVE_CELL);
         r.accept(id("circuit_switch"), CIRCUIT_SWITCH);
+        r.accept(id("electromagnetic_dust_box"), ELECTROMAGNETIC_DUST_BOX);
     }
 
     private static ResourceLocation id(String path) {

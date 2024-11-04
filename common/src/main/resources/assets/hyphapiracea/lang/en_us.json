@@ -3,6 +3,7 @@
   "block.hyphapiracea.azimuldey_mass": "Azimuldey Mass",
   "block.hyphapiracea.circuit_switch": "Circuit Switch",
   "block.hyphapiracea.creative_cell": "Creative Cell",
+  "block.hyphapiracea.electromagnetic_dust_box": "Electromagnetic Dust Box",
   "block.hyphapiracea.piraceatic_tar": "Piraceatic TAR",
   "block.hyphapiracea.hyphal_node": "Hyphal Node",
   "block.hyphapiracea.hyphal_conductor": "Hyphal Conductor",
@@ -10,6 +11,13 @@
   "block.hyphapiracea.magnetometer_block": "Leyfield Magnetometer Block",
   "block.hyphapiracea.stormsap_cell": "Stormsap Cell",
   "block.hyphapiracea.voltmeter_block": "Hyphal Voltmeter",
+
+  "effect.hyphapiracea.positively_charged": "Positive",
+  "effect.hyphapiracea.negatively_charged": "Negative",
+  "effect.hyphapiracea.northerly_charged": "Northern",
+  "effect.hyphapiracea.southerly_charged": "Southern",
+
+  "entity.hyphapiracea.chargeball": "Chargeball",
 
   "gui.hyphapiracea.magnetometer.field_strength_microtesla": "Magetic Leyfield Strength: %s µT",
 
@@ -26,9 +34,19 @@
   "item.modifiers.hyphapiracea.wire_line.max_wire_length": "Maximum Wire Length",
   "item.modifiers.hyphapiracea.wire_line.radius_of_influence": "Range of Influence",
   "item.modifiers.hyphapiracea.wire_line.resistance_per_block": "Resistance per Block",
-  "item.hyphapiracea.hyphaline": "Hyphaline",
+
+  "item.hyphapiracea.electromagnetic_dust": "Electromagnetic Dust",
   "item.hyphapiracea.keyed_disc": "Keyed Disc",
+  "item.hyphapiracea.hyphaline": "Hyphaline",
   "item.hyphapiracea.magnetometer": "Leyfield Magnetometer",
+  "item.hyphapiracea.positive_chargeball": "Positive Chargeball",
+  "item.hyphapiracea.negative_chargeball": "Negative Chargeball",
+  "item.hyphapiracea.northern_chargeball": "Northern Chargeball",
+  "item.hyphapiracea.southern_chargeball": "Southern Chargeball",
+  "item.hyphapiracea.positive_sporeberry": "Positive Sporeberry",
+  "item.hyphapiracea.negative_sporeberry": "Negative Sporeberry",
+  "item.hyphapiracea.northern_sporeberry": "Northern Sporeberry",
+  "item.hyphapiracea.southern_sporeberry": "Southern Sporeberry",
 
   "itemGroup.hyphapiracea": "HyphaPiracea",
 

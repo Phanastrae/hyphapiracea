@@ -25,10 +25,20 @@ public class HyphaPiraceaItems {
     public static final BlockItem AZIMULDEY_MASS = ofBlock(HyphaPiraceaBlocks.AZIMULDEY_MASS);
     public static final BlockItem CREATIVE_CELL = ofBlock(HyphaPiraceaBlocks.CREATIVE_CELL, properties().rarity(Rarity.EPIC));
     public static final BlockItem CIRCUIT_SWITCH = ofBlock(HyphaPiraceaBlocks.CIRCUIT_SWITCH);
+    public static final BlockItem ELECTROMAGNETIC_DUST_BOX = ofBlock(HyphaPiraceaBlocks.ELECTROMAGNETIC_DUST_BOX);
 
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON).component(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, new KeyedDiscComponent(ResourceLocation.fromNamespaceAndPath("minecraft", "fortress"), 48.0F, 0.000001F, 8)));
     public static final Item HYPHALINE = new HyphalineItem(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40, 0.004F)));
     public static final Item LEYFIELD_MAGNETOMETER = new MagnetometerItem(properties().stacksTo(1));
+    public static final Item ELECTROMAGNETIC_DUST = new ElectromagneticDustItem(properties());
+    public static final Item POSITIVE_CHARGEBALL = new ChargeballItem(properties(),1, 0);
+    public static final Item NEGATIVE_CHARGEBALL = new ChargeballItem(properties(),-1, 0);
+    public static final Item NORTHERN_CHARGEBALL = new ChargeballItem(properties(),0, 1);
+    public static final Item SOUTHERN_CHARGEBALL = new ChargeballItem(properties(),0, -1);
+    public static final Item POSITIVE_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.POSITIVE_SPOREBERRY));
+    public static final Item NEGATIVE_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NEGATIVE_SPOREBERRY));
+    public static final Item NORTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NORTHERN_SPOREBERRY));
+    public static final Item SOUTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.SOUTHERN_SPOREBERRY));
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
         BiConsumer<String, Item> rwt = (s, i) -> { // register and add to creative mode tab
@@ -49,6 +59,16 @@ public class HyphaPiraceaItems {
         rwt.accept("azimuldey_mass", AZIMULDEY_MASS);
         rwt.accept("creative_cell", CREATIVE_CELL);
         rwt.accept("circuit_switch", CIRCUIT_SWITCH);
+        rwt.accept("electromagnetic_dust", ELECTROMAGNETIC_DUST);
+        rwt.accept("positive_chargeball", POSITIVE_CHARGEBALL);
+        rwt.accept("negative_chargeball", NEGATIVE_CHARGEBALL);
+        rwt.accept("northern_chargeball", NORTHERN_CHARGEBALL);
+        rwt.accept("southern_chargeball", SOUTHERN_CHARGEBALL);
+        rwt.accept("positive_sporeberry", POSITIVE_SPOREBERRY);
+        rwt.accept("negative_sporeberry", NEGATIVE_SPOREBERRY);
+        rwt.accept("northern_sporeberry", NORTHERN_SPOREBERRY);
+        rwt.accept("southern_sporeberry", SOUTHERN_SPOREBERRY);
+        rwt.accept("electromagnetic_dust_box", ELECTROMAGNETIC_DUST_BOX);
     }
 
     private static ResourceLocation id(String path) {

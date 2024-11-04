@@ -6,6 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.DispenserBlock;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
 import phanastrae.hyphapiracea.component.type.WireLineComponent;
+import phanastrae.hyphapiracea.entity.HyphaPiraceaEntityTypes;
 import phanastrae.hyphapiracea.item.HyphaPiraceaCreativeModeTabs;
 import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
 import phanastrae.hyphapiracea.particle.HyphaPiraceaParticleTypes;
@@ -43,8 +45,18 @@ public class HyphaPiracea {
         // block entity types
         rla.addRegistryListener(BuiltInRegistries.BLOCK_ENTITY_TYPE, HyphaPiraceaBlockEntityTypes::init);
 
+        // entity types
+        rla.addRegistryListener(BuiltInRegistries.ENTITY_TYPE, HyphaPiraceaEntityTypes::init);
+
         // particle types
         rla.addRegistryListener(BuiltInRegistries.PARTICLE_TYPE, HyphaPiraceaParticleTypes::init);
+    }
+
+    public static void commonInit() {
+        DispenserBlock.registerProjectileBehavior(HyphaPiraceaItems.POSITIVE_CHARGEBALL);
+        DispenserBlock.registerProjectileBehavior(HyphaPiraceaItems.NEGATIVE_CHARGEBALL);
+        DispenserBlock.registerProjectileBehavior(HyphaPiraceaItems.NORTHERN_CHARGEBALL);
+        DispenserBlock.registerProjectileBehavior(HyphaPiraceaItems.SOUTHERN_CHARGEBALL);
     }
 
     public static void modifyDataComponents(ComponentModificationHelper helper) {

@@ -2,8 +2,10 @@ package phanastrae.hyphapiracea.neoforge;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -11,11 +13,14 @@ import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import phanastrae.hyphapiracea.HyphaPiracea;
+import phanastrae.hyphapiracea.entity.status.HyphaPiraceaStatusEffects;
 import phanastrae.hyphapiracea.item.HyphaPiraceaCreativeModeTabs;
 
 import java.util.Collection;
@@ -31,6 +36,11 @@ public class HyphaPiraceaNeoForge {
     }
 
     public void setupModBusEvents(IEventBus modEventBus) {
+        // mob effect registry
+        DeferredRegister<MobEffect> mobEffectDeferredRegister = DeferredRegister.create(Registries.MOB_EFFECT, HyphaPiracea.MOD_ID);
+        mobEffectDeferredRegister.register(modEventBus);
+        HyphaPiraceaStatusEffects.init((name, mobEffect) -> mobEffectDeferredRegister.register(name, () -> mobEffect));
+
         // init registry entries
         HyphaPiracea.initRegistryEntries(new HyphaPiracea.RegistryListenerAdder() {
             @Override
@@ -44,6 +54,9 @@ public class HyphaPiraceaNeoForge {
             }
         });
 
+        // common init
+        modEventBus.addListener(this::commonInit);
+
         // creative tabs
         modEventBus.addListener(this::buildCreativeModeTabContents);
 
@@ -52,6 +65,11 @@ public class HyphaPiraceaNeoForge {
     }
 
     public void setupGameBusEvents(IEventBus gameEventBus) {
+    }
+
+    public void commonInit(FMLCommonSetupEvent event) {
+        // everything here needs to be multithread safe
+        event.enqueueWork(HyphaPiracea::commonInit);
     }
 
     public void buildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {

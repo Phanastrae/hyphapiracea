@@ -112,4 +112,10 @@ public class Electromagnetism {
         // add to total
         out.add(magFieldX, magFieldY, magFieldZ);
     }
+
+    public static Vec3 calculateForce(Vec3 magneticField, Vec3 velocity, double electricCharge, double magneticCharge) {
+        Vec3 eForce = electricCharge == 0 ? Vec3.ZERO : velocity.cross(magneticField).scale(electricCharge);
+        Vec3 mForce = magneticCharge == 0 ? Vec3.ZERO : magneticField.scale(magneticCharge / MU_0);
+        return eForce.add(mForce);
+    }
 }

@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import phanastrae.hyphapiracea.HyphaPiracea;
+import phanastrae.hyphapiracea.entity.status.HyphaPiraceaStatusEffects;
 import phanastrae.hyphapiracea.item.HyphaPiraceaCreativeModeTabs;
 
 import java.util.Collection;
@@ -22,6 +24,9 @@ public class HyphaPiraceaFabric implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		// mob effect registry
+		HyphaPiraceaStatusEffects.init((name, mobEffect) -> Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, HyphaPiracea.id(name), mobEffect));
+
 		// init registry entries
 		HyphaPiracea.initRegistryEntries(new HyphaPiracea.RegistryListenerAdder() {
 			@Override
@@ -29,6 +34,9 @@ public class HyphaPiraceaFabric implements ModInitializer {
 				source.accept((rl, t) -> Registry.register(registry, rl, t));
 			}
 		});
+
+		// common init
+		HyphaPiracea.commonInit();
 
 		// creative tabs
 		setupCreativeTabs();
