@@ -23,6 +23,7 @@
   "entity.hyphapiracea.chargeball": "Chargeball",
 
   "gui.hyphapiracea.magnetometer.field_strength_microtesla": "Magetic Leyfield Strength: %s µT",
+  "gui.hyphapiracea.magnetometer.warded": "Location Warded",
 
   "item.modifiers.hyphapiracea.equals.m": "%s m %s",
   "item.modifiers.hyphapiracea.equals.microtesla": "%s µT %s",
@@ -37,11 +38,14 @@
   "item.modifiers.hyphapiracea.wire_line.max_wire_length": "Maximum Wire Length",
   "item.modifiers.hyphapiracea.wire_line.radius_of_influence": "Range of Influence",
   "item.modifiers.hyphapiracea.wire_line.resistance_per_block": "Resistance per Block",
+  "item.modifiers.hyphapiracea.wire_line.warding_radius": "Piraceatic Warding Radius",
 
   "item.hyphapiracea.electromagnetic_dust": "Electromagnetic Dust",
+  "item.hyphapiracea.ferric_wardline": "Ferric Wardline",
   "item.hyphapiracea.keyed_disc": "Keyed Disc",
   "item.hyphapiracea.hyphaline": "Hyphaline",
   "item.hyphapiracea.magnetometer": "Leyfield Magnetometer",
+  "item.hyphapiracea.ogral_hyphaline": "Ogral Hyphaline",
   "item.hyphapiracea.positive_chargeball": "Positive Chargeball",
   "item.hyphapiracea.negative_chargeball": "Negative Chargeball",
   "item.hyphapiracea.northern_chargeball": "Northern Chargeball",

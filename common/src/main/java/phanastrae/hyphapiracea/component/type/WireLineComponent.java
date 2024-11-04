@@ -57,18 +57,18 @@ public class WireLineComponent implements TooltipProvider {
         this.showInTooltip = showInTooltip;
     }
 
-    public WireLineComponent(float maxWireLength, float rangeOfInfluence, float resistancePerBlock, boolean showInTooltip, ResourceLocation texture, Vector3f lightColor, Vector3f darkColor) {
-        this.wireStats = new WireStats(maxWireLength, rangeOfInfluence, resistancePerBlock);
+    public WireLineComponent(float maxWireLength, float rangeOfInfluence, float resistancePerBlock, float wardingRadius, boolean showInTooltip, ResourceLocation texture, Vector3f lightColor, Vector3f darkColor) {
+        this.wireStats = new WireStats(maxWireLength, rangeOfInfluence, resistancePerBlock, wardingRadius);
         this.wireVisuals = new WireVisuals(texture, lightColor, darkColor);
         this.showInTooltip = showInTooltip;
     }
 
-    public WireLineComponent(float maxWireLength, float rangeOfInfluence, float resistancePerBlock, ResourceLocation texture, Vector3f lightColor, Vector3f darkColor) {
-        this(maxWireLength, rangeOfInfluence, resistancePerBlock, true, texture, lightColor, darkColor);
+    public WireLineComponent(float maxWireLength, float rangeOfInfluence, float resistancePerBlock, float wardingRadius, ResourceLocation texture, Vector3f lightColor, Vector3f darkColor) {
+        this(maxWireLength, rangeOfInfluence, resistancePerBlock, wardingRadius, true, texture, lightColor, darkColor);
     }
 
-    public WireLineComponent(float maxWireLength, float rangeOfInfluence, float resistancePerBlock) {
-        this(maxWireLength, rangeOfInfluence, resistancePerBlock, textureOf("hyphaline"), new Vector3f(0.7F, 0.7F, 0.5F), new Vector3f(0.49F, 0.49F, 0.35F));
+    public WireLineComponent(float maxWireLength, float rangeOfInfluence, float resistancePerBlock, float wardingRadius) {
+        this(maxWireLength, rangeOfInfluence, resistancePerBlock, wardingRadius, textureOf("hyphaline"), new Vector3f(0.7F, 0.7F, 0.5F), new Vector3f(0.49F, 0.49F, 0.35F));
     }
 
     public static ResourceLocation textureOf(String name) {
@@ -93,6 +93,10 @@ public class WireLineComponent implements TooltipProvider {
 
     public float rangeOfInfluence() {
         return this.wireStats.rangeOfInfluence;
+    }
+
+    public float wardingRadius() {
+        return this.wireStats.wardingRadius;
     }
 
     public float resistancePerBlock() {
@@ -121,29 +125,33 @@ public class WireLineComponent implements TooltipProvider {
             tooltipAdder.accept(CommonComponents.EMPTY);
             tooltipAdder.accept(Component.translatable("item.modifiers.hyphapiracea.wire_line").withStyle(ChatFormatting.GRAY));
 
-            tooltipAdder.accept(
-                    CommonComponents.space()
-                            .append(
-                                    Component.translatable(
-                                            "item.modifiers.hyphapiracea.equals.m",
-                                            ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(this.wireStats.maxWireLength),
-                                            Component.translatable("item.modifiers.hyphapiracea.wire_line.max_wire_length")
-                                    )
-                            )
-                            .withStyle(ChatFormatting.AQUA)
-            );
+            if(this.wireStats.maxWireLength != 0) {
+                tooltipAdder.accept(
+                        CommonComponents.space()
+                                .append(
+                                        Component.translatable(
+                                                "item.modifiers.hyphapiracea.equals.m",
+                                                ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(this.wireStats.maxWireLength),
+                                                Component.translatable("item.modifiers.hyphapiracea.wire_line.max_wire_length")
+                                        )
+                                )
+                                .withStyle(ChatFormatting.AQUA)
+                );
+            }
 
-            tooltipAdder.accept(
-                    CommonComponents.space()
-                            .append(
-                                    Component.translatable(
-                                            "item.modifiers.hyphapiracea.equals.m",
-                                            ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(this.wireStats.rangeOfInfluence),
-                                            Component.translatable("item.modifiers.hyphapiracea.wire_line.radius_of_influence")
-                                    )
-                            )
-                            .withStyle(ChatFormatting.AQUA)
-            );
+            if(this.wireStats.rangeOfInfluence != 0) {
+                tooltipAdder.accept(
+                        CommonComponents.space()
+                                .append(
+                                        Component.translatable(
+                                                "item.modifiers.hyphapiracea.equals.m",
+                                                ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(this.wireStats.rangeOfInfluence),
+                                                Component.translatable("item.modifiers.hyphapiracea.wire_line.radius_of_influence")
+                                        )
+                                )
+                                .withStyle(ChatFormatting.AQUA)
+                );
+            }
 
             tooltipAdder.accept(
                     CommonComponents.space()
@@ -156,15 +164,30 @@ public class WireLineComponent implements TooltipProvider {
                             )
                             .withStyle(ChatFormatting.AQUA)
             );
+
+            if(this.wireStats.wardingRadius != 0) {
+                tooltipAdder.accept(
+                        CommonComponents.space()
+                                .append(
+                                        Component.translatable(
+                                                "item.modifiers.hyphapiracea.equals.m",
+                                                ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(this.wireStats.wardingRadius),
+                                                Component.translatable("item.modifiers.hyphapiracea.wire_line.warding_radius")
+                                        )
+                                )
+                                .withStyle(ChatFormatting.AQUA)
+                );
+            }
         }
     }
 
-    public record WireStats(float maxWireLength, float rangeOfInfluence, float resistancePerBlock) {
+    public record WireStats(float maxWireLength, float rangeOfInfluence, float resistancePerBlock, float wardingRadius) {
         public static final Codec<WireStats> CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(
                                 CodecUtil.NON_NEGATIVE_FLOAT.fieldOf("max_wire_length").forGetter(WireStats::maxWireLength),
                                 CodecUtil.NON_NEGATIVE_FLOAT.fieldOf("range_of_influence").forGetter(WireStats::rangeOfInfluence),
-                                CodecUtil.NON_NEGATIVE_FLOAT.fieldOf("resistance_per_block").forGetter(WireStats::resistancePerBlock)
+                                ExtraCodecs.POSITIVE_FLOAT.fieldOf("resistance_per_block").forGetter(WireStats::resistancePerBlock),
+                                CodecUtil.NON_NEGATIVE_FLOAT.fieldOf("warding_radius").forGetter(WireStats::wardingRadius)
                         )
                         .apply(instance, WireStats::new)
         );
@@ -175,6 +198,8 @@ public class WireLineComponent implements TooltipProvider {
                 WireStats::rangeOfInfluence,
                 ByteBufCodecs.FLOAT,
                 WireStats::resistancePerBlock,
+                ByteBufCodecs.FLOAT,
+                WireStats::wardingRadius,
                 WireStats::new
         );
     }

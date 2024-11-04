@@ -16,6 +16,8 @@ public class WireLine {
 
     private float dropoffRadius;
     private double dropoffRadiusSqr;
+    private float wardingRadius;
+    private double wardingRadiusSqr;
     private double maxPossibleInfluenceRadius;
     private double maxPossibleInfluenceRadiusSqr;
 
@@ -35,6 +37,9 @@ public class WireLine {
 
         this.dropoffRadius = 0;
         this.dropoffRadiusSqr = 0;
+        this.wardingRadius = 0;
+        this.wardingRadiusSqr = 0;
+        this.maxPossibleInfluenceRadius = 0;
         this.maxPossibleInfluenceRadiusSqr = 0;
 
         this.resistancePerBlock = 1F;
@@ -44,6 +49,13 @@ public class WireLine {
     public void setCurrent(float current) {
         this.current = current;
         this.magCalcConstant = this.current * Electromagnetism.MU_0_BY_FOUR_PI;
+    }
+
+    public void setWardingRadius(float wardingRadius) {
+        this.wardingRadius = wardingRadius;
+        this.wardingRadiusSqr = wardingRadius * wardingRadius;
+
+        this.updateMaxInfluenceRadius();
     }
 
     public void setDropoffRadius(float dropoffRadius) {
@@ -71,7 +83,7 @@ public class WireLine {
     }
 
     private void updateMaxInfluenceRadius() {
-        this.maxPossibleInfluenceRadius = (this.startToEndDistance * 0.5) + this.dropoffRadius;
+        this.maxPossibleInfluenceRadius = (this.startToEndDistance * 0.5) + Math.max(this.dropoffRadius, this.wardingRadius);
         this.maxPossibleInfluenceRadiusSqr = this.maxPossibleInfluenceRadius * this.maxPossibleInfluenceRadius;
     }
 
@@ -113,6 +125,14 @@ public class WireLine {
 
     public double getDropoffRadiusSqr() {
         return this.dropoffRadiusSqr;
+    }
+
+    public float getWardingRadius() {
+        return this.wardingRadius;
+    }
+
+    public double getWardingRadiusSqr() {
+        return this.wardingRadiusSqr;
     }
 
     public double getMaxPossibleInfluenceRadius() {

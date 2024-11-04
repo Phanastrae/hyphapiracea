@@ -56,7 +56,7 @@ public class HyphalNodeBlockEntity extends BlockEntity implements MiniCircuitHol
             CircuitNode sideNode = new CircuitNode();
             sideNode.setNetwork(network);
 
-            CircuitWire sideWire = new CircuitWire(coreNode, sideNode, this.getInternalResistance(), 0);
+            CircuitWire sideWire = new CircuitWire(coreNode, sideNode, this.getInternalResistance() * 0.5, 0);
             network.addWire(sideWire);
             this.miniCircuit.addInternalWire(sideWire);
 

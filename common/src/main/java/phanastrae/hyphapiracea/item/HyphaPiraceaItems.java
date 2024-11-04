@@ -5,6 +5,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
+import org.joml.Vector3f;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
 import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
@@ -12,6 +13,8 @@ import phanastrae.hyphapiracea.component.type.KeyedDiscComponent;
 import phanastrae.hyphapiracea.component.type.WireLineComponent;
 
 import java.util.function.BiConsumer;
+
+import static phanastrae.hyphapiracea.component.type.WireLineComponent.textureOf;
 
 public class HyphaPiraceaItems {
 
@@ -27,7 +30,15 @@ public class HyphaPiraceaItems {
     public static final BlockItem ELECTROMAGNETIC_DUST_BOX = ofBlock(HyphaPiraceaBlocks.ELECTROMAGNETIC_DUST_BOX);
     public static final BlockItem PIRACEATIC_LEUKBOX = ofBlock(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
 
-    public static final Item HYPHALINE = new HyphalineItem(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, new WireLineComponent(24, 40, 0.004F)));
+    public static final Item HYPHALINE = new Item(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT,
+            new WireLineComponent(24, 40, 0.004F, 3)
+    ));
+    public static final Item OGRAL_HYPHALINE = new Item(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT,
+            new WireLineComponent(48, 60, 0.002F, 5, textureOf("ogral_hyphaline"), new Vector3f(0.8F, 0.9F, 0.5F), new Vector3f(0.4F, 0.6F, 0.3F))
+    ));
+    public static final Item FERRIC_WARDLINE = new Item(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT,
+            new WireLineComponent(13, 0, 0.026F, 13, textureOf("ferric_wardline"), new Vector3f(0.6F, 0.6F, 0.6F), new Vector3f(0.4F, 0.4F, 0.4F))
+    ));
     public static final Item LEYFIELD_MAGNETOMETER = new MagnetometerItem(properties().stacksTo(1));
     public static final Item ELECTROMAGNETIC_DUST = new ElectromagneticDustItem(properties());
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON).component(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, new KeyedDiscComponent(ResourceLocation.fromNamespaceAndPath("minecraft", "fortress"), 48.0F, 0.000001F, 8)));
@@ -48,6 +59,8 @@ public class HyphaPiraceaItems {
 
         rwt.accept("azimuldey_mass", AZIMULDEY_MASS);
         rwt.accept("hyphaline", HYPHALINE);
+        rwt.accept("ogral_hyphaline", OGRAL_HYPHALINE);
+        rwt.accept("ferric_wardline", FERRIC_WARDLINE);
         rwt.accept("hyphal_node", HYPHAL_NODE);
         rwt.accept("hyphal_conductor", HYPHAL_CONDUCTOR);
         rwt.accept("stormsap_cell", STORMSAP_CELL);

@@ -106,7 +106,7 @@ public class PlaceBlocksStage extends AbstractLeukboxStage implements SpawnTimeH
                                         continue;
                                     }
                                     if (isStateFeastable(oldState, level, mutableBlockPos)) {
-                                        Vec3 localMagneticField = levelAttachment.getMagneticFieldAtPosition(mutableBlockPos.getCenter(), worldWireSectionInfo);
+                                        Vec3 localMagneticField = levelAttachment.getMagneticFieldAtPosition(mutableBlockPos.getCenter(), worldWireSectionInfo, true);
                                         if (canOperateUnderFields(magneticField, localMagneticField, minOperatingTesla)) {
                                             spawnConsumeParticles(level, mutableBlockPos, oldState, 0.3F);
                                             setBlock(level, mutableBlockPos, piraceaticTAR, true);

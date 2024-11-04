@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "H": {
+      "item": "hyphapiracea:hyphaline"
+    }
+  },
+  "pattern": [
+    " H ",
+    "HCH",
+    " H "
+  ],
+  "result": {
+    "count": 4,
+    "id": "hyphapiracea:ogral_hyphaline"
+  }
+}

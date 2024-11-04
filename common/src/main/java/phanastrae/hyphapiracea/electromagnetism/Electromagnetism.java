@@ -1,7 +1,7 @@
 package phanastrae.hyphapiracea.electromagnetism;
 
 import net.minecraft.world.phys.Vec3;
-import phanastrae.hyphapiracea.util.Vec3Mutable;
+import phanastrae.hyphapiracea.util.MagneticFieldData;
 
 public class Electromagnetism {
     public static final double MU_0 = 1.256637061E-6;
@@ -11,7 +11,7 @@ public class Electromagnetism {
     public static final double WIRE_RADIUS_SQR = WIRE_RADIUS * WIRE_RADIUS;
     public static final double ONE_BY_WIRE_RADIUS_SQR = 1 / WIRE_RADIUS_SQR;
 
-    public static void calculateMagneticFieldFromWireAtPoint(WireLine wire, Vec3 particlePos, Vec3Mutable out) {
+    public static void calculateMagneticFieldFromWireAtPoint(WireLine wire, Vec3 particlePos, MagneticFieldData out) {
         // everything here is written here with primitives and as few(ish) operations as possible to try and make it go zoom
 
         // get precalculated info from the wire
@@ -20,6 +20,7 @@ public class Electromagnetism {
         Vec3 iVec = wire.getIVec();
         double mcc = wire.getMagCalcConstant();
         double dropoffRadiusSqr = wire.getDropoffRadiusSqr();
+        double wardingRadiusSqr = wire.getWardingRadiusSqr();
 
         // calculate the relative start position: a = startPos - particlePos
         double ax = startPos.x - particlePos.x;
@@ -69,6 +70,9 @@ public class Electromagnetism {
         }
 
         // if outside radius, add nothing, and so exit early
+        if(distSqr <= wardingRadiusSqr) {
+            out.setInsideWardingZone(true);
+        }
         if(distSqr >= dropoffRadiusSqr) {
             return;
         }

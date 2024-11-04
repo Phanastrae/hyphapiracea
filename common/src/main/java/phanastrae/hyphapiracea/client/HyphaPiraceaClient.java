@@ -57,11 +57,13 @@ public class HyphaPiraceaClient {
         if(!(cameraEntity instanceof Player player)) return;
 
         ItemStack stack = player.getMainHandItem();
-        if(stack.isEmpty()) return;
+        ItemStack stack2 = player.getOffhandItem();
 
-        if(stack.getItem() instanceof MagnetometerItem) {
+        if((!stack.isEmpty() && stack.getItem() instanceof MagnetometerItem) || (!stack2.isEmpty() && stack2.getItem() instanceof MagnetometerItem)) {
             Font font = client.font;
-            Vec3 magneticField = HyphaPiraceaLevelAttachment.getAttachment(player.level()).getMagneticFieldAtPosition(player.position());
+            HyphaPiraceaLevelAttachment hpla = HyphaPiraceaLevelAttachment.getAttachment(player.level());
+            Vec3 magneticField = hpla.getMagneticFieldAtPosition(player.position());
+            boolean warded = hpla.isPositionWarded(player.position());
 
             double fieldStrengthTesla = magneticField.length();
             double fieldStrengthMicroTesla = fieldStrengthTesla * 1E6;
@@ -79,6 +81,15 @@ public class HyphaPiraceaClient {
             y -= 14;
 
             guiGraphics.drawStringWithBackdrop(font, component, x, y, width, FastColor.ARGB32.color(255, -1));
+
+            if(warded) {
+                y -= 14;
+
+                Component component2 = Component.translatable("gui.hyphapiracea.magnetometer.warded").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+                int width2 = font.width(component2);
+                x = (guiGraphics.guiWidth() - width2) / 2;
+                guiGraphics.drawStringWithBackdrop(font, component2, x, y, width, FastColor.ARGB32.color(255, -1));
+            }
         }
     }
 
@@ -141,16 +152,18 @@ public class HyphaPiraceaClient {
     }
 
     public static void spawnFieldLine(Level level, Vec3 startPos, int length, double distance) {
-        MagnetometerItem.spawnFieldLine(level, startPos, length, distance, vec3 -> {
-                    RandomSource randomSource = level.random;
-                    level.addParticle(HyphaPiraceaParticleTypes.FAIRY_FOG, true,
-                            vec3.x + (randomSource.nextFloat() * 2.0 - 1.0) * 0.3,
-                            vec3.y + (randomSource.nextFloat() * 2.0 - 1.0) * 0.3,
-                            vec3.z + (randomSource.nextFloat() * 2.0 - 1.0) * 0.3,
-                            (randomSource.nextFloat() * 2.0 - 1.0) * 0.05,
-                            (randomSource.nextFloat() * 2.0 - 1.0) * 0.05,
-                            (randomSource.nextFloat() * 2.0 - 1.0) * 0.05
-                    );
+        MagnetometerItem.spawnFieldLine(level, startPos, length, distance, (vec3, b) -> {
+                    if (!b) {
+                        RandomSource randomSource = level.random;
+                        level.addParticle(HyphaPiraceaParticleTypes.FAIRY_FOG, true,
+                                vec3.x + (randomSource.nextFloat() * 2.0 - 1.0) * 0.3,
+                                vec3.y + (randomSource.nextFloat() * 2.0 - 1.0) * 0.3,
+                                vec3.z + (randomSource.nextFloat() * 2.0 - 1.0) * 0.3,
+                                (randomSource.nextFloat() * 2.0 - 1.0) * 0.05,
+                                (randomSource.nextFloat() * 2.0 - 1.0) * 0.05,
+                                (randomSource.nextFloat() * 2.0 - 1.0) * 0.05
+                        );
+                    }
                 }
         );
     }

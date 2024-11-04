@@ -57,6 +57,8 @@ public class ModelProvider extends FabricModelProvider {
         generateFlat(IMG,
                 HyphaPiraceaItems.KEYED_DISC,
                 HyphaPiraceaItems.HYPHALINE,
+                HyphaPiraceaItems.OGRAL_HYPHALINE,
+                HyphaPiraceaItems.FERRIC_WARDLINE,
                 HyphaPiraceaItems.ELECTROMAGNETIC_DUST,
                 HyphaPiraceaItems.POSITIVE_CHARGEBALL,
                 HyphaPiraceaItems.NEGATIVE_CHARGEBALL,

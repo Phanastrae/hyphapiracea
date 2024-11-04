@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "H": {
+      "item": "hyphapiracea:hyphaline"
+    },
+    "I": {
+      "item": "minecraft:copper_ingot"
+    }
+  },
+  "pattern": [
+    " H ",
+    "HIH",
+    " H "
+  ],
+  "result": {
+    "count": 4,
+    "id": "hyphapiracea:ferric_wardline"
+  }
+}

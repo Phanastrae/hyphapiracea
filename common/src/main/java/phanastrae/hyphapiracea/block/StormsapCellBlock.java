@@ -103,7 +103,7 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(stack.is(Items.REDSTONE)) {
+        if(stack.is(Items.GUNPOWDER)) {
             if (level.getBlockEntity(pos) instanceof StormsapCellBlockEntity blockEntity) {
                 if (!level.isClientSide) {
                     stack.consume(1, player);

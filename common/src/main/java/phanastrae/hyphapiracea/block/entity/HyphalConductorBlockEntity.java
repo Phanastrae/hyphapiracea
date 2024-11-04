@@ -614,13 +614,19 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
         WireLineComponent component = this.getWireLineComponent();
         float oldDropoffRadius = this.wireLine.getDropoffRadius();
+        float oldWardingRadius = this.wireLine.getWardingRadius();
         float oldResistancePerBlock = this.wireLine.getResistancePerBlock();
         float newDropoffRadius = component == null ? 0 : component.rangeOfInfluence();
+        float newWardingRadius = component == null ? 0 : component.wardingRadius();
         float newResistancePerBlock = component == null ? 1F : component.resistancePerBlock();
 
         boolean needsAreaUpdate = false;
         if(oldDropoffRadius != newDropoffRadius) {
             this.wireLine.setDropoffRadius(newDropoffRadius);
+            needsAreaUpdate = true;
+        }
+        if(oldWardingRadius != newWardingRadius) {
+            this.wireLine.setWardingRadius(newWardingRadius);
             needsAreaUpdate = true;
         }
         if(oldResistancePerBlock != newResistancePerBlock) {

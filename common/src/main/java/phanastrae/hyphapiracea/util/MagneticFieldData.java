@@ -2,20 +2,30 @@ package phanastrae.hyphapiracea.util;
 
 import net.minecraft.world.phys.Vec3;
 
-public class Vec3Mutable {
+public class MagneticFieldData {
 
     private double x;
     private double y;
     private double z;
+    private boolean insideWardingZone;
 
-    public Vec3Mutable(double x, double y, double z) {
+    public MagneticFieldData(double x, double y, double z, boolean insideWardingZone) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.insideWardingZone = insideWardingZone;
     }
 
-    public Vec3Mutable() {
-        this(0.0, 0.0, 0.0);
+    public MagneticFieldData() {
+        this(0.0, 0.0, 0.0, false);
+    }
+
+    public void setInsideWardingZone(boolean value) {
+        this.insideWardingZone = value;
+    }
+
+    public boolean insideWardingZone() {
+        return this.insideWardingZone;
     }
 
     public void setX(double x) {

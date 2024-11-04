@@ -65,9 +65,9 @@ public class RecipeProvider extends FabricRecipeProvider  {
                 .define('A', AZIMULDEY_MASS)
                 .define('H', HYPHALINE)
                 .define('R', REDSTONE)
-                .define('C', COPPER_INGOT)
+                .define('O', OGRAL_HYPHALINE)
                 .pattern("ARA")
-                .pattern("HCH")
+                .pattern("HOH")
                 .pattern("AAA")
                 .unlockedBy(
                         getHasName(HYPHALINE),
@@ -78,9 +78,9 @@ public class RecipeProvider extends FabricRecipeProvider  {
                 .define('A', AZIMULDEY_MASS)
                 .define('H', HYPHALINE)
                 .define('R', REDSTONE)
-                .define('I', IRON_INGOT)
+                .define('F', FERRIC_WARDLINE)
                 .pattern("ARA")
-                .pattern("HIH")
+                .pattern("HFH")
                 .pattern("AAA")
                 .unlockedBy(
                         getHasName(HYPHALINE),
@@ -148,6 +148,28 @@ public class RecipeProvider extends FabricRecipeProvider  {
                 .unlockedBy(
                         getHasName(AZIMULDEY_MASS),
                         has(AZIMULDEY_MASS)
+                )
+                .save(exporter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, OGRAL_HYPHALINE, 4)
+                .define('C', COPPER_INGOT)
+                .define('H', HYPHALINE)
+                .pattern(" H ")
+                .pattern("HCH")
+                .pattern(" H ")
+                .unlockedBy(
+                        getHasName(HYPHALINE),
+                        has(HYPHALINE)
+                )
+                .save(exporter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, FERRIC_WARDLINE, 4)
+                .define('I', COPPER_INGOT)
+                .define('H', HYPHALINE)
+                .pattern(" H ")
+                .pattern("HIH")
+                .pattern(" H ")
+                .unlockedBy(
+                        getHasName(HYPHALINE),
+                        has(HYPHALINE)
                 )
                 .save(exporter);
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, LEYFIELD_MAGNETOMETER, 1)

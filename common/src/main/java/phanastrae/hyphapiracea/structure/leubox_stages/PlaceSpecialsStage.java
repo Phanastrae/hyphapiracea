@@ -52,7 +52,7 @@ public class PlaceSpecialsStage extends AbstractLeukboxStage {
                                 if(isPositionInRange(mutableBlockPos, this.leukboxPos, maxOperatingRadius)) {
                                     BlockState oldState = level.getBlockState(mutableBlockPos);
                                     if (isStateSubsumed(oldState)) {
-                                        Vec3 localMagneticField = levelAttachment.getMagneticFieldAtPosition(mutableBlockPos.getCenter(), worldWireSectionInfo);
+                                        Vec3 localMagneticField = levelAttachment.getMagneticFieldAtPosition(mutableBlockPos.getCenter(), worldWireSectionInfo, true);
                                         if (canOperateUnderFields(magneticField, localMagneticField, minOperatingTesla)) {
                                             spawnDissolveParticles(level, mutableBlockPos, 1F);
                                             setBlock(level, mutableBlockPos, state, false);
@@ -110,7 +110,7 @@ public class PlaceSpecialsStage extends AbstractLeukboxStage {
             int dz = entity.getBlockZ() - this.leukboxPos.getZ();
             double noise = NOISE.get(dx, dz);
             if(isPositionInRange(entityPos, this.leukboxPos, maxOperatingRadius - noise)) {
-                Vec3 entityMagneticField = levelAttachment.getMagneticFieldAtPosition(entityPos);
+                Vec3 entityMagneticField = levelAttachment.getMagneticFieldAtPosition(entityPos, true);
                 if (canOperateUnderFields(magneticField, entityMagneticField, minOperatingTesla)) {
                     level.addFreshEntity(entity);
                 }

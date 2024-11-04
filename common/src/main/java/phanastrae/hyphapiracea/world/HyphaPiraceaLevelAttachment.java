@@ -7,7 +7,7 @@ import phanastrae.hyphapiracea.duck.LevelDuckInterface;
 import phanastrae.hyphapiracea.electromagnetism.Electromagnetism;
 import phanastrae.hyphapiracea.electromagnetism.WireLine;
 import phanastrae.hyphapiracea.electromagnetism.WorldWireField;
-import phanastrae.hyphapiracea.util.Vec3Mutable;
+import phanastrae.hyphapiracea.util.MagneticFieldData;
 
 public class HyphaPiraceaLevelAttachment {
 
@@ -35,30 +35,58 @@ public class HyphaPiraceaLevelAttachment {
     }
 
     public Vec3 getMagneticFieldAtPosition(Vec3 pos) {
-        Vec3Mutable magneticField = new Vec3Mutable();
-        this.worldWireField.forEachWireAffectingPosition(pos, line -> Electromagnetism.calculateMagneticFieldFromWireAtPoint(line, pos, magneticField));
-
-        Vec3 magField = magneticField.toVec3();
-        magField = addNoise(magField);
-
-        return magField;
+        return this.getMagneticFieldAtPosition(pos, false);
     }
 
-    public Vec3 getMagneticFieldAtPosition(Vec3 pos, @Nullable WorldWireField.SectionInfo sectionInfo) {
-        Vec3Mutable magneticField = new Vec3Mutable();
+    public boolean isPositionWarded(Vec3 pos) {
+        MagneticFieldData magneticField = new MagneticFieldData();
+        this.worldWireField.forEachWireAffectingPosition(pos, line -> {
+            if(!magneticField.insideWardingZone()) {
+                Electromagnetism.calculateMagneticFieldFromWireAtPoint(line, pos, magneticField);
+            }
+        });
+        return magneticField.insideWardingZone();
+    }
+
+    public Vec3 getMagneticFieldAtPosition(Vec3 pos, boolean obeyWarding) {
+        MagneticFieldData magneticField = new MagneticFieldData();
+        this.worldWireField.forEachWireAffectingPosition(pos, line -> {
+            if(!obeyWarding || !magneticField.insideWardingZone()) {
+                Electromagnetism.calculateMagneticFieldFromWireAtPoint(line, pos, magneticField);
+            }
+        });
+
+        if(obeyWarding && magneticField.insideWardingZone()) {
+            return Vec3.ZERO;
+        } else {
+            Vec3 magField = magneticField.toVec3();
+            magField = addNoise(magField);
+
+            return magField;
+        }
+    }
+
+    public Vec3 getMagneticFieldAtPosition(Vec3 pos, @Nullable WorldWireField.SectionInfo sectionInfo, boolean obeyWarding) {
+        MagneticFieldData magneticField = new MagneticFieldData();
         if(sectionInfo != null) {
             sectionInfo.forEach(wireLineHolder -> {
-                WireLine wireLine = wireLineHolder.wireLine;
-                if (wireLine.canInfluencePoint(pos)) {
-                    Electromagnetism.calculateMagneticFieldFromWireAtPoint(wireLine, pos, magneticField);
+                if(!obeyWarding || !magneticField.insideWardingZone()) {
+                    WireLine wireLine = wireLineHolder.wireLine;
+                    if (wireLine.canInfluencePoint(pos)) {
+                        Electromagnetism.calculateMagneticFieldFromWireAtPoint(wireLine, pos, magneticField);
+                    }
                 }
             });
         }
 
-        Vec3 magField = magneticField.toVec3();
-        magField = addNoise(magField);
+        if(obeyWarding && magneticField.insideWardingZone()) {
+            return Vec3.ZERO;
+        } else {
+            Vec3 magField = magneticField.toVec3();
+            magField = addNoise(magField);
 
-        return magField;
+            return magField;
+        }
     }
 
     public WorldWireField getWorldWireField() {

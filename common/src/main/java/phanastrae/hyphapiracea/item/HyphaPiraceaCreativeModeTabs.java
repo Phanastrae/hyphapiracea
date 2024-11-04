@@ -62,6 +62,8 @@ public class HyphaPiraceaCreativeModeTabs {
 
         helper.add(REDSTONE_BLOCKS,
                 HyphaPiraceaItems.HYPHALINE,
+                HyphaPiraceaItems.OGRAL_HYPHALINE,
+                HyphaPiraceaItems.FERRIC_WARDLINE,
                 HyphaPiraceaItems.HYPHAL_NODE,
                 HyphaPiraceaItems.HYPHAL_CONDUCTOR,
                 HyphaPiraceaItems.STORMSAP_CELL,

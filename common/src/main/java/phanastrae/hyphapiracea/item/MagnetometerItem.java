@@ -1,6 +1,7 @@
 package phanastrae.hyphapiracea.item;
 
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -18,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import phanastrae.hyphapiracea.particle.HyphaPiraceaParticleTypes;
 import phanastrae.hyphapiracea.world.HyphaPiraceaLevelAttachment;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class MagnetometerItem extends Item {
 
@@ -66,17 +67,27 @@ public class MagnetometerItem extends Item {
     }
 
     public static void spawnFieldLine(Level level, Vec3 startPos, int length, double distance) {
-        spawnFieldLine(level, startPos, length, distance, vec3 -> {
+        spawnFieldLine(level, startPos, length, distance, (vec3, b) -> {
                     RandomSource random = level.random;
                     float f = random.nextFloat();
 
                     ParticleOptions particleOptions;
-                    if (f > 0.1) {
-                        particleOptions = HyphaPiraceaParticleTypes.LINE_SPECK;
-                    } else if(f > 0.05) {
-                        particleOptions = HyphaPiraceaParticleTypes.ZAPPY_GRIT;
+                    if(b) {
+                        if (f > 0.85) {
+                            particleOptions = HyphaPiraceaParticleTypes.LINE_SPECK;
+                        } else if (f > 0.8) {
+                            particleOptions = HyphaPiraceaParticleTypes.ZAPPY_GRIT;
+                        } else {
+                            particleOptions = ParticleTypes.MYCELIUM;
+                        }
                     } else {
-                        particleOptions = HyphaPiraceaParticleTypes.FAIRY_FOG;
+                        if (f > 0.1) {
+                            particleOptions = HyphaPiraceaParticleTypes.LINE_SPECK;
+                        } else if (f > 0.05) {
+                            particleOptions = HyphaPiraceaParticleTypes.ZAPPY_GRIT;
+                        } else {
+                            particleOptions = HyphaPiraceaParticleTypes.FAIRY_FOG;
+                        }
                     }
                     level.addParticle(
                             particleOptions, true,
@@ -87,7 +98,7 @@ public class MagnetometerItem extends Item {
         );
     }
 
-    public static void spawnFieldLine(Level level, Vec3 startPos, int length, double distance, Consumer<Vec3> particleSpawner) {
+    public static void spawnFieldLine(Level level, Vec3 startPos, int length, double distance, BiConsumer<Vec3, Boolean> particleSpawner) {
         Vec3 pos = startPos;
         HyphaPiraceaLevelAttachment yla = HyphaPiraceaLevelAttachment.getAttachment(level);
         for(int i = 0; i < length * 2; i++) {
@@ -100,10 +111,11 @@ public class MagnetometerItem extends Item {
             int sign = (i >= length ? -1 : 1);
 
             Vec3 magneticField = yla.getMagneticFieldAtPosition(pos);
+            boolean warded = yla.isPositionWarded(pos);
             double oneByLength = 1 / magneticField.length();
             pos = pos.add(magneticField.scale(oneByLength * sign * d));
 
-            particleSpawner.accept(pos);
+            particleSpawner.accept(pos, warded);
         }
     }
 }

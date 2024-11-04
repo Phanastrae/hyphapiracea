@@ -5,11 +5,11 @@
     "A": {
       "item": "hyphapiracea:azimuldey_mass"
     },
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
     "H": {
       "item": "hyphapiracea:hyphaline"
+    },
+    "O": {
+      "item": "hyphapiracea:ogral_hyphaline"
     },
     "R": {
       "item": "minecraft:redstone"
@@ -17,7 +17,7 @@
   },
   "pattern": [
     "ARA",
-    "HCH",
+    "HOH",
     "AAA"
   ],
   "result": {
