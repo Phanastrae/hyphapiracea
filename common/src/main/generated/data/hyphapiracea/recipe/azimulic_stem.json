@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": {
+      "item": "hyphapiracea:azimuldey_mass"
+    },
+    "L": {
+      "tag": "minecraft:logs"
+    }
+  },
+  "pattern": [
+    "ALA",
+    "ALA",
+    "ALA"
+  ],
+  "result": {
+    "count": 8,
+    "id": "hyphapiracea:azimulic_stem"
+  }
+}

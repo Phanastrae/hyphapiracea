@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "hyphapiracea:block/azimulic_stem_top",
+    "side": "hyphapiracea:block/azimulic_stem_side"
+  }
+}

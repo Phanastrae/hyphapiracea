@@ -23,7 +23,21 @@ public class HyphaPiraceaBlocks {
             .sound(SoundType.NYLIUM)
     );
 
+    public static final Block AZIMULIC_STEM = new AzimulicStemBlock(properties()
+            .mapColor(MapColor.COLOR_GREEN)
+            .instrument(NoteBlockInstrument.BASS)
+            .strength(1.2F)
+            .sound(SoundType.NYLIUM)
+    );
+
     public static final Block HYPHAL_NODE = new HyphalNodeBlock(properties()
+            .mapColor(MapColor.COLOR_GREEN)
+            .instrument(NoteBlockInstrument.BASS)
+            .strength(2.0F)
+            .sound(SoundType.NYLIUM)
+    );
+
+    public static final Block HYPHAL_STEM = new HyphalStemBlock(properties()
             .mapColor(MapColor.COLOR_GREEN)
             .instrument(NoteBlockInstrument.BASS)
             .strength(2.0F)
@@ -101,7 +115,7 @@ public class HyphaPiraceaBlocks {
     public static final Block PIRACEATIC_TAR = new PiraceaticTarBlock(properties()
             .mapColor(MapColor.COLOR_RED)
             .instrument(NoteBlockInstrument.CHIME)
-            .strength(1.0F)
+            .strength(0.8F)
             .sound(SoundType.SLIME_BLOCK)
             .emissiveRendering((state, blockGetter, blockPos) -> true)
             .lightLevel((blockState) -> 13)
@@ -111,12 +125,27 @@ public class HyphaPiraceaBlocks {
             .isViewBlocking(HyphaPiraceaBlocks::never)
             .noOcclusion()
             .randomTicks()
-            .noLootTable()
+    );
+
+    public static final Block PIRACEATIC_GLOBGLASS = new PiraceaticGlobglassBlock(properties()
+            .mapColor(MapColor.COLOR_RED)
+            .instrument(NoteBlockInstrument.CHIME)
+            .strength(0.9F)
+            .sound(SoundType.SLIME_BLOCK)
+            .emissiveRendering((state, blockGetter, blockPos) -> true)
+            .lightLevel((blockState) -> 13)
+            .isValidSpawn(HyphaPiraceaBlocks::never)
+            .isRedstoneConductor(HyphaPiraceaBlocks::never)
+            .isSuffocating(HyphaPiraceaBlocks::never)
+            .isViewBlocking(HyphaPiraceaBlocks::never)
+            .noOcclusion()
     );
 
     public static void init(BiConsumer<ResourceLocation, Block> r) {
         r.accept(id("azimuldey_mass"), AZIMULDEY_MASS);
+        r.accept(id("azimulic_stem"), AZIMULIC_STEM);
         r.accept(id("hyphal_node"), HYPHAL_NODE);
+        r.accept(id("hyphal_stem"), HYPHAL_STEM);
         r.accept(id("hyphal_conductor"), HYPHAL_CONDUCTOR);
         r.accept(id("stormsap_cell"), STORMSAP_CELL);
         r.accept(id("creative_cell"), CREATIVE_CELL);
@@ -127,6 +156,7 @@ public class HyphaPiraceaBlocks {
         r.accept(id("electromagnetic_dust_box"), ELECTROMAGNETIC_DUST_BOX);
         r.accept(id("piraceatic_leukbox"), PIRACEATIC_LEUKBOX);
         r.accept(id("piraceatic_tar"), PIRACEATIC_TAR);
+        r.accept(id("piraceatic_globglass"), PIRACEATIC_GLOBGLASS);
     }
 
     private static ResourceLocation id(String path) {

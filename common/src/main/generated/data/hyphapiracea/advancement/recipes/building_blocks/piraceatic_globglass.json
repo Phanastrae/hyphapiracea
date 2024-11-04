@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_piraceatic_glob": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hyphapiracea:piraceatic_glob"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hyphapiracea:piraceatic_globglass"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_piraceatic_glob"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hyphapiracea:piraceatic_globglass"
+    ]
+  }
+}

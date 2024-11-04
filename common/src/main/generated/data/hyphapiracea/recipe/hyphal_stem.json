@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "hyphapiracea:azimulic_stem"
+    },
+    {
+      "item": "hyphapiracea:hyphaline"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hyphapiracea:hyphal_stem"
+  }
+}

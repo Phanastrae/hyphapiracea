@@ -19,7 +19,9 @@ import static phanastrae.hyphapiracea.component.type.WireLineComponent.textureOf
 public class HyphaPiraceaItems {
 
     public static final BlockItem AZIMULDEY_MASS = ofBlock(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+    public static final BlockItem AZIMULIC_STEM = ofBlock(HyphaPiraceaBlocks.AZIMULIC_STEM);
     public static final BlockItem HYPHAL_NODE = ofBlock(HyphaPiraceaBlocks.HYPHAL_NODE);
+    public static final BlockItem HYPHAL_STEM = ofBlock(HyphaPiraceaBlocks.HYPHAL_STEM);
     public static final BlockItem HYPHAL_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
     public static final BlockItem STORMSAP_CELL = ofBlock(HyphaPiraceaBlocks.STORMSAP_CELL);
     public static final BlockItem CREATIVE_CELL = ofBlock(HyphaPiraceaBlocks.CREATIVE_CELL, properties().rarity(Rarity.EPIC));
@@ -29,6 +31,7 @@ public class HyphaPiraceaItems {
     public static final BlockItem LEYFIELD_MAGNETOMETER_BLOCK = ofBlock(HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
     public static final BlockItem ELECTROMAGNETIC_DUST_BOX = ofBlock(HyphaPiraceaBlocks.ELECTROMAGNETIC_DUST_BOX);
     public static final BlockItem PIRACEATIC_LEUKBOX = ofBlock(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
+    public static final BlockItem PIRACEATIC_GLOBGLASS = ofBlock(HyphaPiraceaBlocks.PIRACEATIC_GLOBGLASS);
 
     public static final Item HYPHALINE = new Item(properties().component(HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT,
             new WireLineComponent(24, 40, 0.004F, 3)
@@ -50,6 +53,7 @@ public class HyphaPiraceaItems {
     public static final Item NEGATIVE_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NEGATIVE_SPOREBERRY));
     public static final Item NORTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NORTHERN_SPOREBERRY));
     public static final Item SOUTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.SOUTHERN_SPOREBERRY));
+    public static final Item PIRACEATIC_GLOB = new Item(properties());
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
         BiConsumer<String, Item> rwt = (s, i) -> { // register and add to creative mode tab
@@ -58,10 +62,12 @@ public class HyphaPiraceaItems {
         };
 
         rwt.accept("azimuldey_mass", AZIMULDEY_MASS);
+        rwt.accept("azimulic_stem", AZIMULIC_STEM);
+        rwt.accept("hyphal_node", HYPHAL_NODE);
+        rwt.accept("hyphal_stem", HYPHAL_STEM);
         rwt.accept("hyphaline", HYPHALINE);
         rwt.accept("ogral_hyphaline", OGRAL_HYPHALINE);
         rwt.accept("ferric_wardline", FERRIC_WARDLINE);
-        rwt.accept("hyphal_node", HYPHAL_NODE);
         rwt.accept("hyphal_conductor", HYPHAL_CONDUCTOR);
         rwt.accept("stormsap_cell", STORMSAP_CELL);
         rwt.accept("creative_cell", CREATIVE_CELL);
@@ -82,6 +88,8 @@ public class HyphaPiraceaItems {
         rwt.accept("negative_sporeberry", NEGATIVE_SPOREBERRY);
         rwt.accept("northern_sporeberry", NORTHERN_SPOREBERRY);
         rwt.accept("southern_sporeberry", SOUTHERN_SPOREBERRY);
+        rwt.accept("piraceatic_glob", PIRACEATIC_GLOB);
+        rwt.accept("piraceatic_globglass", PIRACEATIC_GLOBGLASS);
     }
 
     private static ResourceLocation id(String path) {

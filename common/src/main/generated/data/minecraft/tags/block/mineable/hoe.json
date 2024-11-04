@@ -1,7 +1,9 @@
 {
   "values": [
     "hyphapiracea:azimuldey_mass",
+    "hyphapiracea:azimulic_stem",
     "hyphapiracea:hyphal_node",
+    "hyphapiracea:hyphal_stem",
     "hyphapiracea:hyphal_conductor"
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "hyphapiracea:block/hyphal_stem",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "hyphapiracea:block/hyphal_stem"
+    },
+    "axis=z": {
+      "model": "hyphapiracea:block/hyphal_stem",
+      "x": 90
+    }
+  }
+}

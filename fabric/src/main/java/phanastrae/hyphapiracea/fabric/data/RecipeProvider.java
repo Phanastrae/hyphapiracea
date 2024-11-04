@@ -7,6 +7,8 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -32,8 +34,27 @@ public class RecipeProvider extends FabricRecipeProvider  {
                         has(ENDER_PEARL)
                 )
                 .save(exporter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, AZIMULIC_STEM, 8)
+                .define('A', AZIMULDEY_MASS)
+                .define('L', ItemTags.LOGS)
+                .pattern("ALA")
+                .pattern("ALA")
+                .pattern("ALA")
+                .unlockedBy(
+                        getHasName(ENDER_PEARL),
+                        has(ENDER_PEARL)
+                )
+                .save(exporter);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, HYPHAL_NODE, 1)
                 .requires(AZIMULDEY_MASS)
+                .requires(HYPHALINE)
+                .unlockedBy(
+                        getHasName(HYPHALINE),
+                        has(HYPHALINE)
+                )
+                .save(exporter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, HYPHAL_STEM, 1)
+                .requires(AZIMULIC_STEM)
                 .requires(HYPHALINE)
                 .unlockedBy(
                         getHasName(HYPHALINE),
@@ -240,6 +261,17 @@ public class RecipeProvider extends FabricRecipeProvider  {
                         has(ELECTROMAGNETIC_DUST)
                 )
                 .save(exporter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, PIRACEATIC_GLOBGLASS, 1)
+                .define('G', PIRACEATIC_GLOB)
+                .pattern("GG")
+                .pattern("GG")
+                .unlockedBy(
+                        getHasName(PIRACEATIC_GLOB),
+                        has(PIRACEATIC_GLOB)
+                )
+                .save(exporter);
+
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, POSITIVE_CHARGEBALL, 3)
                 .requires(POSITIVE_SPOREBERRY)
                 .requires(WIND_CHARGE)

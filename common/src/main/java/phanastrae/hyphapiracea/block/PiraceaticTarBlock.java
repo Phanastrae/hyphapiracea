@@ -54,7 +54,7 @@ public class PiraceaticTarBlock extends TransparentBlock {
             level.setBlockAndUpdate(pos, state.cycle(AGE));
             level.scheduleTick(pos, this, 20 + random.nextInt(10));
         } else {
-            level.destroyBlock(pos, true);
+            level.destroyBlock(pos, false);
             for(int i = 0; i < 20; i++) {
                 BlockPos adjPos;
                 if(i <= 5) {

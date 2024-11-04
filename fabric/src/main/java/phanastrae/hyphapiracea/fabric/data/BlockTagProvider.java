@@ -25,7 +25,8 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(HyphaPiraceaBlocks.CREATIVE_CELL);
 
         getOrCreateTagBuilder(BlockTags.MUSHROOM_GROW_BLOCK)
-                .add(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+                .add(HyphaPiraceaBlocks.AZIMULDEY_MASS)
+                .add(HyphaPiraceaBlocks.AZIMULIC_STEM);
 
         getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE)
                 .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR)
@@ -39,7 +40,9 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
         getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_HOE)
                 .add(HyphaPiraceaBlocks.AZIMULDEY_MASS)
+                .add(HyphaPiraceaBlocks.AZIMULIC_STEM)
                 .add(HyphaPiraceaBlocks.HYPHAL_NODE)
+                .add(HyphaPiraceaBlocks.HYPHAL_STEM)
                 .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
 
         getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -54,9 +57,12 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
         getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_SHOVEL)
                 .add(HyphaPiraceaBlocks.AZIMULDEY_MASS)
+                .add(HyphaPiraceaBlocks.AZIMULIC_STEM)
                 .add(HyphaPiraceaBlocks.HYPHAL_NODE)
+                .add(HyphaPiraceaBlocks.HYPHAL_STEM)
                 .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR)
-                .add(HyphaPiraceaBlocks.PIRACEATIC_TAR);
+                .add(HyphaPiraceaBlocks.PIRACEATIC_TAR)
+                .add(HyphaPiraceaBlocks.PIRACEATIC_GLOBGLASS);
 
         getOrCreateTagBuilder(ConventionalBlockTags.RELOCATION_NOT_SUPPORTED)
                 .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR)

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_hyphaline": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hyphapiracea:hyphaline"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hyphapiracea:hyphal_stem"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_hyphaline"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hyphapiracea:hyphal_stem"
+    ]
+  }
+}

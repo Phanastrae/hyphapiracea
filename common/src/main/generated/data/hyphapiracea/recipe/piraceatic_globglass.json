@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "G": {
+      "item": "hyphapiracea:piraceatic_glob"
+    }
+  },
+  "pattern": [
+    "GG",
+    "GG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hyphapiracea:piraceatic_globglass"
+  }
+}

@@ -33,8 +33,12 @@ public class ModelProvider extends FabricModelProvider {
     @Override
     public void generateBlockStateModels(BlockModelGenerators BMG) {
         BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_TAR);
+        BMG.createTrivialCube(HyphaPiraceaBlocks.PIRACEATIC_GLOBGLASS);
 
         this.createTopSideBottom(BMG, HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
+
+        BMG.createAxisAlignedPillarBlock(HyphaPiraceaBlocks.AZIMULIC_STEM, TexturedModel.COLUMN);
+        BMG.createAxisAlignedPillarBlock(HyphaPiraceaBlocks.HYPHAL_STEM, TexturedModel.COLUMN);
 
         this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
         this.createCubeTopBottomSide(BMG, HyphaPiraceaBlocks.HYPHAL_AMMETER);
@@ -67,7 +71,8 @@ public class ModelProvider extends FabricModelProvider {
                 HyphaPiraceaItems.POSITIVE_SPOREBERRY,
                 HyphaPiraceaItems.NEGATIVE_SPOREBERRY,
                 HyphaPiraceaItems.NORTHERN_SPOREBERRY,
-                HyphaPiraceaItems.SOUTHERN_SPOREBERRY
+                HyphaPiraceaItems.SOUTHERN_SPOREBERRY,
+                HyphaPiraceaItems.PIRACEATIC_GLOB
         );
     }
 

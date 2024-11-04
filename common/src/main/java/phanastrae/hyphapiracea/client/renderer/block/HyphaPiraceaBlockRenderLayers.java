@@ -11,7 +11,8 @@ public class HyphaPiraceaBlockRenderLayers {
         putBlocks(RenderType.cutoutMipped(),
                 HyphaPiraceaBlocks.STORMSAP_CELL);
         putBlocks(RenderType.translucent(),
-                HyphaPiraceaBlocks.PIRACEATIC_TAR);
+                HyphaPiraceaBlocks.PIRACEATIC_TAR,
+                HyphaPiraceaBlocks.PIRACEATIC_GLOBGLASS);
     }
 
     private static void putBlocks(RenderType renderLayer, Block... blocks) {
