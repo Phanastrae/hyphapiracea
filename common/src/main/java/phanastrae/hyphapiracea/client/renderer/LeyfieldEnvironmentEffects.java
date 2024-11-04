@@ -82,6 +82,7 @@ public class LeyfieldEnvironmentEffects {
             float time = ((level.getGameTime() % 24000) + tickDelta) / 24000.0F;
 
             RenderSystem.enableBlend();
+            RenderSystem.disableDepthTest();
             RenderSystem.setShaderTexture(0, LEYFIELD_AZIMUTH_SHIMMER);
             for (int i = 1; i <= 5; i++) {
                 matrices.pushPose();
@@ -94,7 +95,8 @@ public class LeyfieldEnvironmentEffects {
                 VertexBuffer.unbind();
                 matrices.popPose();
             }
-            RenderSystem.defaultBlendFunc();
+            RenderSystem.enableDepthTest();
+            RenderSystem.disableBlend();
             RenderSystem.setShaderColor(1, 1, 1, 1);
         }
     }
@@ -113,6 +115,9 @@ public class LeyfieldEnvironmentEffects {
             }
 
             EFFECT_LEVEL = EFFECT_LEVEL * 0.97F + target * 0.03F;
+            if(EFFECT_LEVEL < 0.001) {
+                EFFECT_LEVEL = 0;
+            }
         }
     }
 }
