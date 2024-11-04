@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
+import phanastrae.hyphapiracea.block.HyphaPiraceaBlockTags;
 import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
 import phanastrae.hyphapiracea.particle.HyphaPiraceaParticleTypes;
 import phanastrae.hyphapiracea.util.IntNoise2D;
@@ -33,6 +34,10 @@ public class StructurePlacer {
             return true;
         }
 
+        if(state.is(HyphaPiraceaBlockTags.PLACEMENT_FRAGILE)) {
+            return true;
+        }
+
         if(block instanceof DoorBlock) {
             // bottoms of doors are not always properly detected by the canSurvive check
             return true;
@@ -42,8 +47,6 @@ public class StructurePlacer {
             // this prevents some, but not all, problems
             return true;
         }
-
-        // TODO consider adding any other 'fragile' blocks here, if they exist (all redstone components? falling blocks? fluids?)
 
         return false;
     }
@@ -55,12 +58,15 @@ public class StructurePlacer {
             return false;
         }
 
+        if(state.is(HyphaPiraceaBlockTags.NOT_FEASTABLE)) {
+            return false;
+        }
+
         float destroySpeed = state.getDestroySpeed(level, pos);
         if(destroySpeed == -1.0F) {
             // cannot feast upon indestructible blocks, ie bedrock
             return false;
         }
-        // TODO consider blacklisting other blocks? eg obsidian?, iron block?
 
         return true;
     }

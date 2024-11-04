@@ -12,10 +12,13 @@
   "block.hyphapiracea.stormsap_cell": "Stormsap Cell",
   "block.hyphapiracea.voltmeter_block": "Hyphal Voltmeter",
 
-  "effect.hyphapiracea.positively_charged": "Positive",
-  "effect.hyphapiracea.negatively_charged": "Negative",
-  "effect.hyphapiracea.northerly_charged": "Northern",
-  "effect.hyphapiracea.southerly_charged": "Southern",
+  "death.attack.hyphapiracea.chargeball": "%1$s was overcharged",
+  "death.attack.hyphapiracea.chargeball.player": "%1$s was overcharged by %2$s",
+
+  "effect.hyphapiracea.positively_charged": "+ Charged",
+  "effect.hyphapiracea.negatively_charged": "- Charged",
+  "effect.hyphapiracea.northerly_charged": "N Charged",
+  "effect.hyphapiracea.southerly_charged": "S Charged",
 
   "entity.hyphapiracea.chargeball": "Chargeball",
 

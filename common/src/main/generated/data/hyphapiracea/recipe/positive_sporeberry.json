@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "E": {
+      "item": "hyphapiracea:electromagnetic_dust"
+    },
+    "G": {
+      "item": "minecraft:glow_berries"
+    }
+  },
+  "pattern": [
+    " E ",
+    "EGE",
+    " E "
+  ],
+  "result": {
+    "count": 3,
+    "id": "hyphapiracea:positive_sporeberry"
+  }
+}

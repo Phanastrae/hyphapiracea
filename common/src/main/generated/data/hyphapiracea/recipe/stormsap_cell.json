@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": {
+      "item": "hyphapiracea:azimuldey_mass"
+    },
+    "G": {
+      "item": "minecraft:gunpowder"
+    },
+    "H": {
+      "item": "hyphapiracea:hyphaline"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "HGH",
+    "AAA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hyphapiracea:stormsap_cell"
+  }
+}

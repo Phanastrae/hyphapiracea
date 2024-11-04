@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_electromagnetic_dust": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hyphapiracea:electromagnetic_dust"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hyphapiracea:northern_sporeberry"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_electromagnetic_dust"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hyphapiracea:northern_sporeberry"
+    ]
+  }
+}

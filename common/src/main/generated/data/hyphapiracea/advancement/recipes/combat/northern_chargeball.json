@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_northern_sporeberry": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hyphapiracea:northern_sporeberry"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hyphapiracea:northern_chargeball"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_northern_sporeberry"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hyphapiracea:northern_chargeball"
+    ]
+  }
+}

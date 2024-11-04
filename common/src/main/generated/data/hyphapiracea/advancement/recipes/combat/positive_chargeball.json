@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_positive_sporeberry": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hyphapiracea:positive_sporeberry"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hyphapiracea:positive_chargeball"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_positive_sporeberry"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hyphapiracea:positive_chargeball"
+    ]
+  }
+}

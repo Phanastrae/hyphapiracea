@@ -11,6 +11,12 @@ public class HyphaPiraceaDataGenerator implements DataGeneratorEntrypoint {
 		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
 		pack.addProvider(ModelProvider::new);
+
+		pack.addProvider(BlockTagProvider::new);
+		pack.addProvider(EntityTypeTagProvider::new);
+		pack.addProvider(DamageTypeTagProvider::new);
+		pack.addProvider(BlockLootTableProvider::new);
+		pack.addProvider(RecipeProvider::new);
 	}
 
 	@Override

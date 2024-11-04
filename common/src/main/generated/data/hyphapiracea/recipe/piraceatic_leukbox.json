@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "B": {
+      "item": "minecraft:bone_block"
+    },
+    "E": {
+      "item": "hyphapiracea:electromagnetic_dust"
+    },
+    "H": {
+      "item": "hyphapiracea:hyphaline"
+    },
+    "P": {
+      "item": "minecraft:ender_pearl"
+    }
+  },
+  "pattern": [
+    "BEB",
+    "HPH",
+    "BEB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hyphapiracea:piraceatic_leukbox"
+  }
+}

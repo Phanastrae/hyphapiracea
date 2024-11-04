@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": {
+      "item": "hyphapiracea:azimuldey_mass"
+    },
+    "E": {
+      "item": "hyphapiracea:electromagnetic_dust"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "A A",
+    "EEE",
+    "ARA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hyphapiracea:electromagnetic_dust_box"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "D": {
+      "item": "minecraft:dirt"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "R": {
+      "item": "minecraft:rotten_flesh"
+    }
+  },
+  "pattern": [
+    "DRD",
+    "RER",
+    "DRD"
+  ],
+  "result": {
+    "count": 8,
+    "id": "hyphapiracea:azimuldey_mass"
+  }
+}

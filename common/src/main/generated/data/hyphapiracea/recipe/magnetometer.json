@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "hyphapiracea:hyphal_conductor"
+    },
+    "H": {
+      "item": "hyphapiracea:hyphaline"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "H H",
+    "CRC",
+    " I "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hyphapiracea:magnetometer"
+  }
+}

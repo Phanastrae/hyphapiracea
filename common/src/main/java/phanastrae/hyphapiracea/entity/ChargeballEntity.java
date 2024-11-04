@@ -155,10 +155,9 @@ public class ChargeballEntity extends AbstractHurtingProjectile implements ItemS
                 }
             }
 
-            // TODO damage source
-            DamageSource damagesource = this.damageSources().windCharge(this, livingentity);
-            if (entity.hurt(damagesource, 1.0F) && entity instanceof LivingEntity livingentity2) {
-                EnchantmentHelper.doPostAttackEffects((ServerLevel)this.level(), livingentity2, damagesource);
+            DamageSource damageSource = HyphaPiraceaDamageTypes.of(this.level(), HyphaPiraceaDamageTypes.CHARGEBALL, this, livingentity);
+            if (entity.hurt(damageSource, 1.0F) && entity instanceof LivingEntity livingentity2) {
+                EnchantmentHelper.doPostAttackEffects((ServerLevel)this.level(), livingentity2, damageSource);
             }
         }
     }

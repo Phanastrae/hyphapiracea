@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "hyphapiracea:southern_sporeberry"
+    },
+    {
+      "item": "minecraft:wind_charge"
+    },
+    {
+      "item": "hyphapiracea:electromagnetic_dust"
+    }
+  ],
+  "result": {
+    "count": 3,
+    "id": "hyphapiracea:southern_chargeball"
+  }
+}

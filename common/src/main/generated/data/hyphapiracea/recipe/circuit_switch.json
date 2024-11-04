@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": {
+      "item": "hyphapiracea:azimuldey_mass"
+    },
+    "H": {
+      "item": "hyphapiracea:hyphaline"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "ARA",
+    "HSH",
+    "AAA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hyphapiracea:circuit_switch"
+  }
+}
