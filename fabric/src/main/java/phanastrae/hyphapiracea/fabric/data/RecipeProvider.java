@@ -162,7 +162,7 @@ public class RecipeProvider extends FabricRecipeProvider  {
                 )
                 .save(exporter);
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, FERRIC_WARDLINE, 4)
-                .define('I', COPPER_INGOT)
+                .define('I', IRON_INGOT)
                 .define('H', HYPHALINE)
                 .pattern(" H ")
                 .pattern("HIH")
