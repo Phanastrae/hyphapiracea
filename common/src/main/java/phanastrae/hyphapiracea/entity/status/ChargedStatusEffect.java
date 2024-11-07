@@ -44,8 +44,34 @@ public class ChargedStatusEffect extends MobEffect {
             double maxDeltaMovement = 0.1;
             totalForce = totalForce.scale(maxDeltaMovement / maxForce);
             livingEntity.addDeltaMovement(totalForce.scale(amplifier + 1));
-            if (livingEntity.getDeltaMovement().y > 0) {
+
+            Vec3 deltaMovement = livingEntity.getDeltaMovement();
+            if (deltaMovement.y > 0) {
+                // reset fall height if entity is moving upwards
                 livingEntity.resetFallDistance();
+            } else if(totalForce.y > 0) {
+                // limit fall damage if entity is being pushed upwards
+                double drag = 0.98F;
+                double gravity = livingEntity.getGravity();
+                float fallDistance = livingEntity.fallDistance;
+                double v = deltaMovement.y;
+
+                // t = log(1 - [d-1]v/[g*d]) / (d-1)
+                // expected fall time (in ticks)
+                double dragMinusOne = drag - 1;
+                double expectedFallTime = Math.log(1 - dragMinusOne * v/(gravity * drag)) / dragMinusOne;
+
+                // y = [g*d/(d-1)] * (t - e^([d-1]t) / (d-1) + 1 / (d-1))
+                // expected fall distance (in meters)
+                double expectedYChange = (gravity*drag/dragMinusOne) * (expectedFallTime - Math.exp(dragMinusOne * expectedFallTime) / dragMinusOne + 1 / dragMinusOne);
+                double expectedFall = -expectedYChange;
+                if(expectedFall < 0) {
+                    expectedFall = 0;
+                }
+
+                if(expectedFall < fallDistance) {
+                    livingEntity.fallDistance = (float)expectedFall;
+                }
             }
 
             livingEntity.level().addParticle(HyphaPiraceaParticleTypes.ZAPPY_GRIT, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), 0.0, 0.0, 0.0);
