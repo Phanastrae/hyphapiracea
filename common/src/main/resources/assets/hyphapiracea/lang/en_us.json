@@ -25,7 +25,7 @@
 
   "entity.hyphapiracea.chargeball": "Chargeball",
 
-  "gui.hyphapiracea.magnetometer.field_strength_microtesla": "Magetic Leyfield Strength: %s µT",
+  "gui.hyphapiracea.magnetometer.field_strength_microtesla": "Magnetic Leyfield Strength: %s µT",
   "gui.hyphapiracea.magnetometer.warded": "Location Warded",
 
   "item.modifiers.hyphapiracea.equals.m": "%s m %s",
