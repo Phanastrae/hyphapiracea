@@ -1,7 +1,9 @@
 {
   "values": [
+    "#hyphapiracea:azimuldey",
+    "#hyphapiracea:fae_toxin",
+    "#hyphapiracea:piraceatic",
     "minecraft:obsidian",
-    "minecraft:crying_obsidian",
-    "#hyphapiracea:fae_toxin"
+    "minecraft:crying_obsidian"
   ]
 }

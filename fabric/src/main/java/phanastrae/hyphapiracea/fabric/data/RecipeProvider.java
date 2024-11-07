@@ -7,7 +7,6 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +21,7 @@ public class RecipeProvider extends FabricRecipeProvider  {
 
     @Override
     public void buildRecipes(RecipeOutput exporter) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, AZIMULDEY_MASS, 8)
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, AZIMULDEY_MASS, 24)
                 .define('D', DIRT)
                 .define('E', ENDER_PEARL)
                 .define('R', ROTTEN_FLESH)
@@ -171,7 +170,7 @@ public class RecipeProvider extends FabricRecipeProvider  {
                         has(AZIMULDEY_MASS)
                 )
                 .save(exporter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, OGRAL_HYPHALINE, 4)
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, OGRAL_HYPHALINE, 2)
                 .define('C', COPPER_INGOT)
                 .define('H', HYPHALINE)
                 .pattern(" H ")
