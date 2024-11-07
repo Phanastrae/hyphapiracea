@@ -17,7 +17,7 @@ public class HyphaPiraceaModelTemplates {
             blockId("template_conductor_wall"), "_wall", TextureSlot.PARTICLE, TextureSlot.ALL
     );
     public static final ModelTemplate CUBE_BOTTOM_TOP_TINTED_SIDES = create(
-            blockId("cube_bottom_top_tinted_sides"), TextureSlot.TOP, TextureSlot.BOTTOM, TextureSlot.SIDE, TINT_SIDE
+            blockId("cube_bottom_top_tinted_sides"), TextureSlot.PARTICLE, TextureSlot.BOTTOM, TextureSlot.TOP, TextureSlot.SIDE, TINT_SIDE
     );
 
     public static ResourceLocation blockId(String location) {
