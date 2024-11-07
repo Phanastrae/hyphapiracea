@@ -14,6 +14,7 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.GameShuttingDownEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.client.HyphaPiraceaClient;
 import phanastrae.hyphapiracea.client.particle.HyphaPiraceaParticles;
@@ -91,8 +92,10 @@ public class HyphaPiraceaClientNeoForge {
         }
     }
 
-    public void startClientTick(ClientTickEvent.Pre event) {
-        HyphaPiraceaClient.startClientTick();
+    public void startClientTick(LevelTickEvent.Pre event) {
+        if(event.getLevel().isClientSide) {
+            HyphaPiraceaClient.startClientTick();
+        }
     }
 
     public void onGameShutdown(GameShuttingDownEvent event) {
