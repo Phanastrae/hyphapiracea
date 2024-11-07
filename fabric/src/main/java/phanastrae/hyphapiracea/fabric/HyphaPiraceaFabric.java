@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static phanastrae.hyphapiracea.item.HyphaPiraceaCreativeModeTabs.OP_BLOCKS;
+
 public class HyphaPiraceaFabric implements ModInitializer {
 
 	@Override
@@ -103,6 +105,12 @@ public class HyphaPiraceaFabric implements ModInitializer {
 					CreativeModeTab.ItemDisplayParameters displayContext = entries.getContext();
 					biConsumer.accept(displayContext, entries);
 				});
+			}
+
+			@Override
+			public boolean operatorTabEnabled() {
+				// fabric seems to hide the operator tab automatically, so we can just return true here
+				return true;
 			}
 		});
 	}

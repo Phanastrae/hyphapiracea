@@ -52,8 +52,13 @@ public class HyphaPiraceaCreativeModeTabs {
     public static void setupEntries(Helper helper) {
         addQueuedItems(helper);
 
+        helper.add(BUILDING_BLOCKS,
+                HyphaPiraceaItems.PIRACEATIC_GLOBGLASS
+        );
+
         helper.add(NATURAL_BLOCKS,
-                HyphaPiraceaItems.AZIMULDEY_MASS
+                HyphaPiraceaItems.AZIMULDEY_MASS,
+                HyphaPiraceaItems.AZIMULIC_STEM
         );
 
         helper.add(FUNCTIONAL_BLOCKS,
@@ -65,6 +70,7 @@ public class HyphaPiraceaCreativeModeTabs {
                 HyphaPiraceaItems.OGRAL_HYPHALINE,
                 HyphaPiraceaItems.FERRIC_WARDLINE,
                 HyphaPiraceaItems.HYPHAL_NODE,
+                HyphaPiraceaItems.HYPHAL_STEM,
                 HyphaPiraceaItems.HYPHAL_CONDUCTOR,
                 HyphaPiraceaItems.STORMSAP_CELL,
                 HyphaPiraceaItems.HYPHAL_AMMETER,
@@ -94,6 +100,16 @@ public class HyphaPiraceaCreativeModeTabs {
                 HyphaPiraceaItems.NORTHERN_SPOREBERRY,
                 HyphaPiraceaItems.SOUTHERN_SPOREBERRY
         );
+
+        helper.add(INGREDIENTS,
+                HyphaPiraceaItems.PIRACEATIC_GLOB
+        );
+
+        if(helper.operatorTabEnabled()) {
+            helper.add(OP_BLOCKS,
+                    HyphaPiraceaItems.CREATIVE_CELL
+            );
+        }
     }
 
     private static void addQueuedItems(Helper helper) {
@@ -120,6 +136,8 @@ public class HyphaPiraceaCreativeModeTabs {
         public abstract void addAfter(ItemLike after, ResourceKey<CreativeModeTab> groupKey, ItemLike... items);
 
         public abstract void forTabRun(ResourceKey<CreativeModeTab> groupKey, BiConsumer<CreativeModeTab.ItemDisplayParameters, CreativeModeTab.Output> biConsumer);
+
+        public abstract boolean operatorTabEnabled();
     }
 
     private static ResourceKey<CreativeModeTab> createKey(String name) {

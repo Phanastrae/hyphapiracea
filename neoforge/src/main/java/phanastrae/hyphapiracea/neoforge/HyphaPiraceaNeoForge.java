@@ -137,6 +137,11 @@ public class HyphaPiraceaNeoForge {
                     biConsumer.accept(event.getParameters(), event);
                 }
             }
+
+            @Override
+            public boolean operatorTabEnabled() {
+                return event.getParameters().hasPermissions();
+            }
         });
     }
 
