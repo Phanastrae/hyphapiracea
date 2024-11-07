@@ -23,6 +23,7 @@ public class LeyfieldEnvironmentEffects {
     @Nullable
     private static VertexBuffer CYLINDER_BUFFER;
 
+    private static float PREV_EFFECT_LEVEL;
     private static float EFFECT_LEVEL;
 
     public static void close() {
@@ -70,7 +71,11 @@ public class LeyfieldEnvironmentEffects {
     }
 
     public static void renderSky(Matrix4f positionMatrix, DeltaTracker deltaTracker, GameRenderer gameRenderer, Camera camera, ClientLevel level, Matrix4f projectionMatrix) {
-        if(EFFECT_LEVEL != 0) {
+        if(EFFECT_LEVEL != 0 || PREV_EFFECT_LEVEL != 0) {
+            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
+
+            float effectLevel = Mth.lerp(partialTick, PREV_EFFECT_LEVEL, EFFECT_LEVEL);
+
             PoseStack matrices = new PoseStack();
             matrices.mulPose(positionMatrix);
 
@@ -78,8 +83,7 @@ public class LeyfieldEnvironmentEffects {
                 createCylinder();
             }
 
-            float tickDelta = deltaTracker.getGameTimeDeltaPartialTick(false);
-            float time = ((level.getGameTime() % 24000) + tickDelta) / 24000.0F;
+            float time = ((level.getGameTime() % 24000) + partialTick) / 24000.0F;
 
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
@@ -88,7 +92,7 @@ public class LeyfieldEnvironmentEffects {
                 matrices.pushPose();
                 matrices.mulPose(Axis.YP.rotationDegrees((11 + 5 * i) * 360 * time * 2 + 0.4F * i));
                 matrices.mulPose(Axis.XP.rotationDegrees((5 + 2 * i) * Mth.sin(Mth.TWO_PI * time * (5 - i) + 2.3F * i)));
-                RenderSystem.setShaderColor(0.7F, 1, 0.8F, 0.3F * EFFECT_LEVEL);
+                RenderSystem.setShaderColor(0.7F, 1, 0.8F, 0.3F * effectLevel);
 
                 CYLINDER_BUFFER.bind();
                 CYLINDER_BUFFER.drawWithShader(matrices.last().pose(), projectionMatrix, GameRenderer.getPositionTexColorShader());
@@ -104,6 +108,7 @@ public class LeyfieldEnvironmentEffects {
     public static void update(@Nullable Level level, @Nullable Entity entity) {
         if(level == null || entity == null) {
             EFFECT_LEVEL = 0;
+            PREV_EFFECT_LEVEL = 0;
         } else {
             Vec3 magFieldStrength = HyphaPiraceaLevelAttachment.getAttachment(level).getMagneticFieldAtPosition(entity.getEyePosition());
             double mag = magFieldStrength.length();
@@ -114,8 +119,10 @@ public class LeyfieldEnvironmentEffects {
                 target = 1 - 1 / ((float)Math.log(mag / threshold));
             }
 
-            EFFECT_LEVEL = EFFECT_LEVEL * 0.97F + target * 0.03F;
-            if(EFFECT_LEVEL < 0.001) {
+            PREV_EFFECT_LEVEL = EFFECT_LEVEL;
+
+            EFFECT_LEVEL = Mth.lerp(0.02F, EFFECT_LEVEL, target);
+            if(EFFECT_LEVEL < 0.0001) {
                 EFFECT_LEVEL = 0;
             }
         }
