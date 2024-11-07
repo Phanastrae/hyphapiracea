@@ -63,8 +63,9 @@ public class HyphaPiraceaClient {
         if((!stack.isEmpty() && stack.getItem() instanceof MagnetometerItem) || (!stack2.isEmpty() && stack2.getItem() instanceof MagnetometerItem)) {
             Font font = client.font;
             HyphaPiraceaLevelAttachment hpla = HyphaPiraceaLevelAttachment.getAttachment(player.level());
-            Vec3 magneticField = hpla.getMagneticFieldAtPosition(player.position());
-            boolean warded = hpla.isPositionWarded(player.position());
+            Vec3 samplePos = player.getEyePosition();
+            Vec3 magneticField = hpla.getMagneticFieldAtPosition(samplePos);
+            boolean warded = hpla.isPositionWarded(samplePos);
 
             double fieldStrengthTesla = magneticField.length();
             double fieldStrengthMicroTesla = fieldStrengthTesla * 1E6;
