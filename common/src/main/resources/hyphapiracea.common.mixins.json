@@ -12,8 +12,10 @@
     "StructureStartAccessor"
   ],
   "client": [
+    "client.BlockEntityRenderDispatcherAccessor",
     "client.BlockEntityRenderersAccessor",
-    "client.ItemPropertiesAccessor"
+    "client.ItemPropertiesAccessor",
+    "client.LevelRendererAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

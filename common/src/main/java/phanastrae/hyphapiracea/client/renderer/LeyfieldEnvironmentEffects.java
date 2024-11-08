@@ -3,7 +3,6 @@ package phanastrae.hyphapiracea.client.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
@@ -70,7 +69,7 @@ public class LeyfieldEnvironmentEffects {
         return bufferBuilder.buildOrThrow();
     }
 
-    public static void renderSky(Matrix4f positionMatrix, DeltaTracker deltaTracker, GameRenderer gameRenderer, Camera camera, ClientLevel level, Matrix4f projectionMatrix) {
+    public static void renderSky(Matrix4f positionMatrix, DeltaTracker deltaTracker, ClientLevel level, Matrix4f projectionMatrix) {
         if(EFFECT_LEVEL != 0 || PREV_EFFECT_LEVEL != 0) {
             float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
 

@@ -19,9 +19,11 @@ import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.client.HyphaPiraceaClient;
 import phanastrae.hyphapiracea.client.particle.HyphaPiraceaParticles;
 import phanastrae.hyphapiracea.client.renderer.LeyfieldEnvironmentEffects;
+import phanastrae.hyphapiracea.client.renderer.block.entity.HyphalConductorBlockEntityRenderer;
 import phanastrae.hyphapiracea.client.renderer.entity.HyphaPiraceaEntityRenderers;
 import phanastrae.hyphapiracea.client.renderer.entity.model.HyphaPiraceaEntityModelLayers;
 
+import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_ENTITIES;
 import static net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_SKY;
 
 @Mod(value = HyphaPiracea.MOD_ID, dist = Dist.CLIENT)
@@ -106,8 +108,13 @@ public class HyphaPiraceaClientNeoForge {
         ClientLevel level = Minecraft.getInstance().level;
         if(level == null) return;
 
-        if(event.getStage().equals(AFTER_SKY)) {
-            LeyfieldEnvironmentEffects.renderSky(event.getModelViewMatrix(), event.getPartialTick(), Minecraft.getInstance().gameRenderer, event.getCamera(), level, event.getProjectionMatrix());
+        RenderLevelStageEvent.Stage stage = event.getStage();
+        if(stage.equals(AFTER_SKY)) {
+            // render leyfield effects
+            LeyfieldEnvironmentEffects.renderSky(event.getModelViewMatrix(), event.getPartialTick(), level, event.getProjectionMatrix());
+        } else if(stage.equals(AFTER_ENTITIES)) {
+            // render hyphalines
+            HyphalConductorBlockEntityRenderer.renderHyphalines(event.getPoseStack(), event.getPartialTick(), event.getLevelRenderer(), event.getCamera(), level);
         }
     }
 }

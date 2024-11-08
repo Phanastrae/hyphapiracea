@@ -1,18 +1,23 @@
 package phanastrae.hyphapiracea.world;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import phanastrae.hyphapiracea.block.entity.HyphalConductorBlockEntity;
 import phanastrae.hyphapiracea.duck.LevelDuckInterface;
 import phanastrae.hyphapiracea.electromagnetism.Electromagnetism;
 import phanastrae.hyphapiracea.electromagnetism.WireLine;
 import phanastrae.hyphapiracea.electromagnetism.WorldWireField;
 import phanastrae.hyphapiracea.util.MagneticFieldData;
 
+import java.util.List;
+
 public class HyphaPiraceaLevelAttachment {
 
     private final Level level;
     private final WorldWireField worldWireField = new WorldWireField();
+    private final List<HyphalConductorBlockEntity> wireBlockEntitiesWithWires = new ObjectArrayList<>();
 
     public HyphaPiraceaLevelAttachment(Level level) {
         this.level = level;
@@ -20,6 +25,14 @@ public class HyphaPiraceaLevelAttachment {
 
     public static HyphaPiraceaLevelAttachment getAttachment(Level level) {
         return ((LevelDuckInterface)level).hyphapiracea$getAttachment();
+    }
+
+    public void addBlockEntityWithWire(HyphalConductorBlockEntity blockEntity) {
+        this.wireBlockEntitiesWithWires.add(blockEntity);
+    }
+
+    public void removeBlockEntityWithWire(HyphalConductorBlockEntity blockEntity) {
+        this.wireBlockEntitiesWithWires.remove(blockEntity);
     }
 
     public void addWire(WireLine wireLine) {
@@ -91,6 +104,10 @@ public class HyphaPiraceaLevelAttachment {
 
     public WorldWireField getWorldWireField() {
         return this.worldWireField;
+    }
+
+    public List<HyphalConductorBlockEntity> getWireBlockEntitiesWithWires() {
+        return wireBlockEntitiesWithWires;
     }
 
     public Vec3 addNoise(Vec3 magField) {

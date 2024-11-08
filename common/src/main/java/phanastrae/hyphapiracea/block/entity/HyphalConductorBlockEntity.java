@@ -280,7 +280,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
                         level.addParticle(HyphaPiraceaParticleTypes.ZAPPY_GRIT, x, y, z, s, s, s);
                     } else if(f > 0.1) {
                         level.addParticle(ParticleTypes.FALLING_NECTAR, x, y, z, s * 0.3, -0.1, s * 0.3);
-                    } else {
+                    } else if(blockEntity.getWireLineComponent().rangeOfInfluence() > 0) {
                         level.addParticle(HyphaPiraceaParticleTypes.FAIRY_FOG, x, y, z, s * 0.3, s * 0.3, s * 0.3);
                     }
                 }
@@ -333,11 +333,19 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
     @Override
     public void setLevel(Level level) {
+        if(this.level != null) {
+            HyphaPiraceaLevelAttachment.getAttachment(this.level).removeBlockEntityWithWire(this);
+        }
+
         if(this.level != level) {
             this.removeFromLevelListIfPossible();
         }
         super.setLevel(level);
         updateLevelListStatus(false);
+
+        if(this.level != null) {
+            HyphaPiraceaLevelAttachment.getAttachment(this.level).addBlockEntityWithWire(this);
+        }
     }
 
     private void updateLevelListStatus(boolean needsAreaUpdate) {

@@ -16,6 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import phanastrae.hyphapiracea.client.HyphaPiraceaClient;
 import phanastrae.hyphapiracea.client.particle.HyphaPiraceaParticles;
 import phanastrae.hyphapiracea.client.renderer.LeyfieldEnvironmentEffects;
+import phanastrae.hyphapiracea.client.renderer.block.entity.HyphalConductorBlockEntityRenderer;
 import phanastrae.hyphapiracea.client.renderer.entity.HyphaPiraceaEntityRenderers;
 import phanastrae.hyphapiracea.client.renderer.entity.model.HyphaPiraceaEntityModelLayers;
 
@@ -46,7 +47,10 @@ public class HyphaPiraceaClientFabric implements ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STOPPING.register(HyphaPiraceaClient::onClientStop);
 
         // render leyfield effects
-        WorldRenderEvents.AFTER_SETUP.register((context -> LeyfieldEnvironmentEffects.renderSky(context.positionMatrix(), context.tickCounter(), context.gameRenderer(), context.camera(), context.world(), context.projectionMatrix())));
+        WorldRenderEvents.AFTER_SETUP.register(context -> LeyfieldEnvironmentEffects.renderSky(context.positionMatrix(), context.tickCounter(), context.world(), context.projectionMatrix()));
+
+        // render hyphalines
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> HyphalConductorBlockEntityRenderer.renderHyphalines(context.matrixStack(), context.tickCounter(), context.worldRenderer(), context.camera(), context.world()));
 
         // start client tick
         ClientTickEvents.START_WORLD_TICK.register((minecraft) -> {
