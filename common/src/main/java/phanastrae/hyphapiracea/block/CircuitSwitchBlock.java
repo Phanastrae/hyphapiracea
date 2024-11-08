@@ -13,11 +13,11 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.block.entity.AbstractTwoSidedChargeSacBlockEntity;
+import phanastrae.hyphapiracea.block.entity.AbstractTwoSidedCircuitComponentBlockEntity;
 import phanastrae.hyphapiracea.block.entity.CircuitSwitchBlockEntity;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 
-public class CircuitSwitchBlock extends AbstractTwoSidedChargeSacBlock {
+public class CircuitSwitchBlock extends AbstractTwoSidedCircuitComponentBlock {
     public static final MapCodec<CircuitSwitchBlock> CODEC = simpleCodec(CircuitSwitchBlock::new);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -52,7 +52,7 @@ public class CircuitSwitchBlock extends AbstractTwoSidedChargeSacBlock {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return level.isClientSide
                 ? null
-                : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.CIRCUIT_SWITCH, AbstractTwoSidedChargeSacBlockEntity::serverTick);
+                : createTickerHelper(blockEntityType, HyphaPiraceaBlockEntityTypes.CIRCUIT_SWITCH, AbstractTwoSidedCircuitComponentBlockEntity::serverTick);
     }
 
     @Override

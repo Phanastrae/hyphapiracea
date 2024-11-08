@@ -22,7 +22,7 @@ import phanastrae.hyphapiracea.block.entity.AmmeterBlockEntity;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 
-public class AmmeterBlock extends AbstractTwoSidedChargeSacBlock {
+public class AmmeterBlock extends AbstractTwoSidedCircuitComponentBlock {
     public static final MapCodec<AmmeterBlock> CODEC = simpleCodec(AmmeterBlock::new);
     public static final BooleanProperty ALWAYS_SHOW_INFO = HyphaPiraceaBlockProperties.ALWAYS_SHOW_INFO;
 

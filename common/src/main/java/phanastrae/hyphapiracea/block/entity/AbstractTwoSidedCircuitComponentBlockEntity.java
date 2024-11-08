@@ -11,19 +11,19 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.block.AbstractTwoSidedChargeSacBlock;
+import phanastrae.hyphapiracea.block.AbstractTwoSidedCircuitComponentBlock;
 import phanastrae.hyphapiracea.block.MiniCircuit;
 import phanastrae.hyphapiracea.block.MiniCircuitHolder;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNetwork;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNode;
 import phanastrae.hyphapiracea.electromagnetism.CircuitWire;
 
-public abstract class AbstractTwoSidedChargeSacBlockEntity extends BlockEntity implements MiniCircuitHolder {
+public abstract class AbstractTwoSidedCircuitComponentBlockEntity extends BlockEntity implements MiniCircuitHolder {
 
     protected final MiniCircuit miniCircuit;
     protected final CircuitWire wire;
 
-    public AbstractTwoSidedChargeSacBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+    public AbstractTwoSidedCircuitComponentBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
 
         this.miniCircuit = new MiniCircuit();
@@ -38,8 +38,8 @@ public abstract class AbstractTwoSidedChargeSacBlockEntity extends BlockEntity i
         network.addWire(this.wire);
         this.miniCircuit.addInternalWire(this.wire);
 
-        if(blockState.hasProperty(AbstractTwoSidedChargeSacBlock.FACING)) {
-            Direction facing = blockState.getValue(AbstractTwoSidedChargeSacBlock.FACING);
+        if(blockState.hasProperty(AbstractTwoSidedCircuitComponentBlock.FACING)) {
+            Direction facing = blockState.getValue(AbstractTwoSidedCircuitComponentBlock.FACING);
             this.miniCircuit.setNode(facing, positiveCircuitNode);
             this.miniCircuit.setNode(facing.getOpposite(), negativeCircuitNode);
         }
@@ -57,7 +57,7 @@ public abstract class AbstractTwoSidedChargeSacBlockEntity extends BlockEntity i
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, AbstractTwoSidedChargeSacBlockEntity blockEntity) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, AbstractTwoSidedCircuitComponentBlockEntity blockEntity) {
         if(blockEntity.miniCircuit.needsUpdate()) {
             MiniCircuitHolder.updateIfNeeded(level, pos, blockEntity.miniCircuit);
         }
@@ -96,8 +96,8 @@ public abstract class AbstractTwoSidedChargeSacBlockEntity extends BlockEntity i
 
     @Override
     public @Nullable MiniCircuit getMiniCircuit(BlockGetter blockGetter, BlockPos pos, BlockState state, Direction side) {
-        if(state.hasProperty(AbstractTwoSidedChargeSacBlock.FACING)) {
-            Direction direction = state.getValue(AbstractTwoSidedChargeSacBlock.FACING);
+        if(state.hasProperty(AbstractTwoSidedCircuitComponentBlock.FACING)) {
+            Direction direction = state.getValue(AbstractTwoSidedCircuitComponentBlock.FACING);
 
             if(direction == side || direction == side.getOpposite()) {
                 return this.miniCircuit;

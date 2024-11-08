@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
@@ -26,11 +25,10 @@ import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.block.entity.StormsapCellBlockEntity;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 
-public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
+public class StormsapCellBlock extends AbstractTwoSidedCircuitComponentBlock {
     public static final MapCodec<StormsapCellBlock> CODEC = simpleCodec(StormsapCellBlock::new);
     public static final BooleanProperty ALWAYS_SHOW_INFO = HyphaPiraceaBlockProperties.ALWAYS_SHOW_INFO;
     public static final IntegerProperty STORED_POWER = HyphaPiraceaBlockProperties.STORED_POWER;
-    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     @Override
     public MapCodec<StormsapCellBlock> codec() {
@@ -44,14 +42,13 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
                         .any()
                         .setValue(ALWAYS_SHOW_INFO, false)
                         .setValue(STORED_POWER, 0)
-                        .setValue(POWERED, false)
         );
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(ALWAYS_SHOW_INFO, STORED_POWER, POWERED);
+        builder.add(ALWAYS_SHOW_INFO, STORED_POWER);
     }
 
     @Nullable
@@ -84,21 +81,7 @@ public class StormsapCellBlock extends AbstractTwoSidedChargeSacBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite()).setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
-    }
-
-    @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
-
-        boolean powered = level.hasNeighborSignal(pos);
-        if (powered != state.getValue(POWERED)) {
-            if(level.getBlockEntity(pos) instanceof StormsapCellBlockEntity blockEntity) {
-                blockEntity.setPowered(powered);
-            }
-
-            level.setBlock(pos, state.setValue(POWERED, powered), 3);
-        }
+        return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite());
     }
 
     @Override

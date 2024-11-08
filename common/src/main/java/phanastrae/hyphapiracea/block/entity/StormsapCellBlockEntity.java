@@ -10,14 +10,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import phanastrae.hyphapiracea.block.StormsapCellBlock;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNetwork;
 
-public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntity implements ClientHighlightReactingBlockEntity {
+public class StormsapCellBlockEntity extends AbstractTwoSidedCircuitComponentBlockEntity implements ClientHighlightReactingBlockEntity {
     public static final String STORED_ENERGY_KEY = "stored_energy";
 
     public long lastHighlightTime = -1;
     protected int lastComparatorOutput = -1;
     protected int storedEnergy;
     protected boolean active = false;
-    protected boolean powered;
 
     public StormsapCellBlockEntity(BlockPos pos, BlockState blockState) {
         this(HyphaPiraceaBlockEntityTypes.STORMSAP_CELL, pos, blockState);
@@ -25,10 +24,6 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
 
     public StormsapCellBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
-
-        if(blockState.hasProperty(StormsapCellBlock.POWERED)) {
-            this.powered = blockState.getValue(StormsapCellBlock.POWERED);
-        }
     }
 
     @Override
@@ -46,20 +41,17 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, StormsapCellBlockEntity blockEntity) {
-        AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
+        AbstractTwoSidedCircuitComponentBlockEntity.serverTick(level, pos, state, blockEntity);
 
-        int dE = 0;
         double efficiency = 0.95;
-        double current = blockEntity.wire.getCurrent();
-        double emf = blockEntity.active ? blockEntity.getGeneratedVoltage() : 0;
-        double powerUse = current * emf;
-        if (powerUse < 0) {
-            powerUse *= efficiency;
+        double secondsPerTick = 1 / 20.0;
+        // calculate only the power dissipation caused by emf, as opposed to including the internal resistance
+        double powerDissipation = blockEntity.wire.getCurrent() * blockEntity.getGeneratedVoltage();
+        double storedEnergyChangePerTick = powerDissipation * secondsPerTick;
+        if(storedEnergyChangePerTick > 0) {
+            storedEnergyChangePerTick *= efficiency;
         }
-        dE += Mth.floor(-powerUse / 20);
-        double powerGain = blockEntity.wire.getPower();
-        powerGain *= efficiency;
-        dE += Mth.floor(powerGain / 20);
+        int dE = Mth.floor(storedEnergyChangePerTick);
 
         if (dE != 0) {
             blockEntity.addEnergy(dE);
@@ -69,13 +61,14 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
         }
 
         CircuitNetwork network = blockEntity.wire.getStartNode().getNetwork();
-        if(!blockEntity.active && !blockEntity.powered && blockEntity.storedEnergy > 0) {
+        if(!blockEntity.active && blockEntity.storedEnergy > 0) {
             blockEntity.active = true;
-            blockEntity.wire.setEmf(blockEntity.getGeneratedVoltage());
+            // wire flows from positive start to negative end, emf here refers to push from start to end, we want push from negative (end) to positive (start) hence negative emf
+            blockEntity.wire.setEmf(-blockEntity.getGeneratedVoltage());
             if(network != null) {
                 network.markNeedsUpdate();
             }
-        } else if(blockEntity.active && (blockEntity.powered || blockEntity.storedEnergy <= 0)) {
+        } else if(blockEntity.active && blockEntity.storedEnergy <= 0) {
             blockEntity.active = false;
             blockEntity.wire.setEmf(0);
             if(network != null) {
@@ -156,10 +149,6 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedChargeSacBlockEntit
                 this.level.setBlock(this.getBlockPos(), newState, 3);
             }
         }
-    }
-
-    public void setPowered(boolean powered) {
-        this.powered = powered;
     }
 
     @Override

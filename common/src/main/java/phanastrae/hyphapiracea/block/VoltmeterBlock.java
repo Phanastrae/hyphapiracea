@@ -22,7 +22,7 @@ import phanastrae.hyphapiracea.block.entity.VoltmeterBlockEntity;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 
-public class VoltmeterBlock extends AbstractTwoSidedChargeSacBlock {
+public class VoltmeterBlock extends AbstractTwoSidedCircuitComponentBlock {
     public static final MapCodec<VoltmeterBlock> CODEC = simpleCodec(VoltmeterBlock::new);
     public static final BooleanProperty ALWAYS_SHOW_INFO = HyphaPiraceaBlockProperties.ALWAYS_SHOW_INFO;
 

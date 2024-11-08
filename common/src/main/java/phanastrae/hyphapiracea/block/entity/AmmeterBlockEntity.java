@@ -7,7 +7,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity implements ClientHighlightReactingBlockEntity {
+public class AmmeterBlockEntity extends AbstractTwoSidedCircuitComponentBlockEntity implements ClientHighlightReactingBlockEntity {
     public static final String KEY_CURRENT = "current";
 
     public long lastHighlightTime = -1;
@@ -38,7 +38,7 @@ public class AmmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity imp
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmeterBlockEntity blockEntity) {
-        AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
+        AbstractTwoSidedCircuitComponentBlockEntity.serverTick(level, pos, state, blockEntity);
 
         double current = blockEntity.wire.getCurrent();
         if(blockEntity.current != current || blockEntity.lastComparatorOutput == -1) {

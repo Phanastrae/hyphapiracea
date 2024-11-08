@@ -11,10 +11,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractTwoSidedChargeSacBlock extends BaseEntityBlock implements MiniCircuitHolder {
+public abstract class AbstractTwoSidedCircuitComponentBlock extends BaseEntityBlock implements MiniCircuitHolder {
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
 
-    public AbstractTwoSidedChargeSacBlock(Properties properties) {
+    public AbstractTwoSidedCircuitComponentBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }

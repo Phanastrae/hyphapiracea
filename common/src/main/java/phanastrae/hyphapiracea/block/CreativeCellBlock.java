@@ -24,7 +24,7 @@ import phanastrae.hyphapiracea.block.entity.CreativeCellBlockEntity;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 
-public class CreativeCellBlock extends AbstractTwoSidedChargeSacBlock {
+public class CreativeCellBlock extends AbstractTwoSidedCircuitComponentBlock {
     public static final MapCodec<CreativeCellBlock> CODEC = simpleCodec(CreativeCellBlock::new);
     public static final BooleanProperty ALWAYS_SHOW_INFO = HyphaPiraceaBlockProperties.ALWAYS_SHOW_INFO;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;

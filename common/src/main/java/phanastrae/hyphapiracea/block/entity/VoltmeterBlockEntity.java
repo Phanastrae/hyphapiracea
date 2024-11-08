@@ -7,7 +7,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class VoltmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity implements ClientHighlightReactingBlockEntity {
+public class VoltmeterBlockEntity extends AbstractTwoSidedCircuitComponentBlockEntity implements ClientHighlightReactingBlockEntity {
     public static final String KEY_VOLTAGE = "voltage";
 
     public long lastHighlightTime = -1;
@@ -38,7 +38,7 @@ public class VoltmeterBlockEntity extends AbstractTwoSidedChargeSacBlockEntity i
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, VoltmeterBlockEntity blockEntity) {
-        AbstractTwoSidedChargeSacBlockEntity.serverTick(level, pos, state, blockEntity);
+        AbstractTwoSidedCircuitComponentBlockEntity.serverTick(level, pos, state, blockEntity);
 
         double voltage = blockEntity.wire.getVoltage();
         if(blockEntity.voltage != voltage || blockEntity.lastComparatorOutput == -1) {

@@ -8,7 +8,7 @@ public class CircuitWire {
 
     private double voltage;
     private double current;
-    private double power;
+    private double powerDissipation;
 
     public CircuitWire(CircuitNode startNode, CircuitNode endNode, double resistance, double emf) {
         this.startNode = startNode;
@@ -28,7 +28,7 @@ public class CircuitWire {
     public void setStats(double voltage, double current, double power) {
         this.voltage = voltage;
         this.current = current;
-        this.power = power;
+        this.powerDissipation = power;
     }
 
     public CircuitNode getOtherNode(CircuitNode node) {
@@ -63,7 +63,7 @@ public class CircuitWire {
         return current;
     }
 
-    public double getPower() {
-        return power;
+    public double getPowerDissipation() {
+        return powerDissipation;
     }
 }

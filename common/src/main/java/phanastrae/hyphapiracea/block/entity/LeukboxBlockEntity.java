@@ -26,7 +26,6 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.block.AbstractTwoSidedChargeSacBlock;
 import phanastrae.hyphapiracea.block.LeukboxBlock;
 import phanastrae.hyphapiracea.block.MiniCircuit;
 import phanastrae.hyphapiracea.block.MiniCircuitHolder;
@@ -628,7 +627,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     }
 
     public double getPower() {
-        return this.wire.getPower();
+        return this.wire.getPowerDissipation();
     }
 
     @Override

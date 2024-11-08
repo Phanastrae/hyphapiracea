@@ -582,8 +582,8 @@ public class CircuitNetwork {
                 this.wire.setStats(0, 0, 0);
             } else {
                 double current = v / this.getResistance();
-                double power = current * v;
-                this.wire.setStats(v, current, power);
+                double power = current * pd;
+                this.wire.setStats(pd, current, power);
             }
         }
     }

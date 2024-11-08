@@ -6,7 +6,7 @@ import phanastrae.hyphapiracea.block.CircuitSwitchBlock;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNetwork;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNode;
 
-public class CircuitSwitchBlockEntity extends AbstractTwoSidedChargeSacBlockEntity {
+public class CircuitSwitchBlockEntity extends AbstractTwoSidedCircuitComponentBlockEntity {
 
     private boolean powered;
 
