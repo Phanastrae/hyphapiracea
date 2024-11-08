@@ -52,7 +52,7 @@ public class VoltmeterBlockEntity extends AbstractTwoSidedCircuitComponentBlockE
     public int calculateComparatorOutput() {
         int comparatorOutput = 0;
         double strengthToBeat = 0.25;
-        double voltage = Math.abs(this.voltage);
+        double voltage = this.voltage;
         for(int i = 0; i < 15; i++) {
             if(voltage >= strengthToBeat) {
                 strengthToBeat *= 2;

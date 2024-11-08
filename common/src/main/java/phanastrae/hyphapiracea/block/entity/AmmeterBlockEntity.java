@@ -52,7 +52,7 @@ public class AmmeterBlockEntity extends AbstractTwoSidedCircuitComponentBlockEnt
     public int calculateComparatorOutput() {
         int comparatorOutput = 0;
         double strengthToBeat = 0.25;
-        double current = Math.abs(this.current);
+        double current = this.current;
         for(int i = 0; i < 15; i++) {
             if(current >= strengthToBeat) {
                 strengthToBeat *= 2;
