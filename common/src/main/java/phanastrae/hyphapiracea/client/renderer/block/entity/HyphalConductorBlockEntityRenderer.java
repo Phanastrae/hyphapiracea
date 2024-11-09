@@ -51,6 +51,7 @@ import phanastrae.hyphapiracea.component.type.WireLineComponent;
 import phanastrae.hyphapiracea.entity.HyphaPiraceaEntityAttachment;
 import phanastrae.hyphapiracea.mixin.client.BlockEntityRenderDispatcherAccessor;
 import phanastrae.hyphapiracea.mixin.client.LevelRendererAccessor;
+import phanastrae.hyphapiracea.services.XPlatInterface;
 import phanastrae.hyphapiracea.world.HyphaPiraceaLevelAttachment;
 
 import java.util.List;
@@ -71,8 +72,13 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
             return;
         }
 
+        boolean fabric = XPlatInterface.INSTANCE.getLoader().equals("fabric");
         ProfilerFiller profiler = Minecraft.getInstance().getProfiler();
-        profiler.popPush("hyphapiracea:hyphaline");
+        if(fabric) {
+            profiler.popPush("hyphapiracea:hyphaline");
+        } else {
+            profiler.push("hyphapiracea:hyphaline");
+        }
 
         LevelRendererAccessor lra = (LevelRendererAccessor)levelRenderer;
         BlockEntityRenderDispatcher berd = lra.getBlockEntityRenderDispatcher();
@@ -113,7 +119,11 @@ public class HyphalConductorBlockEntityRenderer implements BlockEntityRenderer<H
             }
         }
 
-        profiler.popPush("entities");
+        if(fabric) {
+            profiler.popPush("entities");
+        } else {
+            profiler.pop();
+        }
     }
 
     private void setupAndRender(
