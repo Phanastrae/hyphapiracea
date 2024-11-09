@@ -46,6 +46,11 @@ public class ElectromagneticDustParticle extends TextureSheetParticle {
         this.xos = new double[TRAIL_LENGTH];
         this.yos = new double[TRAIL_LENGTH];
         this.zos = new double[TRAIL_LENGTH];
+        for(int i = 0; i < TRAIL_LENGTH; i++) {
+            this.xos[i] = x;
+            this.yos[i] = y;
+            this.zos[i] = z;
+        }
         this.sprites = new TextureAtlasSprite[TRAIL_LENGTH + 1];
     }
 
@@ -244,7 +249,7 @@ public class ElectromagneticDustParticle extends TextureSheetParticle {
         @Nullable
         @Override
         public ElectromagneticDustParticle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            ElectromagneticDustParticle electromagneticDustParticle = super.createParticle(type, level, x, y, z, xSpeed, ySpeed, z);
+            ElectromagneticDustParticle electromagneticDustParticle = super.createParticle(type, level, x, y, z, xSpeed, ySpeed, zSpeed);
             if(electromagneticDustParticle != null) {
                 electromagneticDustParticle.quadSize *= 4;
                 electromagneticDustParticle.lifetime = electromagneticDustParticle.lifetime * 2;
