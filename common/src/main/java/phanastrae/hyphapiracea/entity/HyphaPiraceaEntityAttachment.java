@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.entity.HyphalConductorBlockEntity;
 import phanastrae.hyphapiracea.duck.EntityDuckInterface;
 
@@ -25,7 +24,6 @@ public class HyphaPiraceaEntityAttachment {
 
     public void tick() {
         if(!this.linkedConductors.isEmpty()) {
-            this.linkedConductors.forEach(c -> HyphaPiracea.LOGGER.info(c.isRemoved()+""));
             this.linkedConductors.removeIf(BlockEntity::isRemoved);
         }
     }
