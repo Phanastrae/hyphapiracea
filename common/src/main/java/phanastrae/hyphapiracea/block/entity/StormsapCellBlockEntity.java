@@ -46,16 +46,22 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedCircuitComponentBlo
         double efficiency = 0.95;
         double secondsPerTick = 1 / 20.0;
         // calculate only the power dissipation caused by emf, as opposed to including the internal resistance
-        double powerDissipation = blockEntity.wire.getCurrent() * blockEntity.getGeneratedVoltage();
-        double storedEnergyChangePerTick = powerDissipation * secondsPerTick;
-        if(storedEnergyChangePerTick > 0) {
+
+        double current = blockEntity.wire.getCurrent();
+        int dE;
+        if(current > 0) {
+            // if current is flowing from positive to negative, charge
+            double powerDissipation = blockEntity.wire.getPowerDissipation();
+            double storedEnergyChangePerTick = powerDissipation * secondsPerTick;
             // limit efficiency of energy absorption
             storedEnergyChangePerTick *= efficiency;
-        } else if(blockEntity.storedEnergy <= 0) {
-            // don't drain from empty cells
-            storedEnergyChangePerTick = 0;
+            dE = Mth.floor(storedEnergyChangePerTick);
+        } else {
+            // if current is flowing from negative to positive, discharge
+            double powerDissipation = current * blockEntity.getGeneratedVoltage();
+            double storedEnergyChangePerTick = powerDissipation * secondsPerTick;
+            dE = Mth.floor(storedEnergyChangePerTick);
         }
-        int dE = Mth.floor(storedEnergyChangePerTick);
 
         if (dE != 0) {
             blockEntity.addEnergy(dE);
