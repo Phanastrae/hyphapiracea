@@ -12,12 +12,15 @@ public class HyphaPiraceaModelTemplates {
 
     public static final ModelTemplate CONDUCTOR = create(
             blockId("template_conductor"), TextureSlot.PARTICLE, TextureSlot.ALL
-            );
+    );
     public static final ModelTemplate CONDUCTOR_WALL = create(
             blockId("template_conductor_wall"), "_wall", TextureSlot.PARTICLE, TextureSlot.ALL
     );
     public static final ModelTemplate CUBE_BOTTOM_TOP_TINTED_SIDES = create(
             blockId("cube_bottom_top_tinted_sides"), TextureSlot.PARTICLE, TextureSlot.BOTTOM, TextureSlot.TOP, TextureSlot.SIDE, TINT_SIDE
+    );
+    public static final ModelTemplate SINGLE_FACE_WITH_INDICATORS = create(
+            blockId("template_single_face_indicators"), TextureSlot.PARTICLE, TextureSlot.SIDE, TextureSlot.BACK
     );
 
     public static ResourceLocation blockId(String location) {

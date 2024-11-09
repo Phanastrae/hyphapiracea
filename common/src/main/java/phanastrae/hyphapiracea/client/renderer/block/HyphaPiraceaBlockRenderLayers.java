@@ -9,6 +9,8 @@ public class HyphaPiraceaBlockRenderLayers {
 
     public static void init() {
         putBlocks(RenderType.cutoutMipped(),
+                HyphaPiraceaBlocks.AZIMULDEY_MASS,
+                HyphaPiraceaBlocks.HYPHAL_NODE,
                 HyphaPiraceaBlocks.STORMSAP_CELL);
         putBlocks(RenderType.translucent(),
                 HyphaPiraceaBlocks.PIRACEATIC_TAR,

@@ -18,12 +18,16 @@ import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
 import phanastrae.hyphapiracea.block.LeukboxBlock;
 import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
 
-import static net.minecraft.core.Direction.*;
+import static net.minecraft.core.Direction.DOWN;
+import static net.minecraft.core.Direction.EAST;
+import static net.minecraft.core.Direction.NORTH;
+import static net.minecraft.core.Direction.SOUTH;
+import static net.minecraft.core.Direction.UP;
+import static net.minecraft.core.Direction.WEST;
 import static net.minecraft.data.models.BlockModelGenerators.createHorizontalFacingDispatch;
 import static net.minecraft.data.models.blockstates.VariantProperties.*;
 import static net.minecraft.data.models.blockstates.VariantProperties.Rotation.*;
-import static net.minecraft.data.models.model.TextureSlot.ALL;
-import static net.minecraft.data.models.model.TextureSlot.PARTICLE;
+import static net.minecraft.data.models.model.TextureSlot.*;
 
 public class ModelProvider extends FabricModelProvider {
     public ModelProvider(FabricDataOutput output) {
@@ -135,7 +139,7 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
                 .put(TextureSlot.BOTTOM, bottom)
                 .put(TextureSlot.TOP, top)
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
+                .put(SIDE, TextureMapping.getBlockTexture(block, "_side"));
         ResourceLocation verticalModel = ModelTemplates.CUBE_BOTTOM_TOP.create(block, verticalMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
@@ -170,14 +174,14 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
                 .put(TextureSlot.BOTTOM, bottom)
                 .put(TextureSlot.TOP, top)
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
+                .put(SIDE, TextureMapping.getBlockTexture(block, "_side"));
         ResourceLocation offModel = ModelTemplates.CUBE_BOTTOM_TOP.create(block, offMapping, BMG.modelOutput);
 
         TextureMapping onMapping = new TextureMapping()
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side_on"))
                 .put(TextureSlot.BOTTOM, bottom)
                 .put(TextureSlot.TOP, top)
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side_on"));
+                .put(SIDE, TextureMapping.getBlockTexture(block, "_side_on"));
         ResourceLocation onModel = ModelTemplates.CUBE_BOTTOM_TOP.createWithOverride(block, "_on", onMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
@@ -230,14 +234,14 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
                 .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(block, "_bottom"))
                 .put(TextureSlot.TOP, TextureMapping.getBlockTexture(block, "_top"))
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
+                .put(SIDE, TextureMapping.getBlockTexture(block, "_side"));
         ResourceLocation offModel = ModelTemplates.CUBE_BOTTOM_TOP.create(block, offMapping, BMG.modelOutput);
 
         TextureMapping onMapping = new TextureMapping()
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
                 .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(block, "_bottom"))
                 .put(TextureSlot.TOP, TextureMapping.getBlockTexture(block, "_top_on"))
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"));
+                .put(SIDE, TextureMapping.getBlockTexture(block, "_side"));
         ResourceLocation onModel = ModelTemplates.CUBE_BOTTOM_TOP.createWithOverride(block, "_on", onMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
@@ -292,7 +296,7 @@ public class ModelProvider extends FabricModelProvider {
                 .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_side"))
                 .put(TextureSlot.BOTTOM, negativeTerminal)
                 .put(TextureSlot.TOP, positiveTerminal)
-                .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"))
+                .put(SIDE, TextureMapping.getBlockTexture(block, "_side"))
                 .put(HyphaPiraceaModelTemplates.TINT_SIDE, TextureMapping.getBlockTexture(block, "_side_tint"));
         ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CUBE_BOTTOM_TOP_TINTED_SIDES.create(block, verticalMapping, BMG.modelOutput);
 
@@ -322,51 +326,17 @@ public class ModelProvider extends FabricModelProvider {
     }
 
     public void createHyphalNode(BlockModelGenerators BMG, Block block) {
-        ResourceLocation resourceLocation = ModelTemplates.SINGLE_FACE.createWithSuffix(block, "_open", TextureMapping.defaultTexture(TextureMapping.getBlockTexture(block, "_open")), BMG.modelOutput);
+        TextureMapping indicatorMapping = new TextureMapping()
+                .put(PARTICLE, TextureMapping.getBlockTexture(block, "_open_front"))
+                .put(SIDE, TextureMapping.getBlockTexture(block, "_open_side"))
+                .put(BACK, TextureMapping.getBlockTexture(block, "_open_back"));
+
+        ResourceLocation resourceLocation = ModelTemplates.SINGLE_FACE.createWithSuffix(block, "_open", TextureMapping.defaultTexture(TextureMapping.getBlockTexture(block, "_open_front")), BMG.modelOutput);
         ResourceLocation resourceLocation2 = ModelTemplates.SINGLE_FACE.create(block, TextureMapping.defaultTexture(block), BMG.modelOutput);
+        ResourceLocation resourceLocation3 = HyphaPiraceaModelTemplates.SINGLE_FACE_WITH_INDICATORS.createWithSuffix(block, "_open_indicator", indicatorMapping, BMG.modelOutput);
         BMG.blockStateOutput
                 .accept(
                         MultiPartGenerator.multiPart(block)
-                                .with(
-                                        Condition.condition().term(BlockStateProperties.NORTH, true),
-                                        Variant.variant().with(
-                                                VariantProperties.MODEL, resourceLocation
-                                        ))
-                                .with(
-                                        Condition.condition().term(BlockStateProperties.EAST, true),
-                                        Variant.variant()
-                                                .with(VariantProperties.MODEL, resourceLocation)
-                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)
-                                                .with(VariantProperties.UV_LOCK, false)
-                                )
-                                .with(
-                                        Condition.condition().term(BlockStateProperties.SOUTH, true),
-                                        Variant.variant()
-                                                .with(VariantProperties.MODEL, resourceLocation)
-                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
-                                                .with(VariantProperties.UV_LOCK, false)
-                                )
-                                .with(
-                                        Condition.condition().term(BlockStateProperties.WEST, true),
-                                        Variant.variant()
-                                                .with(VariantProperties.MODEL, resourceLocation)
-                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)
-                                                .with(VariantProperties.UV_LOCK, false)
-                                )
-                                .with(
-                                        Condition.condition().term(BlockStateProperties.UP, true),
-                                        Variant.variant()
-                                                .with(VariantProperties.MODEL, resourceLocation)
-                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
-                                                .with(VariantProperties.UV_LOCK, false)
-                                )
-                                .with(
-                                        Condition.condition().term(BlockStateProperties.DOWN, true),
-                                        Variant.variant()
-                                                .with(VariantProperties.MODEL, resourceLocation)
-                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
-                                                .with(VariantProperties.UV_LOCK, false)
-                                )
                                 .with(
                                         Condition.condition().term(BlockStateProperties.NORTH, false),
                                         Variant.variant().with(
@@ -404,6 +374,86 @@ public class ModelProvider extends FabricModelProvider {
                                         Condition.condition().term(BlockStateProperties.DOWN, false),
                                         Variant.variant()
                                                 .with(VariantProperties.MODEL, resourceLocation2)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.NORTH, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.EAST, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.SOUTH, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.WEST, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.UP, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.DOWN, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.NORTH, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation3)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.EAST, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation3)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.SOUTH, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation3)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.WEST, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation3)
+                                                .with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.UP, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation3)
+                                                .with(VariantProperties.X_ROT, VariantProperties.Rotation.R270)
+                                                .with(VariantProperties.UV_LOCK, false)
+                                )
+                                .with(
+                                        Condition.condition().term(BlockStateProperties.DOWN, true),
+                                        Variant.variant()
+                                                .with(VariantProperties.MODEL, resourceLocation3)
                                                 .with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)
                                                 .with(VariantProperties.UV_LOCK, false)
                                 )

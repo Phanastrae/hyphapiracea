@@ -1,0 +1,8 @@
+{
+  "parent": "hyphapiracea:block/template_single_face_indicators",
+  "textures": {
+    "back": "hyphapiracea:block/hyphal_node_open_back",
+    "particle": "hyphapiracea:block/hyphal_node_open_front",
+    "side": "hyphapiracea:block/hyphal_node_open_side"
+  }
+}

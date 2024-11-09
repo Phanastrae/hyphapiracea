@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/template_single_face",
   "textures": {
-    "texture": "hyphapiracea:block/azimuldey_mass_open"
+    "texture": "hyphapiracea:block/azimuldey_mass_open_front"
   }
 }

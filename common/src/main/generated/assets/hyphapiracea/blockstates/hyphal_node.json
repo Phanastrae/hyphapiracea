@@ -2,6 +2,64 @@
   "multipart": [
     {
       "apply": {
+        "model": "hyphapiracea:block/hyphal_node"
+      },
+      "when": {
+        "north": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "hyphapiracea:block/hyphal_node",
+        "uvlock": false,
+        "y": 90
+      },
+      "when": {
+        "east": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "hyphapiracea:block/hyphal_node",
+        "uvlock": false,
+        "y": 180
+      },
+      "when": {
+        "south": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "hyphapiracea:block/hyphal_node",
+        "uvlock": false,
+        "y": 270
+      },
+      "when": {
+        "west": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "hyphapiracea:block/hyphal_node",
+        "uvlock": false,
+        "x": 270
+      },
+      "when": {
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "hyphapiracea:block/hyphal_node",
+        "uvlock": false,
+        "x": 90
+      },
+      "when": {
+        "down": "false"
+      }
+    },
+    {
+      "apply": {
         "model": "hyphapiracea:block/hyphal_node_open"
       },
       "when": {
@@ -60,60 +118,60 @@
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node"
+        "model": "hyphapiracea:block/hyphal_node_open_indicator"
       },
       "when": {
-        "north": "false"
+        "north": "true"
       }
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/hyphal_node_open_indicator",
         "uvlock": false,
         "y": 90
       },
       "when": {
-        "east": "false"
+        "east": "true"
       }
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/hyphal_node_open_indicator",
         "uvlock": false,
         "y": 180
       },
       "when": {
-        "south": "false"
+        "south": "true"
       }
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/hyphal_node_open_indicator",
         "uvlock": false,
         "y": 270
       },
       "when": {
-        "west": "false"
+        "west": "true"
       }
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/hyphal_node_open_indicator",
         "uvlock": false,
         "x": 270
       },
       "when": {
-        "up": "false"
+        "up": "true"
       }
     },
     {
       "apply": {
-        "model": "hyphapiracea:block/hyphal_node",
+        "model": "hyphapiracea:block/hyphal_node_open_indicator",
         "uvlock": false,
         "x": 90
       },
       "when": {
-        "down": "false"
+        "down": "true"
       }
     }
   ]
