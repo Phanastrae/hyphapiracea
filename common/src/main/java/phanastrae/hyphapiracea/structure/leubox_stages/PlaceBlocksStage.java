@@ -59,6 +59,13 @@ public class PlaceBlocksStage extends AbstractLeukboxStage implements SpawnTimeH
         HyphaPiraceaLevelAttachment levelAttachment = HyphaPiraceaLevelAttachment.getAttachment(level);
 
         this.intermediateStructureStorage.forEachContainer((sectionPos, boxedContainer) -> {
+            // make sure nearby chunks are loaded
+            for(int i = -2; i <= 2; i++) {
+                for(int j = -2; j <= 2; j++) {
+                    level.getChunk(sectionPos.x() + i, sectionPos.z() + j);
+                }
+            }
+
             WorldWireField.SectionInfo worldWireSectionInfo = levelAttachment.getWorldWireField().getSectionInfoForPosition(sectionPos);
 
             BoundingBox box = boxedContainer.getBox();

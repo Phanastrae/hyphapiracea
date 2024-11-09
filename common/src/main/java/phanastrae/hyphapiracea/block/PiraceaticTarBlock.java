@@ -42,9 +42,9 @@ public class PiraceaticTarBlock extends TransparentBlock {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if(state.getValue(AGE) == 0 && random.nextInt(10) == 0) {
+        if(state.getValue(AGE) == 0 && random.nextInt(20) == 0) {
             level.setBlockAndUpdate(pos, state.cycle(AGE));
-            level.scheduleTick(pos, this, 20 + random.nextInt(10));
+            level.scheduleTick(pos, this, 40 + random.nextInt(20));
         }
     }
 
@@ -52,7 +52,7 @@ public class PiraceaticTarBlock extends TransparentBlock {
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if(state.getValue(AGE) < 7) {
             level.setBlockAndUpdate(pos, state.cycle(AGE));
-            level.scheduleTick(pos, this, 20 + random.nextInt(10));
+            level.scheduleTick(pos, this, 40 + random.nextInt(20));
         } else {
             level.destroyBlock(pos, false);
             for(int i = 0; i < 20; i++) {

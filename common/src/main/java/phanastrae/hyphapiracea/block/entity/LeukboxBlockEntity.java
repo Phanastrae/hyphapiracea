@@ -249,16 +249,16 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
                 if (stageChanged) {
                     // play effects on feasting start
                     if ((oldStage == AbstractLeukboxStage.LeukboxStage.POST_PROCESS || oldStage == LeukboxStage.INSUFFICIENT_MAGNETIC_FIELD) && newStage == AbstractLeukboxStage.LeukboxStage.PLACE_BLOCKS) {
-                        serverLevel.sendParticles(ParticleTypes.MYCELIUM, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 600, 0.4, 0, 0.4, 10.4);
-                        serverLevel.sendParticles(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 0.2, pos.getZ() + 0.5, 150, 0.5, 0.2, 0.5, 4.5);
+                        serverLevel.sendParticles(ParticleTypes.MYCELIUM, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 600, 0.4, 0, 0.4, 10.4);
+                        serverLevel.sendParticles(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 0.9, pos.getZ() + 0.5, 150, 0.5, 0.2, 0.5, 4.5);
                         level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.PARROT_IMITATE_GHAST, SoundSource.BLOCKS, 4.5F, 0.3F);
 
                         blockEntity.setDiscRecoverable(false);
                     }
 
                     // play progress particles
-                    if (newStage != LeukboxStage.COMPLETED) {
-                        serverLevel.sendParticles(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 0.2, pos.getZ() + 0.5, oldStage.getWait() * 2, 0.5, 0.2, 0.5, 0.9);
+                    if (newStage.isActive()) {
+                        serverLevel.sendParticles(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 0.9, pos.getZ() + 0.5, oldStage.getWait() * 2, 0.5, 0.2, 0.5, 0.9);
                     }
 
                     blockEntity.sendUpdate();

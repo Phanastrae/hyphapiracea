@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import phanastrae.hyphapiracea.electromagnetism.WorldWireField;
 import phanastrae.hyphapiracea.structure.IntermediateStructureStorage;
 import phanastrae.hyphapiracea.world.HyphaPiraceaLevelAttachment;
 
@@ -35,8 +34,6 @@ public class PlaceSpecialsStage extends AbstractLeukboxStage {
         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
         // place blocks
         this.intermediateStructureStorage.forEachFragileContainer((sectionPos, boxedContainer) -> {
-            WorldWireField.SectionInfo worldWireSectionInfo = levelAttachment.getWorldWireField().getSectionInfoForPosition(sectionPos);
-
             BoundingBox box = boxedContainer.getBox();
             if(box != null) {
                 int mx = sectionPos.minBlockX();
@@ -52,11 +49,8 @@ public class PlaceSpecialsStage extends AbstractLeukboxStage {
                                 if(isPositionInRange(mutableBlockPos, this.leukboxPos, maxOperatingRadius)) {
                                     BlockState oldState = level.getBlockState(mutableBlockPos);
                                     if (isStateSubsumed(oldState)) {
-                                        Vec3 localMagneticField = levelAttachment.getMagneticFieldAtPosition(mutableBlockPos.getCenter(), worldWireSectionInfo, true);
-                                        if (canOperateUnderFields(magneticField, localMagneticField, minOperatingTesla)) {
-                                            spawnDissolveParticles(level, mutableBlockPos, 1F);
-                                            setBlock(level, mutableBlockPos, state, false);
-                                        }
+                                        spawnDissolveParticles(level, mutableBlockPos, 1F);
+                                        setBlock(level, mutableBlockPos, state, false);
                                     }
                                 }
                             }
