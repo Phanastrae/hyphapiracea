@@ -27,16 +27,14 @@ public class FillStorageAfterStage extends AbstractLeukboxStage {
     private final IntermediateStructureStorage intermediateStructureStorage;
     private final BoundingBox boundingBox;
     private final PiecesContainer piecesContainer;
-    private final BlockPos structureOrigin;
 
-    public FillStorageAfterStage(BlockPos leukboxPos, IntermediateStructureStorage intermediateStructureStorage, Structure structure, PiecesContainer piecesContainer, BoundingBox boundingBox, BlockPos structureOrigin) {
+    public FillStorageAfterStage(BlockPos leukboxPos, IntermediateStructureStorage intermediateStructureStorage, Structure structure, PiecesContainer piecesContainer, BoundingBox boundingBox) {
         super(leukboxPos, LeukboxStage.FILL_STORAGE_AFTER);
 
         this.structure = structure;
         this.intermediateStructureStorage = intermediateStructureStorage;
         this.boundingBox = boundingBox;
         this.piecesContainer = piecesContainer;
-        this.structureOrigin = structureOrigin;
     }
 
     @Override
@@ -93,7 +91,7 @@ public class FillStorageAfterStage extends AbstractLeukboxStage {
                             }
                     );
         } catch (Exception e) {
-            HyphaPiracea.LOGGER.error("Error trying to apply after-place for structure {} with Leukbox at {}!", this.structure.toString(), this.structureOrigin.toString());
+            HyphaPiracea.LOGGER.error("Error trying to apply after-place for structure {} with Leukbox at {}!", this.structure.toString(), this.leukboxPos.toString());
             return false;
         }
 

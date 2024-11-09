@@ -1,17 +1,22 @@
 package phanastrae.hyphapiracea.structure.leubox_stages;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.phys.Vec3;
+import phanastrae.hyphapiracea.block.LeukboxBlock;
 import phanastrae.hyphapiracea.mixin.StructureStartAccessor;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class GetStructureStartStage extends AbstractLeukboxStage {
 
@@ -33,20 +38,42 @@ public class GetStructureStartStage extends AbstractLeukboxStage {
         if (structureStart.isValid()) {
             // get structure base position
             BoundingBox box = structureStart.getBoundingBox();
-            BlockPos boxCenter = box.getCenter();
-            BlockPos structureBase = new BlockPos(boxCenter.getX(), box.minY(), boxCenter.getZ());
+
+            BlockPos structureBase;
+            List<StructurePiece> pieces = structureStart.getPieces();
+            if(pieces.isEmpty()) {
+                BlockPos boxCenter = box.getCenter();
+                structureBase = new BlockPos(boxCenter.getX(), box.minY(), boxCenter.getZ());
+            } else {
+                BoundingBox box2 = pieces.getFirst().getBoundingBox();
+                BlockPos boxCenter = box2.getCenter();
+                structureBase = new BlockPos(boxCenter.getX(), box2.minY(), boxCenter.getZ());
+            }
 
             // offset box
-            Vec3i offset = structureBase.subtract(this.leukboxPos);
 
-            structureStart.getPieces().forEach(piece -> piece.move(-offset.getX(), -offset.getY(), -offset.getZ()));
-            box = box.moved(-offset.getX(), -offset.getY(), -offset.getZ());
+            int yOffset = 0;
+            BlockState leukboxState = serverLevel.getBlockState(this.leukboxPos);
+            if(leukboxState.hasProperty(LeukboxBlock.FACING)) {
+                Direction facing = leukboxState.getValue(LeukboxBlock.FACING);
+                BlockPos checkPos = leukboxPos.offset(facing.getNormal());
+                for(int i = 0; i < 8; i++) {
+                    if(serverLevel.getBlockState(checkPos.below()).canBeReplaced()) {
+                        yOffset--;
+                        checkPos = checkPos.below();
+                    }
+                }
+            }
+            Vec3i offset = this.leukboxPos.subtract(structureBase).offset(0, yOffset, 0);
+
+            pieces.forEach(piece -> piece.move(offset.getX(), offset.getY(), offset.getZ()));
+            box = box.moved(offset.getX(), offset.getY(), offset.getZ());
             structureBase = structureBase.offset(offset);
 
             return new FillStoragePiecesStage(
                     this.leukboxPos,
                     structureBase,
-                    new LinkedList<>(structureStart.getPieces()),
+                    new LinkedList<>(pieces),
                     structureStart.getStructure(),
                     ((StructureStartAccessor)(Object)structureStart).getPieceContainer(),
                     box

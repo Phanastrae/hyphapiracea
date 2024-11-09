@@ -60,7 +60,7 @@ public class FillStoragePiecesStage extends AbstractLeukboxStage {
         }
 
         if(this.unplacedPieces.isEmpty()) {
-            return new FillStorageAfterStage(this.leukboxPos, this.intermediateStructureStorage, this.structure, this.structurePieces, this.boundingBox, this.structureOrigin);
+            return new FillStorageAfterStage(this.leukboxPos, this.intermediateStructureStorage, this.structure, this.structurePieces, this.boundingBox);
         } else {
             return this;
         }
@@ -106,7 +106,7 @@ public class FillStoragePiecesStage extends AbstractLeukboxStage {
                             }
                     );
         } catch (Exception e) {
-            HyphaPiracea.LOGGER.error("Error trying to place piece for structure {} with Leukbox at {}!", this.structure.toString(), this.structureOrigin.toString());
+            HyphaPiracea.LOGGER.error("Error trying to place piece for structure {} with Leukbox at {}!", this.structure.toString(), this.leukboxPos.toString());
             return false;
         }
 
