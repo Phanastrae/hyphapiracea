@@ -26,14 +26,34 @@ public class ChargedStatusEffect extends MobEffect {
         if(livingEntity instanceof Player player && player.getAbilities().flying) {
             return true;
         } else {
-            Vec3 velocity = livingEntity.getDeltaMovement().scale(20);
-            Vec3 magneticField = HyphaPiraceaLevelAttachment.getAttachment(livingEntity.level()).getMagneticFieldAtPosition(livingEntity.position());
-
             // scale to more reasonable values
             double actualElectricCharge = electricCharge * 500;
             double actualMagneticCharge = magneticCharge * 0.01F;
 
-            Vec3 totalForce = Electromagnetism.calculateForce(magneticField, velocity, actualElectricCharge, actualMagneticCharge);
+            Vec3 velocity = livingEntity.getDeltaMovement().scale(20.0);
+
+            HyphaPiraceaLevelAttachment hpla = HyphaPiraceaLevelAttachment.getAttachment(livingEntity.level());
+            double h = livingEntity.getBbHeight();
+            double w = livingEntity.getBbWidth();
+            Vec3 centerPos = livingEntity.position().add(0, h * 0.5, 0);
+
+            Vec3 totalForce = Vec3.ZERO;
+            // sample from the 8 corners of the player and get the average
+            for(int i = 0; i < 8; i++) {
+                boolean b1 = (i & 0x1) == 0;
+                boolean b2 = (i & 0x2) == 0;
+                boolean b3 = (i & 0x4) == 0;
+
+                Vec3 pos = centerPos.add(
+                        (b1 ? 1 : -1) * w * 0.5,
+                        (b2 ? 1 : -1) * h * 0.5,
+                        (b3 ? 1 : -1) * w * 0.5
+                );
+
+                Vec3 magneticField = hpla.getMagneticFieldAtPosition(pos);
+                Vec3 force = Electromagnetism.calculateForce(magneticField, velocity, actualElectricCharge, actualMagneticCharge);
+                totalForce = totalForce.add(force.scale(1.0 / 8));
+            }
 
             double force = totalForce.length();
             double maxForce = 1E-2;
