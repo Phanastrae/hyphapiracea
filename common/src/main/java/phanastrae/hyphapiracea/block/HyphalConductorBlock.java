@@ -38,8 +38,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import phanastrae.hyphapiracea.block.entity.HyphalConductorBlockEntity;
 import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
+import phanastrae.hyphapiracea.block.entity.HyphalConductorBlockEntity;
 import phanastrae.hyphapiracea.block.state.ConductorStateProperty;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
@@ -211,38 +211,12 @@ public class HyphalConductorBlock extends BaseEntityBlock {
 
         boolean sticky = state.getValue(STICKY);
         ConductorStateProperty.ConductorState conductorState = state.getValue(CONDUCTOR_STATE);
+        boolean mayBuild = player.getAbilities().mayBuild;
 
-        if(player.getAbilities().mayBuild) {
-            if (!sticky && stack.is(Items.SLIME_BALL)) {
-                // add sticky
-                if (!level.isClientSide) {
-                    if (player instanceof ServerPlayer) {
-                        CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
-                    }
-
-                    BlockState newState = state.setValue(STICKY, true);
-                    level.setBlock(pos, newState, 11);
-                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
-
-                    stack.consume(1, player);
-                }
-                level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0F, 1.0F);
+        if(mayBuild) {
+            if(trySlime(level, pos, state, stack, player)) {
                 return success;
-            } else if (sticky && stack.is(ItemTags.AXES)) {
-                // remove sticky
-                if (!level.isClientSide) {
-                    if (player instanceof ServerPlayer) {
-                        CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
-                    }
-
-                    BlockState newState = state.setValue(STICKY, false);
-                    level.setBlock(pos, newState, 11);
-                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
-
-                    stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
-                }
-                level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
-                level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, pos, 0);
+            } else if(tryUnSlime(level, pos, state, stack, player, hand)) {
                 return success;
             }
         }
@@ -266,15 +240,68 @@ public class HyphalConductorBlock extends BaseEntityBlock {
                     }
                 }
                 case EMPTY -> {
-                    if (player.getAbilities().mayBuild && tryInsertWire(level, pos, state, blockEntity, stack, player)) {
+                    if (mayBuild && tryInsertWire(level, pos, state, blockEntity, stack, player)) {
+                        if(hand == InteractionHand.MAIN_HAND) {
+                            trySlime(level, pos, level.getBlockState(pos), player.getOffhandItem(), player);
+                        }
                         return success;
                     } else if (tryConnectWireToEndpoint(level, pos, blockEntity, player)) {
+                        if(mayBuild && hand == InteractionHand.MAIN_HAND) {
+                            trySlime(level, pos, level.getBlockState(pos), player.getOffhandItem(), player);
+                        }
                         return success;
                     }
                 }
             }
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+
+    public static boolean trySlime(Level level, BlockPos pos, BlockState state, ItemStack stack, Player player) {
+        boolean sticky = state.getValue(STICKY);
+
+        if (!sticky && stack.is(Items.SLIME_BALL)) {
+            // add sticky
+            if (!level.isClientSide) {
+                if (player instanceof ServerPlayer) {
+                    CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
+                }
+
+                BlockState newState = state.setValue(STICKY, true);
+                level.setBlock(pos, newState, 11);
+                level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
+
+                stack.consume(1, player);
+            }
+            level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0F, 1.0F);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean tryUnSlime(Level level, BlockPos pos, BlockState state, ItemStack stack, Player player, InteractionHand hand) {
+        boolean sticky = state.getValue(STICKY);
+
+        if (sticky && stack.is(ItemTags.AXES)) {
+            // remove sticky
+            if (!level.isClientSide) {
+                if (player instanceof ServerPlayer) {
+                    CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
+                }
+
+                BlockState newState = state.setValue(STICKY, false);
+                level.setBlock(pos, newState, 11);
+                level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
+
+                stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+            }
+            level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, pos, 0);
+            return true;
+        }
+
+        return false;
     }
 
     public static boolean tryTakeWireFromSource(Level level, BlockPos pos, HyphalConductorBlockEntity blockEntity, Entity entity) {

@@ -51,7 +51,8 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
     public static final String TAG_LINKED_BLOCK_RELATIVE_Z = "linked_block_relative_z";
 
     private final WireLine wireLine;
-    private boolean inLevelList = false;
+    private boolean wireInLevelList = false;
+    private boolean blockEntityInLevelList = false;
 
     private ItemStack item = ItemStack.EMPTY;
     @Nullable
@@ -316,7 +317,7 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
         if(this.linkedEntity != null) {
             HyphaPiraceaEntityAttachment.getAttachment(this.linkedEntity).unlinkTo(this);
         }
-        this.removeFromLevelListIfPossible();
+        this.removeFromLevelListIfPossible(true);
         super.setRemoved();
     }
 
@@ -333,51 +334,59 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
     @Override
     public void setLevel(Level level) {
-        if(this.level != null) {
-            HyphaPiraceaLevelAttachment.getAttachment(this.level).removeBlockEntityWithWire(this);
-        }
-
         if(this.level != level) {
-            this.removeFromLevelListIfPossible();
+            this.removeFromLevelListIfPossible(true);
         }
         super.setLevel(level);
         updateLevelListStatus(false);
-
-        if(this.level != null) {
-            HyphaPiraceaLevelAttachment.getAttachment(this.level).addBlockEntityWithWire(this);
-        }
     }
 
     private void updateLevelListStatus(boolean needsAreaUpdate) {
-        boolean canAffectWorld = !this.isRemoved() && this.wireLine.getMaxPossibleInfluenceRadiusSqr() > 0 && this.linkedBlockPos != null;
+        boolean removed = this.isRemoved();
+        boolean canAffectWorld = !removed && this.wireLine.getMaxPossibleInfluenceRadiusSqr() > 0 && this.linkedBlockPos != null;
 
         if(canAffectWorld) {
-            if(!this.inLevelList) {
+            if(!this.wireInLevelList) {
                 addToLevelListIfPossible();
             } else if(needsAreaUpdate) {
                 this.updateInLevelListIfPossible();
             }
         } else {
-            removeFromLevelListIfPossible();
+            removeFromLevelListIfPossible(removed);
+        }
+
+        if(!this.blockEntityInLevelList && this.level != null && !removed) {
+            HyphaPiraceaLevelAttachment.getAttachment(this.level).addBlockEntityWithWire(this);
+            this.blockEntityInLevelList = true;
         }
     }
 
     private void addToLevelListIfPossible() {
-        if(!this.inLevelList && this.level != null) {
+        if(!this.wireInLevelList && this.level != null) {
             HyphaPiraceaLevelAttachment.getAttachment(this.level).addWire(this.wireLine);
-            this.inLevelList = true;
+            this.wireInLevelList = true;
+        }
+
+        if(!this.blockEntityInLevelList && this.level != null) {
+            HyphaPiraceaLevelAttachment.getAttachment(this.level).addBlockEntityWithWire(this);
+            this.blockEntityInLevelList = true;
         }
     }
 
-    private void removeFromLevelListIfPossible() {
-        if(this.inLevelList && this.level != null) {
+    private void removeFromLevelListIfPossible(boolean alsoRemoveBlockEntity) {
+        if(this.wireInLevelList && this.level != null) {
             HyphaPiraceaLevelAttachment.getAttachment(this.level).removeWire(this.wireLine);
-            this.inLevelList = false;
+            this.wireInLevelList = false;
+        }
+
+        if(this.blockEntityInLevelList && this.level != null && alsoRemoveBlockEntity) {
+            HyphaPiraceaLevelAttachment.getAttachment(this.level).removeBlockEntityWithWire(this);
+            this.blockEntityInLevelList = false;
         }
     }
 
     private void updateInLevelListIfPossible() {
-        if(this.inLevelList && this.level != null) {
+        if(this.wireInLevelList && this.level != null) {
             HyphaPiraceaLevelAttachment.getAttachment(this.level).updateWire(this.wireLine);
         }
     }
@@ -500,14 +509,14 @@ public class HyphalConductorBlockEntity extends BlockEntity implements Clearable
 
     public void setCurrent(float current) {
         this.wireLine.setCurrent(current);
-        if(this.inLevelList && this.level != null) {
+        if(this.wireInLevelList && this.level != null) {
             HyphaPiraceaLevelAttachment.getAttachment(this.level).updateWire(this.wireLine);
         }
     }
 
     public void setDropoffRadius(float dropoffRadius) {
         this.wireLine.setDropoffRadius(dropoffRadius);
-        if(this.inLevelList && this.level != null) {
+        if(this.wireInLevelList && this.level != null) {
             HyphaPiraceaLevelAttachment.getAttachment(this.level).updateWire(this.wireLine);
         }
     }
