@@ -49,7 +49,11 @@ public class StormsapCellBlockEntity extends AbstractTwoSidedCircuitComponentBlo
         double powerDissipation = blockEntity.wire.getCurrent() * blockEntity.getGeneratedVoltage();
         double storedEnergyChangePerTick = powerDissipation * secondsPerTick;
         if(storedEnergyChangePerTick > 0) {
+            // limit efficiency of energy absorption
             storedEnergyChangePerTick *= efficiency;
+        } else if(blockEntity.storedEnergy <= 0) {
+            // don't drain from empty cells
+            storedEnergyChangePerTick = 0;
         }
         int dE = Mth.floor(storedEnergyChangePerTick);
 
