@@ -1,6 +1,7 @@
 package phanastrae.hyphapiracea.world;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +15,8 @@ import phanastrae.hyphapiracea.util.MagneticFieldData;
 import java.util.List;
 
 public class HyphaPiraceaLevelAttachment {
+
+    private final RandomSource emNoiseRandom = RandomSource.create(0);
 
     private final Level level;
     private final WorldWireField worldWireField = new WorldWireField();
@@ -73,6 +76,7 @@ public class HyphaPiraceaLevelAttachment {
             return Vec3.ZERO;
         } else {
             Vec3 magField = magneticField.toVec3();
+            this.setNoiseSeed(pos, level.getGameTime());
             magField = addNoise(magField);
 
             return magField;
@@ -96,6 +100,7 @@ public class HyphaPiraceaLevelAttachment {
             return Vec3.ZERO;
         } else {
             Vec3 magField = magneticField.toVec3();
+            this.setNoiseSeed(pos, level.getGameTime());
             magField = addNoise(magField);
 
             return magField;
@@ -110,10 +115,19 @@ public class HyphaPiraceaLevelAttachment {
         return wireBlockEntitiesWithWires;
     }
 
+    public void setNoiseSeed(Vec3 pos, long time) {
+        // make noise deterministic
+        long x = Double.doubleToLongBits(pos.x);
+        long y = Double.doubleToLongBits(pos.y);
+        long z = Double.doubleToLongBits(pos.z);
+        long seed = (x * 13 + 3 * time) ^ (y * 17 + 7 * time) ^ (z * 19 + 11 * time) ^ time;
+        this.emNoiseRandom.setSeed(seed);
+    }
+
     public Vec3 addNoise(Vec3 magField) {
         // TODO vary noise amount based on height? dimension? point towards poles? strongholds?
         float noiseAmount = 0.000000001F;
-        long l = this.level.getRandom().nextLong();
+        long l = this.emNoiseRandom.nextLong();
 
         float x = ((l & 0xFF) / 127.5F - 1F) * noiseAmount;
         float y = (((l & 0xFF00) >> 8) / 127.5F - 1F) * noiseAmount;
