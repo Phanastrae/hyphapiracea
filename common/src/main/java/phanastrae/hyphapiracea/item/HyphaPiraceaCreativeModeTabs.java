@@ -31,7 +31,7 @@ public class HyphaPiraceaCreativeModeTabs {
 
     public static final CreativeModeTab HYPHAPIRACEA_TAB = XPlatInterface.INSTANCE.createCreativeModeTabBuilder()
             .icon(HyphaPiraceaItems.KEYED_DISC::getDefaultInstance)
-            .title(Component.translatable("itemGroup.hyphapiracea"))
+            .title(Component.translatable("itemGroup.hyphapiracea.group"))
             .build();
     public static final ResourceKey<CreativeModeTab> HYPHAPIRACEA_RESOURCE_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), HyphaPiracea.id("hyphapiracea"));
 
@@ -120,6 +120,10 @@ public class HyphaPiraceaCreativeModeTabs {
         return HyphaPiracea.id(path);
     }
 
+    private static ResourceKey<CreativeModeTab> createKey(String name) {
+        return ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.withDefaultNamespace(name));
+    }
+
     public static abstract class Helper {
         public abstract void add(ResourceKey<CreativeModeTab> groupKey, ItemLike item);
 
@@ -138,9 +142,5 @@ public class HyphaPiraceaCreativeModeTabs {
         public abstract void forTabRun(ResourceKey<CreativeModeTab> groupKey, BiConsumer<CreativeModeTab.ItemDisplayParameters, CreativeModeTab.Output> biConsumer);
 
         public abstract boolean operatorTabEnabled();
-    }
-
-    private static ResourceKey<CreativeModeTab> createKey(String name) {
-        return ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.withDefaultNamespace(name));
     }
 }

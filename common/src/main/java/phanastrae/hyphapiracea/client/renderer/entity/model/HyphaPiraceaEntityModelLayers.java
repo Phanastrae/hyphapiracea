@@ -21,7 +21,7 @@ public class HyphaPiraceaEntityModelLayers {
     }
 
     private static ModelLayerLocation createMainLayer(String id) {
-        return new ModelLayerLocation(HyphaPiracea.id(id), "main");
+        return createLayer(id, "main");
     }
 
     private static ModelLayerLocation createLayer(String id, String layer) {

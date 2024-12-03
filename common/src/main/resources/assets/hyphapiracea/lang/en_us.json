@@ -59,7 +59,7 @@
   "item.hyphapiracea.southern_chargeball": "Southern Chargeball",
   "item.hyphapiracea.southern_sporeberry": "Southern Sporeberry",
 
-  "itemGroup.hyphapiracea": "HyphaPiracea",
+  "itemGroup.hyphapiracea.group": "HyphaPiracea",
 
   "hyphapiracea.displays.amp": "%s A",
   "hyphapiracea.displays.infinity": "Infinity",

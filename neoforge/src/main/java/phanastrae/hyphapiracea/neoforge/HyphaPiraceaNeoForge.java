@@ -66,6 +66,7 @@ public class HyphaPiraceaNeoForge {
     }
 
     public void setupGameBusEvents(IEventBus gameEventBus) {
+        // add tooltips
         gameEventBus.addListener(this::addTooltips);
     }
 
