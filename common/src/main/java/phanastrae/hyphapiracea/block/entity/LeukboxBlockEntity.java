@@ -414,7 +414,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
         KeyedDiscComponent keyedDiscComponent = this.getDiscComponent();
         if(keyedDiscComponent != null) {
-            return Component.translatable("hyphapiracea.leukbox.structure", keyedDiscComponent.structureId()).withStyle(ChatFormatting.DARK_GRAY);
+            return Component.translatable("hyphapiracea.leukbox.structure", keyedDiscComponent.structureId().toString()).withStyle(ChatFormatting.DARK_GRAY);
         } else {
             return null;
         }
