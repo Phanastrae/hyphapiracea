@@ -1,12 +1,15 @@
 {
   "values": [
-    "hyphapiracea:hyphal_conductor",
     "hyphapiracea:stormsap_cell",
     "hyphapiracea:creative_cell",
     "hyphapiracea:ammeter_block",
     "hyphapiracea:voltmeter_block",
     "hyphapiracea:circuit_switch",
     "hyphapiracea:electromagnetic_dust_box",
-    "hyphapiracea:piraceatic_leukbox"
+    "hyphapiracea:piraceatic_leukbox",
+    {
+      "id": "#hyphapiracea:hyphal_conductor",
+      "required": false
+    }
   ]
 }

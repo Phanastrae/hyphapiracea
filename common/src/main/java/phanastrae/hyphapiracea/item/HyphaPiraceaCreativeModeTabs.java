@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import phanastrae.hyphapiracea.HyphaPiracea;
@@ -70,8 +71,16 @@ public class HyphaPiraceaCreativeModeTabs {
                 HyphaPiraceaItems.OGRAL_HYPHALINE,
                 HyphaPiraceaItems.FERRIC_WARDLINE,
                 HyphaPiraceaItems.HYPHAL_NODE,
-                HyphaPiraceaItems.HYPHAL_STEM,
-                HyphaPiraceaItems.HYPHAL_CONDUCTOR,
+                HyphaPiraceaItems.HYPHAL_STEM
+        );
+
+        for(Item conductor : HyphaPiraceaItems.CONDUCTORS) {
+            helper.add(REDSTONE_BLOCKS,
+                    conductor
+            );
+        }
+
+        helper.add(REDSTONE_BLOCKS,
                 HyphaPiraceaItems.STORMSAP_CELL,
                 HyphaPiraceaItems.HYPHAL_AMMETER,
                 HyphaPiraceaItems.HYPHAL_VOLTMETER,

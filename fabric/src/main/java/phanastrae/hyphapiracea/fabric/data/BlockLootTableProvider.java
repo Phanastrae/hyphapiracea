@@ -3,6 +3,7 @@ package phanastrae.hyphapiracea.fabric.data;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.block.Block;
 import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
 import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
 
@@ -19,7 +20,11 @@ public class BlockLootTableProvider extends FabricBlockLootTableProvider {
         dropSelf(HyphaPiraceaBlocks.AZIMULIC_STEM);
         dropSelf(HyphaPiraceaBlocks.HYPHAL_NODE);
         dropSelf(HyphaPiraceaBlocks.HYPHAL_STEM);
-        dropSelf(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
+
+        for(Block conductor : HyphaPiraceaBlocks.CONDUCTORS) {
+            dropSelf(conductor);
+        }
+
         dropSelf(HyphaPiraceaBlocks.STORMSAP_CELL);
         dropSelf(HyphaPiraceaBlocks.CREATIVE_CELL);
         dropSelf(HyphaPiraceaBlocks.HYPHAL_AMMETER);

@@ -1,6 +1,9 @@
 {
   "values": [
-    "hyphapiracea:hyphal_conductor",
-    "hyphapiracea:piraceatic_leukbox"
+    "hyphapiracea:piraceatic_leukbox",
+    {
+      "id": "#hyphapiracea:hyphal_conductor",
+      "required": false
+    }
   ]
 }

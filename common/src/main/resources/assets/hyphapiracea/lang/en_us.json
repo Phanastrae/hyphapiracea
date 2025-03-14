@@ -1,19 +1,30 @@
 {
+  "block.hyphapiracea.acacia_conductor": "Acacia Conductor",
   "block.hyphapiracea.ammeter_block": "Hyphal Ammeter",
   "block.hyphapiracea.azimuldey_mass": "Azimuldey Mass",
   "block.hyphapiracea.azimulic_stem": "Azimulic Stem",
+  "block.hyphapiracea.bamboo_conductor": "Bamboo Conductor",
+  "block.hyphapiracea.birch_conductor": "Birch Conductor",
+  "block.hyphapiracea.cherry_conductor": "Cherry Conductor",
   "block.hyphapiracea.circuit_switch": "Circuit Switch",
   "block.hyphapiracea.creative_cell": "Creative Cell",
+  "block.hyphapiracea.crimson_conductor": "Crimson Conductor",
+  "block.hyphapiracea.dark_oak_conductor": "Dark Oak Conductor",
   "block.hyphapiracea.electromagnetic_dust_box": "Electromagnetic Dust Box",
+  "block.hyphapiracea.jungle_conductor": "Jungle Conductor",
   "block.hyphapiracea.piraceatic_globglass": "Piraceatic Globglass",
   "block.hyphapiracea.piraceatic_tar": "Piraceatic TAR",
   "block.hyphapiracea.hyphal_node": "Hyphal Node",
   "block.hyphapiracea.hyphal_stem": "Hyphal Stem",
   "block.hyphapiracea.hyphal_conductor": "Hyphal Conductor",
+  "block.hyphapiracea.mangrove_conductor": "Mangrove Conductor",
+  "block.hyphapiracea.oak_conductor": "Oak Conductor",
   "block.hyphapiracea.piraceatic_leukbox": "Piraceatic Leukbox",
+  "block.hyphapiracea.spruce_conductor": "Spruce Conductor",
   "block.hyphapiracea.magnetometer_block": "Leyfield Magnetometer Block",
   "block.hyphapiracea.stormsap_cell": "Stormsap Cell",
   "block.hyphapiracea.voltmeter_block": "Hyphal Voltmeter",
+  "block.hyphapiracea.warped_conductor": "Warped Conductor",
 
   "death.attack.hyphapiracea.chargeball": "%1$s was overcharged",
   "death.attack.hyphapiracea.chargeball.player": "%1$s was overcharged by %2$s",
@@ -102,5 +113,9 @@
   "hyphapiracea.leukbox.subtitle.intro_screen": "[Property of %s]",
   "hyphapiracea.leukbox.subtitle.intro_screen.of": "We Beyond Azimuth",
   "hyphapiracea.leukbox.subtitle.intro_welcome": "[Insert Disc to Begin]",
-  "hyphapiracea.leukbox.subtitle.idle": "[Insert Disc to Begin]"
+  "hyphapiracea.leukbox.subtitle.idle": "[Insert Disc to Begin]",
+
+  "tag.item.hyphapiracea.azimuldey": "Azimuldey Objects",
+  "tag.item.hyphapiracea.fae_toxin": "Fae Toxins",
+  "tag.item.hyphapiracea.hyphal_conductor": "Hyphal Conductors"
 }

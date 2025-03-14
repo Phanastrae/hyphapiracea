@@ -26,6 +26,7 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
         TagKey<Block> STORAGE_BLOCKS_RAW_STEEL = createConventional("storage_blocks/raw_steel");
         TagKey<Block> STEEL_ORES = createConventional("ores/steel");
 
+        // vanilla tags
         getOrCreateTagBuilder(BlockTags.DRAGON_IMMUNE)
                 .add(HyphaPiraceaBlocks.CREATIVE_CELL);
 
@@ -37,21 +38,21 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(HyphaPiraceaBlocks.AZIMULIC_STEM);
 
         getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE)
-                .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR)
                 .add(HyphaPiraceaBlocks.STORMSAP_CELL)
                 .add(HyphaPiraceaBlocks.CREATIVE_CELL)
                 .add(HyphaPiraceaBlocks.HYPHAL_AMMETER)
                 .add(HyphaPiraceaBlocks.HYPHAL_VOLTMETER)
                 .add(HyphaPiraceaBlocks.CIRCUIT_SWITCH)
                 .add(HyphaPiraceaBlocks.ELECTROMAGNETIC_DUST_BOX)
-                .add(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
+                .add(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX)
+                .addOptionalTag(HyphaPiraceaBlockTags.HYPHAL_CONDUCTOR);
 
         getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_HOE)
                 .add(HyphaPiraceaBlocks.AZIMULDEY_MASS)
                 .add(HyphaPiraceaBlocks.AZIMULIC_STEM)
                 .add(HyphaPiraceaBlocks.HYPHAL_NODE)
                 .add(HyphaPiraceaBlocks.HYPHAL_STEM)
-                .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
+                .addOptionalTag(HyphaPiraceaBlockTags.HYPHAL_CONDUCTOR);
 
         getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(HyphaPiraceaBlocks.STORMSAP_CELL)
@@ -68,20 +69,21 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(HyphaPiraceaBlocks.AZIMULIC_STEM)
                 .add(HyphaPiraceaBlocks.HYPHAL_NODE)
                 .add(HyphaPiraceaBlocks.HYPHAL_STEM)
-                .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR)
                 .add(HyphaPiraceaBlocks.PIRACEATIC_TAR)
-                .add(HyphaPiraceaBlocks.PIRACEATIC_GLOBGLASS);
+                .add(HyphaPiraceaBlocks.PIRACEATIC_GLOBGLASS)
+                .addOptionalTag(HyphaPiraceaBlockTags.HYPHAL_CONDUCTOR);
 
+        // convention tags
         getOrCreateTagBuilder(ConventionalBlockTags.RELOCATION_NOT_SUPPORTED)
-                .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR)
-                .add(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
+                .add(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX)
+                .addOptionalTag(HyphaPiraceaBlockTags.HYPHAL_CONDUCTOR);
 
+        // hyphapiracea tags
         getOrCreateTagBuilder(HyphaPiraceaBlockTags.AZIMULDEY)
                 .add(HyphaPiraceaBlocks.AZIMULDEY_MASS)
                 .add(HyphaPiraceaBlocks.AZIMULIC_STEM)
                 .add(HyphaPiraceaBlocks.HYPHAL_NODE)
                 .add(HyphaPiraceaBlocks.HYPHAL_STEM)
-                .add(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR)
                 .add(HyphaPiraceaBlocks.STORMSAP_CELL)
                 .add(HyphaPiraceaBlocks.CREATIVE_CELL)
                 .add(HyphaPiraceaBlocks.HYPHAL_AMMETER)
@@ -89,7 +91,8 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(HyphaPiraceaBlocks.CIRCUIT_SWITCH)
                 .add(HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK)
                 .add(HyphaPiraceaBlocks.ELECTROMAGNETIC_DUST_BOX)
-                .add(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
+                .add(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX)
+                .addOptionalTag(HyphaPiraceaBlockTags.HYPHAL_CONDUCTOR);
 
         getOrCreateTagBuilder(HyphaPiraceaBlockTags.FAE_TOXIN)
                 .addOptionalTag(ConventionalBlockTags.STORAGE_BLOCKS_IRON)
@@ -117,6 +120,12 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .addTag(HyphaPiraceaBlockTags.PIRACEATIC)
                 .add(Blocks.OBSIDIAN)
                 .add(Blocks.CRYING_OBSIDIAN);
+
+        // conductors
+        for(Block conductor : HyphaPiraceaBlocks.CONDUCTORS) {
+            getOrCreateTagBuilder(HyphaPiraceaBlockTags.HYPHAL_CONDUCTOR)
+                    .add(conductor);
+        }
     }
 
     private static TagKey<Block> createConventional(String name) {

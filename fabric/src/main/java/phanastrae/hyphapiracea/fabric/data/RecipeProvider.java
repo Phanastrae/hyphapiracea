@@ -8,6 +8,10 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import phanastrae.hyphapiracea.item.HyphaPiraceaItemTags;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -60,15 +64,21 @@ public class RecipeProvider extends FabricRecipeProvider  {
                         has(HYPHALINE)
                 )
                 .save(exporter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, HYPHAL_CONDUCTOR, 3)
-                .define('A', AZIMULDEY_MASS)
-                .pattern("A")
-                .pattern("A")
-                .unlockedBy(
-                        getHasName(AZIMULDEY_MASS),
-                        has(AZIMULDEY_MASS)
-                )
-                .save(exporter);
+
+        // conductors
+        addConductor(exporter, HYPHAL_CONDUCTOR, AZIMULDEY_MASS);
+        addConductor(exporter, OAK_CONDUCTOR, ItemTags.OAK_LOGS);
+        addConductor(exporter, SPRUCE_CONDUCTOR, ItemTags.SPRUCE_LOGS);
+        addConductor(exporter, BIRCH_CONDUCTOR, ItemTags.BIRCH_LOGS);
+        addConductor(exporter, JUNGLE_CONDUCTOR, ItemTags.JUNGLE_LOGS);
+        addConductor(exporter, ACACIA_CONDUCTOR, ItemTags.ACACIA_LOGS);
+        addConductor(exporter, DARK_OAK_CONDUCTOR, ItemTags.DARK_OAK_LOGS);
+        addConductor(exporter, MANGROVE_CONDUCTOR, ItemTags.MANGROVE_LOGS);
+        addConductor(exporter, CHERRY_CONDUCTOR, ItemTags.CHERRY_LOGS);
+        addConductor(exporter, BAMBOO_CONDUCTOR, ItemTags.BAMBOO_BLOCKS);
+        addConductor(exporter, CRIMSON_CONDUCTOR, ItemTags.CRIMSON_STEMS);
+        addConductor(exporter, WARPED_CONDUCTOR, ItemTags.WARPED_STEMS);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, STORMSAP_CELL, 1)
                 .define('A', AZIMULDEY_MASS)
                 .define('H', HYPHALINE)
@@ -193,7 +203,7 @@ public class RecipeProvider extends FabricRecipeProvider  {
                 )
                 .save(exporter);
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, LEYFIELD_MAGNETOMETER, 1)
-                .define('C', HYPHAL_CONDUCTOR)
+                .define('C', HyphaPiraceaItemTags.HYPHAL_CONDUCTOR)
                 .define('H', HYPHALINE)
                 .define('R', REDSTONE)
                 .define('I', IRON_INGOT)
@@ -305,6 +315,34 @@ public class RecipeProvider extends FabricRecipeProvider  {
                 .unlockedBy(
                         getHasName(SOUTHERN_SPOREBERRY),
                         has(SOUTHERN_SPOREBERRY)
+                )
+                .save(exporter);
+    }
+
+    private static void addConductor(RecipeOutput exporter, Item conductor, TagKey<Item> itemTag) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, conductor, 6)
+                .define('O', itemTag)
+                .define('A', AZIMULDEY_MASS)
+                .pattern("O")
+                .pattern("A")
+                .pattern("O")
+                .unlockedBy(
+                        getHasName(AZIMULDEY_MASS),
+                        has(AZIMULDEY_MASS)
+                )
+                .save(exporter);
+    }
+
+    private static void addConductor(RecipeOutput exporter, Item conductor, ItemLike item) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, conductor, 6)
+                .define('O', item)
+                .define('A', AZIMULDEY_MASS)
+                .pattern("O")
+                .pattern("A")
+                .pattern("O")
+                .unlockedBy(
+                        getHasName(AZIMULDEY_MASS),
+                        has(AZIMULDEY_MASS)
                 )
                 .save(exporter);
     }
