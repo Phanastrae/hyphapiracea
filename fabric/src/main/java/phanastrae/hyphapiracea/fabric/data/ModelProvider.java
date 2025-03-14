@@ -28,6 +28,7 @@ import static net.minecraft.data.models.BlockModelGenerators.createHorizontalFac
 import static net.minecraft.data.models.blockstates.VariantProperties.*;
 import static net.minecraft.data.models.blockstates.VariantProperties.Rotation.*;
 import static net.minecraft.data.models.model.TextureSlot.*;
+import static phanastrae.hyphapiracea.fabric.data.HyphaPiraceaModelTemplates.*;
 
 public class ModelProvider extends FabricModelProvider {
     public ModelProvider(FabricDataOutput output) {
@@ -92,14 +93,25 @@ public class ModelProvider extends FabricModelProvider {
     }
 
     public void createConductorBlock(BlockModelGenerators BMG, Block block) {
+        ResourceLocation baseSide = getBlockTexture(HyphaPiraceaBlocks.AZIMULIC_STEM, "_side");
+        ResourceLocation baseTop = getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+        ResourceLocation rodSide = getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+        ResourceLocation rodTop = getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+
         TextureMapping verticalMapping = new TextureMapping()
-                .put(PARTICLE, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS))
-                .put(ALL, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS));
+                .put(PARTICLE, baseSide)
+                .put(BASE_SIDE, baseSide)
+                .put(BASE_END, baseTop)
+                .put(ROD_SIDE, rodSide)
+                .put(ROD_END, rodTop);
         ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CONDUCTOR.create(block, verticalMapping, BMG.modelOutput);
 
         TextureMapping horizontalMapping = new TextureMapping()
-                .put(PARTICLE, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS))
-                .put(ALL, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS));
+                .put(PARTICLE, baseSide)
+                .put(BASE_SIDE, baseSide)
+                .put(BASE_END, baseTop)
+                .put(ROD_SIDE, rodSide)
+                .put(ROD_END, rodTop);
         ResourceLocation horizontalModel = HyphaPiraceaModelTemplates.CONDUCTOR_WALL.create(block, horizontalMapping, BMG.modelOutput);
 
         BMG.blockStateOutput
