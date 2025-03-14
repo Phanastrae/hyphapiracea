@@ -1,30 +1,49 @@
 package phanastrae.hyphapiracea.structure.leubox_stages;
 
+import net.minecraft.ResourceLocationException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.levelgen.structure.StructurePiece;
-import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.levelgen.structure.*;
+import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
+import net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement;
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.LeukboxBlock;
 import phanastrae.hyphapiracea.mixin.StructureStartAccessor;
+import phanastrae.hyphapiracea.structure.StructureType;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class GetStructureStartStage extends AbstractLeukboxStage {
 
-    private final Structure structure;
+    private final @Nullable Structure structure;
+    private final ResourceLocation structureId;
+    private final StructureType structureType;
+    private final boolean rotateStructure;
 
-    public GetStructureStartStage(BlockPos leukboxPos, Structure structure) {
+    public GetStructureStartStage(BlockPos leukboxPos, @Nullable Structure structure, ResourceLocation structureId, StructureType structureType, boolean rotateStructure) {
         super(leukboxPos, LeukboxStage.GET_STRUCTURE_START);
         this.structure = structure;
+        this.structureId = structureId;
+        this.structureType = structureType;
+        this.rotateStructure = rotateStructure;
     }
 
     @Override
@@ -34,13 +53,15 @@ public class GetStructureStartStage extends AbstractLeukboxStage {
         long levelSeed = serverLevel.getSeed();
         long secondarySeed = serverLevel.getRandom().nextLong();
         long seed = levelSeed ^ secondarySeed;
-        StructureStart structureStart = getStructureStart(this.structure, this.leukboxPos, serverLevel, seed);
-        if (structureStart.isValid()) {
-            // get structure base position
-            BoundingBox box = structureStart.getBoundingBox();
 
+        Optional<PiecesContainer> piecesContainerOptional = this.getPiecesContainer(serverLevel, seed);
+        if (piecesContainerOptional.isPresent()) {
+            PiecesContainer piecesContainer = piecesContainerOptional.get();
+            List<StructurePiece> pieces = piecesContainer.pieces();
+            BoundingBox box = piecesContainer.calculateBoundingBox();
+
+            // get structure base position
             BlockPos structureBase;
-            List<StructurePiece> pieces = structureStart.getPieces();
             if(pieces.isEmpty()) {
                 BlockPos boxCenter = box.getCenter();
                 structureBase = new BlockPos(boxCenter.getX(), box.minY(), boxCenter.getZ());
@@ -74,13 +95,63 @@ public class GetStructureStartStage extends AbstractLeukboxStage {
                     this.leukboxPos,
                     structureBase,
                     new LinkedList<>(pieces),
-                    structureStart.getStructure(),
-                    ((StructureStartAccessor)(Object)structureStart).getPieceContainer(),
+                    this.structure,
+                    piecesContainer,
                     box
             );
         } else {
             return this.getError("invalid_structure_start");
         }
+    }
+
+    public Optional<PiecesContainer> getPiecesContainer(ServerLevel serverLevel, long seed) {
+        if(this.structureType == StructureType.STRUCTURE && this.structure != null) {
+            StructureStart structureStart = getStructureStart(this.structure, this.leukboxPos, serverLevel, seed);
+            if(structureStart.isValid()) {
+                return Optional.of(((StructureStartAccessor)(Object)structureStart).getPieceContainer());
+            }
+        }
+
+        if(this.structureType == StructureType.TEMPLATE) {
+            StructureTemplateManager structureTemplateManager = serverLevel.getStructureManager();
+            Optional<StructureTemplate> optional;
+            try {
+                optional = structureTemplateManager.get(this.structureId);
+            } catch (ResourceLocationException resourcelocationexception) {
+                HyphaPiracea.LOGGER.info("Failed to find structure template with id {}!", this.structureId);
+                return Optional.empty();
+            }
+
+            if(optional.isPresent()) {
+                StructureTemplate structuretemplate = optional.get();
+
+                Mirror mirror = Mirror.NONE;
+                Rotation rotation;
+                if(this.rotateStructure) {
+                    // TODO implement rotateStructure on non-template structures, if possible and something that makes sense?
+                    rotation = Rotation.getRandom(serverLevel.getRandom());
+                } else {
+                    rotation = Rotation.NONE;
+                }
+                StructurePlaceSettings structurePlaceSettings = new StructurePlaceSettings().setMirror(mirror).setRotation(rotation);
+                StructurePiece structurePiece = new PoolElementStructurePiece(
+                        structureTemplateManager,
+                        SinglePoolElement.single(this.structureId.toString()).apply(StructureTemplatePool.Projection.RIGID),
+                        this.leukboxPos,
+                        0,
+                        rotation,
+                        structuretemplate.getBoundingBox(structurePlaceSettings, this.leukboxPos),
+                        LiquidSettings.IGNORE_WATERLOGGING
+                );
+                StructurePiecesBuilder structurePiecesBuilder = new StructurePiecesBuilder();
+                structurePiecesBuilder.addPiece(structurePiece);
+                return Optional.of(structurePiecesBuilder.build());
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.empty();
     }
 
     public static StructureStart getStructureStart(Structure structure, BlockPos pos, ServerLevel serverLevel, long seed) {

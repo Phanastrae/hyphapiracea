@@ -36,12 +36,11 @@ public class HyphaPiracea {
     }
 
     public static void initRegistryEntries(RegistryListenerAdder rla) {
-        // creative mode tabs
-        rla.addRegistryListener(BuiltInRegistries.CREATIVE_MODE_TAB, HyphaPiraceaCreativeModeTabs::init);
-
         // data components
         rla.addRegistryListener(BuiltInRegistries.DATA_COMPONENT_TYPE, HyphaPiraceaComponentTypes::init);
 
+        // creative mode tabs
+        rla.addRegistryListener(BuiltInRegistries.CREATIVE_MODE_TAB, HyphaPiraceaCreativeModeTabs::init);
         // blocks
         rla.addRegistryListener(BuiltInRegistries.BLOCK, HyphaPiraceaBlocks::init);
         // items
@@ -49,7 +48,6 @@ public class HyphaPiracea {
 
         // block entity types
         rla.addRegistryListener(BuiltInRegistries.BLOCK_ENTITY_TYPE, HyphaPiraceaBlockEntityTypes::init);
-
         // entity types
         rla.addRegistryListener(BuiltInRegistries.ENTITY_TYPE, HyphaPiraceaEntityTypes::init);
 

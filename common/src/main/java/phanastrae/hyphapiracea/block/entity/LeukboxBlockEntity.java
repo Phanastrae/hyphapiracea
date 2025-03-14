@@ -36,6 +36,7 @@ import phanastrae.hyphapiracea.electromagnetism.CircuitNode;
 import phanastrae.hyphapiracea.electromagnetism.CircuitWire;
 import phanastrae.hyphapiracea.particle.HyphaPiraceaParticleTypes;
 import phanastrae.hyphapiracea.structure.StructurePlacer;
+import phanastrae.hyphapiracea.structure.StructureType;
 import phanastrae.hyphapiracea.structure.leubox_stages.*;
 import phanastrae.hyphapiracea.structure.leubox_stages.AbstractLeukboxStage.LeukboxStage;
 import phanastrae.hyphapiracea.world.HyphaPiraceaLevelAttachment;
@@ -374,8 +375,8 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
     }
 
-    public void startGeneratingStructure(ResourceLocation structureRL, BlockPos pos) {
-        this.leukboxStage = new GetStructureStage(pos, structureRL);
+    public void startGeneratingStructure(ResourceLocation structureRL, StructureType structureType, boolean rotateStructure, BlockPos pos) {
+        this.leukboxStage = new GetStructureStage(pos, structureRL, structureType, rotateStructure);
     }
 
     public void stopGeneratingStructure() {
@@ -414,7 +415,8 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
         KeyedDiscComponent keyedDiscComponent = this.getDiscComponent();
         if(keyedDiscComponent != null) {
-            return Component.translatable("hyphapiracea.leukbox.structure", keyedDiscComponent.structureId().toString()).withStyle(ChatFormatting.DARK_GRAY);
+            String lang = keyedDiscComponent.structureType() == StructureType.STRUCTURE ? "hyphapiracea.leukbox.structure" : "hyphapiracea.leukbox.template";
+            return Component.translatable(lang, keyedDiscComponent.structureId().toString()).withStyle(ChatFormatting.DARK_GRAY);
         } else {
             return null;
         }
@@ -591,7 +593,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
         KeyedDiscComponent component = item.get(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
         if(component != null) {
-            this.startGeneratingStructure(component.structureId(), this.getBlockPos());
+            this.startGeneratingStructure(component.structureId(), component.structureType(), component.rotateStructure(), this.getBlockPos());
             this.setChanged();
         }
     }
