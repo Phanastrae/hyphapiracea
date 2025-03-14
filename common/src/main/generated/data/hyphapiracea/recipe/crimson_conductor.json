@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": {
+      "item": "hyphapiracea:azimuldey_mass"
+    },
+    "O": {
+      "tag": "minecraft:crimson_stems"
+    }
+  },
+  "pattern": [
+    "O",
+    "A",
+    "O"
+  ],
+  "result": {
+    "count": 6,
+    "id": "hyphapiracea:crimson_conductor"
+  }
+}

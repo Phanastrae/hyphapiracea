@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "hyphapiracea:block/crimson_conductor",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "hyphapiracea:block/crimson_conductor_wall",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "hyphapiracea:block/crimson_conductor_wall"
+    },
+    "facing=south": {
+      "model": "hyphapiracea:block/crimson_conductor_wall",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "hyphapiracea:block/crimson_conductor"
+    },
+    "facing=west": {
+      "model": "hyphapiracea:block/crimson_conductor_wall",
+      "y": 270
+    }
+  }
+}

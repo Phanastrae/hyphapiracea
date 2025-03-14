@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": {
+      "item": "hyphapiracea:azimuldey_mass"
+    },
+    "O": {
+      "tag": "minecraft:mangrove_logs"
+    }
+  },
+  "pattern": [
+    "O",
+    "A",
+    "O"
+  ],
+  "result": {
+    "count": 6,
+    "id": "hyphapiracea:mangrove_conductor"
+  }
+}
