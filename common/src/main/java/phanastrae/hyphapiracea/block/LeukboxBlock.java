@@ -132,34 +132,51 @@ public class LeukboxBlock extends BaseEntityBlock implements MiniCircuitHolder {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(stack.is(HyphaPiraceaItems.LEUKBOX_LOCK) && player.getAbilities().mayBuild) {
-            if(level.getBlockEntity(pos) instanceof LeukboxBlockEntity leukboxBlockEntity) {
-                String lockLock = DiscLockComponent.getDiscLockFromLock(stack);
-                String boxLock = leukboxBlockEntity.getLeukboxLock();
-
-                if(!lockLock.equals(boxLock)) {
-                    LeukboxLockItem.playLockSound(player);
-                    if(!level.isClientSide()) {
-                        leukboxBlockEntity.setLeukboxLock(lockLock);
-                        Component component = lockLock.isEmpty()
-                                ? Component.translatable("hyphapiracea.leukbox.lock.set.empty")
-                                : Component.translatable("hyphapiracea.leukbox.lock.set", lockLock);
-
-                        player.displayClientMessage(component, true);
-                    }
-
-                    return ItemInteractionResult.sidedSuccess(level.isClientSide);
-                }
-            }
+        if(!(level.getBlockEntity(pos) instanceof LeukboxBlockEntity leukboxBlockEntity)) {
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         }
 
-        if (state.getValue(HAS_DISC)) {
-            ItemInteractionResult iteminteractionresult = tryRemoveItem(level, pos, player);
-            return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
+        if(stack.is(HyphaPiraceaItems.LEUKBOX_LOCK) && player.getAbilities().mayBuild) {
+            String lockLock = DiscLockComponent.getDiscLockFromLock(stack);
+            String boxLock = leukboxBlockEntity.getLeukboxLock();
+
+            LeukboxLockItem.playLockSound(player);
+            if(!lockLock.equals(boxLock)) {
+                if(!level.isClientSide()) {
+                    leukboxBlockEntity.setLeukboxLock(lockLock);
+
+                    Component component = lockLock.isEmpty()
+                            ? Component.translatable("hyphapiracea.leukbox.lock.set.empty")
+                            : Component.translatable("hyphapiracea.leukbox.lock.set", lockLock);
+                    player.displayClientMessage(component, true);
+                }
+            } else {
+                LeukboxLockItem.playLockSound(player);
+                if(!level.isClientSide()) {
+                    boolean setShouldPrevent = !leukboxBlockEntity.shouldPreventManualInteraction();
+                    leukboxBlockEntity.setPreventManualInteraction(setShouldPrevent);
+
+                    Component component = setShouldPrevent
+                            ? Component.translatable("hyphapiracea.leukbox.lock.prevent_manual_interaction.set.true")
+                            : Component.translatable("hyphapiracea.leukbox.lock.prevent_manual_interaction.set.false", lockLock);
+                    player.displayClientMessage(component, true);
+                }
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+
+        if(!leukboxBlockEntity.shouldPreventManualInteraction()) {
+            if (state.getValue(HAS_DISC)) {
+                ItemInteractionResult iteminteractionresult = tryRemoveItem(level, pos, player);
+                return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
+            } else {
+                ItemStack itemstack = player.getItemInHand(hand);
+                ItemInteractionResult iteminteractionresult = tryInsertItem(level, pos, itemstack, player);
+                return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
+            }
         } else {
-            ItemStack itemstack = player.getItemInHand(hand);
-            ItemInteractionResult iteminteractionresult = tryInsertItem(level, pos, itemstack, player);
-            return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
+            player.displayClientMessage(Component.translatable("hyphapiracea.leukbox.lock.cannot_interact").withStyle(ChatFormatting.RED), true);
+            return ItemInteractionResult.CONSUME;
         }
     }
 

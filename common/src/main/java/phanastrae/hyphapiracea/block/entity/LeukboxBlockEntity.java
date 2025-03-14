@@ -51,6 +51,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     public static final String TAG_HAS_SUFFICIENT_POWER = "has_sufficient_power";
     public static final String TAG_POWER = "power";
     public static final String TAG_LEUKBOX_LOCK = "leukbox_lock";
+    public static final String TAG_PREVENT_MANUAL_INTERACTION = "prevent_manual_interaction";
 
     private ItemStack item = ItemStack.EMPTY;
     private boolean discRecoverable = true;
@@ -66,6 +67,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     private double power;
 
     private String leukboxLock = "";
+    private boolean preventManualInteraction = false;
 
     public LeukboxBlockEntity(BlockPos pos, BlockState blockState) {
         super(HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, pos, blockState);
@@ -114,6 +116,11 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
             this.leukboxLock = nbt.getString(TAG_LEUKBOX_LOCK);
         } else {
             this.leukboxLock = "";
+        }
+        if(nbt.contains(TAG_PREVENT_MANUAL_INTERACTION, Tag.TAG_BYTE)) {
+            this.preventManualInteraction = nbt.getBoolean(TAG_PREVENT_MANUAL_INTERACTION);
+        } else {
+            this.preventManualInteraction = false;
         }
 
 
@@ -177,6 +184,13 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         nbt.putInt(TAG_PROGRESS, this.progress);
         nbt.putInt(TAG_STAGE_PROGRESS, this.stageProgress);
         nbt.putBoolean(TAG_HAS_SUFFICIENT_POWER, this.hasSufficientPower);
+
+        if(!this.leukboxLock.isEmpty()) {
+            nbt.putString(TAG_LEUKBOX_LOCK, this.leukboxLock);
+        }
+        if(this.preventManualInteraction) {
+            nbt.putBoolean(TAG_PREVENT_MANUAL_INTERACTION, this.preventManualInteraction);
+        }
     }
 
     @Override
@@ -196,10 +210,6 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         fakeClientStage.saveAdditional(fakeClientStageData, registryLookup);
         nbtCompound.put(TAG_STAGE_DATA, fakeClientStageData);
         nbtCompound.putDouble(TAG_POWER, this.getPower());
-
-        if(!this.leukboxLock.isEmpty()) {
-            nbtCompound.putString(TAG_LEUKBOX_LOCK, this.leukboxLock);
-        }
 
         return nbtCompound;
     }
@@ -693,5 +703,15 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
     public String getLeukboxLock() {
         return leukboxLock;
+    }
+
+    public void setPreventManualInteraction(boolean preventManualInteraction) {
+        this.preventManualInteraction = preventManualInteraction;
+        this.setChanged();
+        this.sendUpdate();
+    }
+
+    public boolean shouldPreventManualInteraction() {
+        return this.preventManualInteraction;
     }
 }
