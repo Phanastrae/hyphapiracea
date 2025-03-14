@@ -53,7 +53,7 @@ public class HyphaPiraceaItems {
     public static final Item NEGATIVE_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NEGATIVE_SPOREBERRY));
     public static final Item NORTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NORTHERN_SPOREBERRY));
     public static final Item SOUTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.SOUTHERN_SPOREBERRY));
-    public static final Item PIRACEATIC_GLOB = new Item(properties());
+    public static final Item PIRACEATIC_GLOB = new Item(properties().food(HyphaPiraceaFoodProperties.PIRACEATIC_GLOB));
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
         BiConsumer<String, Item> rwt = (s, i) -> { // register and add to creative mode tab
