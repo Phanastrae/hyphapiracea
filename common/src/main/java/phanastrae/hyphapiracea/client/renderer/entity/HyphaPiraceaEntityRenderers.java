@@ -7,11 +7,12 @@ import phanastrae.hyphapiracea.entity.HyphaPiraceaEntityTypes;
 
 public class HyphaPiraceaEntityRenderers {
 
-    public interface EntityRendererAcceptor {
-        <T extends Entity> void accept(EntityType<? extends T> type, EntityRendererProvider<T> entityRendererProvider);
-    }
-
     public static void init(EntityRendererAcceptor r) {
         r.accept(HyphaPiraceaEntityTypes.CHARGEBALL, ChargeballEntityRenderer::new);
+    }
+
+    @FunctionalInterface
+    public interface EntityRendererAcceptor {
+        <T extends Entity> void accept(EntityType<? extends T> type, EntityRendererProvider<T> entityRendererProvider);
     }
 }

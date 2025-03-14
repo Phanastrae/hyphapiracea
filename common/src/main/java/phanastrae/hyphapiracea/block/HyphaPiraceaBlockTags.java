@@ -11,6 +11,7 @@ public class HyphaPiraceaBlockTags {
     public static final TagKey<Block> NOT_FEASTABLE = create("not_feastable");
     public static final TagKey<Block> PIRACEATIC = create("piraceatic");
     public static final TagKey<Block> PLACEMENT_FRAGILE = create("placement_fragile");
+    public static final TagKey<Block> HYPHAL_CONDUCTOR = create("hyphal_conductor");
 
     private static TagKey<Block> create(String name) {
         return TagKey.create(Registries.BLOCK, HyphaPiracea.id(name));

@@ -4,14 +4,18 @@
   "key": {
     "A": {
       "item": "hyphapiracea:azimuldey_mass"
+    },
+    "O": {
+      "item": "hyphapiracea:azimuldey_mass"
     }
   },
   "pattern": [
+    "O",
     "A",
-    "A"
+    "O"
   ],
   "result": {
-    "count": 3,
+    "count": 6,
     "id": "hyphapiracea:hyphal_conductor"
   }
 }

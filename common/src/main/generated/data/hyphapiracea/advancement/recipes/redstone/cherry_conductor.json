@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_azimuldey_mass": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hyphapiracea:azimuldey_mass"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hyphapiracea:cherry_conductor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_azimuldey_mass"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hyphapiracea:cherry_conductor"
+    ]
+  }
+}

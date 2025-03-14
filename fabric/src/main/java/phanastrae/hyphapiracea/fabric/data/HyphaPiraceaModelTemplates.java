@@ -9,12 +9,16 @@ import java.util.Optional;
 
 public class HyphaPiraceaModelTemplates {
     public static final TextureSlot TINT_SIDE = TextureSlot.create("tint_side");
+    public static final TextureSlot BASE_SIDE = TextureSlot.create("base_side");
+    public static final TextureSlot BASE_END = TextureSlot.create("base_end");
+    public static final TextureSlot ROD_SIDE = TextureSlot.create("rod_side");
+    public static final TextureSlot ROD_END = TextureSlot.create("rod_end");
 
     public static final ModelTemplate CONDUCTOR = create(
-            blockId("template_conductor"), TextureSlot.PARTICLE, TextureSlot.ALL
+            blockId("template_conductor"), TextureSlot.PARTICLE, BASE_SIDE, BASE_END, ROD_SIDE, ROD_END
     );
     public static final ModelTemplate CONDUCTOR_WALL = create(
-            blockId("template_conductor_wall"), "_wall", TextureSlot.PARTICLE, TextureSlot.ALL
+            blockId("template_conductor_wall"), "_wall", TextureSlot.PARTICLE, BASE_SIDE, BASE_END, ROD_SIDE, ROD_END
     );
     public static final ModelTemplate CUBE_BOTTOM_TOP_TINTED_SIDES = create(
             blockId("cube_bottom_top_tinted_sides"), TextureSlot.PARTICLE, TextureSlot.BOTTOM, TextureSlot.TOP, TextureSlot.SIDE, TINT_SIDE

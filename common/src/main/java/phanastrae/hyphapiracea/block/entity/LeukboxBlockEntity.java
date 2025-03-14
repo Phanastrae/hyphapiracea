@@ -30,12 +30,14 @@ import phanastrae.hyphapiracea.block.LeukboxBlock;
 import phanastrae.hyphapiracea.block.MiniCircuit;
 import phanastrae.hyphapiracea.block.MiniCircuitHolder;
 import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
+import phanastrae.hyphapiracea.component.type.DiscLockComponent;
 import phanastrae.hyphapiracea.component.type.KeyedDiscComponent;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNetwork;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNode;
 import phanastrae.hyphapiracea.electromagnetism.CircuitWire;
 import phanastrae.hyphapiracea.particle.HyphaPiraceaParticleTypes;
 import phanastrae.hyphapiracea.structure.StructurePlacer;
+import phanastrae.hyphapiracea.structure.StructureType;
 import phanastrae.hyphapiracea.structure.leubox_stages.*;
 import phanastrae.hyphapiracea.structure.leubox_stages.AbstractLeukboxStage.LeukboxStage;
 import phanastrae.hyphapiracea.world.HyphaPiraceaLevelAttachment;
@@ -48,6 +50,8 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     public static final String TAG_STAGE_DATA = "stage_data";
     public static final String TAG_HAS_SUFFICIENT_POWER = "has_sufficient_power";
     public static final String TAG_POWER = "power";
+    public static final String TAG_LEUKBOX_LOCK = "leukbox_lock";
+    public static final String TAG_PREVENT_MANUAL_INTERACTION = "prevent_manual_interaction";
 
     private ItemStack item = ItemStack.EMPTY;
     private boolean discRecoverable = true;
@@ -61,6 +65,9 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     private boolean hasSufficientPower;
 
     private double power;
+
+    private String leukboxLock = "";
+    private boolean preventManualInteraction = false;
 
     public LeukboxBlockEntity(BlockPos pos, BlockState blockState) {
         super(HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, pos, blockState);
@@ -104,6 +111,16 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
         if(nbt.contains(TAG_HAS_SUFFICIENT_POWER, Tag.TAG_BYTE)) {
             this.hasSufficientPower = nbt.getBoolean(TAG_HAS_SUFFICIENT_POWER);
+        }
+        if(nbt.contains(TAG_LEUKBOX_LOCK, Tag.TAG_STRING)) {
+            this.leukboxLock = nbt.getString(TAG_LEUKBOX_LOCK);
+        } else {
+            this.leukboxLock = "";
+        }
+        if(nbt.contains(TAG_PREVENT_MANUAL_INTERACTION, Tag.TAG_BYTE)) {
+            this.preventManualInteraction = nbt.getBoolean(TAG_PREVENT_MANUAL_INTERACTION);
+        } else {
+            this.preventManualInteraction = false;
         }
 
 
@@ -167,6 +184,13 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         nbt.putInt(TAG_PROGRESS, this.progress);
         nbt.putInt(TAG_STAGE_PROGRESS, this.stageProgress);
         nbt.putBoolean(TAG_HAS_SUFFICIENT_POWER, this.hasSufficientPower);
+
+        if(!this.leukboxLock.isEmpty()) {
+            nbt.putString(TAG_LEUKBOX_LOCK, this.leukboxLock);
+        }
+        if(this.preventManualInteraction) {
+            nbt.putBoolean(TAG_PREVENT_MANUAL_INTERACTION, this.preventManualInteraction);
+        }
     }
 
     @Override
@@ -374,8 +398,8 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
     }
 
-    public void startGeneratingStructure(ResourceLocation structureRL, BlockPos pos) {
-        this.leukboxStage = new GetStructureStage(pos, structureRL);
+    public void startGeneratingStructure(ResourceLocation structureRL, StructureType structureType, boolean rotateStructure, BlockPos pos) {
+        this.leukboxStage = new GetStructureStage(pos, structureRL, structureType, rotateStructure);
     }
 
     public void stopGeneratingStructure() {
@@ -408,13 +432,20 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     }
 
     public Component getStructureText() {
+        if(this.getStage() == LeukboxStage.IDLE) {
+            if(!this.leukboxLock.isEmpty()) {
+                return Component.translatable("hyphapiracea.leukbox.lock.current", this.leukboxLock).withStyle(ChatFormatting.RED);
+            }
+        }
+
         if(!this.getStage().isActive()) {
             return null;
         }
 
         KeyedDiscComponent keyedDiscComponent = this.getDiscComponent();
         if(keyedDiscComponent != null) {
-            return Component.translatable("hyphapiracea.leukbox.structure", keyedDiscComponent.structureId()).withStyle(ChatFormatting.DARK_GRAY);
+            String lang = keyedDiscComponent.structureType() == StructureType.STRUCTURE ? "hyphapiracea.leukbox.structure" : "hyphapiracea.leukbox.template";
+            return Component.translatable(lang, keyedDiscComponent.structureId().toString()).withStyle(ChatFormatting.DARK_GRAY);
         } else {
             return null;
         }
@@ -591,7 +622,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
         KeyedDiscComponent component = item.get(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
         if(component != null) {
-            this.startGeneratingStructure(component.structureId(), this.getBlockPos());
+            this.startGeneratingStructure(component.structureId(), component.structureType(), component.rotateStructure(), this.getBlockPos());
             this.setChanged();
         }
     }
@@ -608,7 +639,9 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        return stack.has(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
+        String stackLock = DiscLockComponent.getDiscLockFromDisc(stack);
+        String thisLock = this.leukboxLock;
+        return stackLock.equals(thisLock) && stack.has(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
     }
 
     @Override
@@ -660,5 +693,25 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
 
         return null;
+    }
+
+    public void setLeukboxLock(String leukboxLock) {
+        this.leukboxLock = leukboxLock;
+        this.setChanged();
+        this.sendUpdate();
+    }
+
+    public String getLeukboxLock() {
+        return leukboxLock;
+    }
+
+    public void setPreventManualInteraction(boolean preventManualInteraction) {
+        this.preventManualInteraction = preventManualInteraction;
+        this.setChanged();
+        this.sendUpdate();
+    }
+
+    public boolean shouldPreventManualInteraction() {
+        return this.preventManualInteraction;
     }
 }

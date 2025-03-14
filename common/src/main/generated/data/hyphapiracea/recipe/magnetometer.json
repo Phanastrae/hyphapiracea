@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "C": {
-      "item": "hyphapiracea:hyphal_conductor"
+      "tag": "hyphapiracea:hyphal_conductor"
     },
     "H": {
       "item": "hyphapiracea:hyphaline"

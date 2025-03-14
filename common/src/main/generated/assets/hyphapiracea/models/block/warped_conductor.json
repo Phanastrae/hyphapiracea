@@ -1,0 +1,10 @@
+{
+  "parent": "hyphapiracea:block/template_conductor",
+  "textures": {
+    "base_end": "minecraft:block/warped_stem_top",
+    "base_side": "minecraft:block/warped_stem",
+    "particle": "minecraft:block/warped_stem",
+    "rod_end": "minecraft:block/stripped_warped_stem_top",
+    "rod_side": "minecraft:block/stripped_warped_stem"
+  }
+}

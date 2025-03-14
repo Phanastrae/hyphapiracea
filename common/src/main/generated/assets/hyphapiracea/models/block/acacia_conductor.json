@@ -1,0 +1,10 @@
+{
+  "parent": "hyphapiracea:block/template_conductor",
+  "textures": {
+    "base_end": "minecraft:block/acacia_log_top",
+    "base_side": "minecraft:block/acacia_log",
+    "particle": "minecraft:block/acacia_log",
+    "rod_end": "minecraft:block/stripped_acacia_log_top",
+    "rod_side": "minecraft:block/stripped_acacia_log"
+  }
+}

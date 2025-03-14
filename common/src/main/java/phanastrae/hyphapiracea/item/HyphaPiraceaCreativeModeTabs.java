@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import phanastrae.hyphapiracea.HyphaPiracea;
@@ -31,7 +32,7 @@ public class HyphaPiraceaCreativeModeTabs {
 
     public static final CreativeModeTab HYPHAPIRACEA_TAB = XPlatInterface.INSTANCE.createCreativeModeTabBuilder()
             .icon(HyphaPiraceaItems.KEYED_DISC::getDefaultInstance)
-            .title(Component.translatable("itemGroup.hyphapiracea"))
+            .title(Component.translatable("itemGroup.hyphapiracea.group"))
             .build();
     public static final ResourceKey<CreativeModeTab> HYPHAPIRACEA_RESOURCE_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), HyphaPiracea.id("hyphapiracea"));
 
@@ -70,8 +71,16 @@ public class HyphaPiraceaCreativeModeTabs {
                 HyphaPiraceaItems.OGRAL_HYPHALINE,
                 HyphaPiraceaItems.FERRIC_WARDLINE,
                 HyphaPiraceaItems.HYPHAL_NODE,
-                HyphaPiraceaItems.HYPHAL_STEM,
-                HyphaPiraceaItems.HYPHAL_CONDUCTOR,
+                HyphaPiraceaItems.HYPHAL_STEM
+        );
+
+        for(Item conductor : HyphaPiraceaItems.CONDUCTORS) {
+            helper.add(REDSTONE_BLOCKS,
+                    conductor
+            );
+        }
+
+        helper.add(REDSTONE_BLOCKS,
                 HyphaPiraceaItems.STORMSAP_CELL,
                 HyphaPiraceaItems.HYPHAL_AMMETER,
                 HyphaPiraceaItems.HYPHAL_VOLTMETER,
@@ -107,7 +116,8 @@ public class HyphaPiraceaCreativeModeTabs {
 
         if(helper.operatorTabEnabled()) {
             helper.add(OP_BLOCKS,
-                    HyphaPiraceaItems.CREATIVE_CELL
+                    HyphaPiraceaItems.CREATIVE_CELL,
+                    HyphaPiraceaItems.LEUKBOX_LOCK
             );
         }
     }
@@ -118,6 +128,10 @@ public class HyphaPiraceaCreativeModeTabs {
 
     private static ResourceLocation id(String path) {
         return HyphaPiracea.id(path);
+    }
+
+    private static ResourceKey<CreativeModeTab> createKey(String name) {
+        return ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.withDefaultNamespace(name));
     }
 
     public static abstract class Helper {
@@ -138,9 +152,5 @@ public class HyphaPiraceaCreativeModeTabs {
         public abstract void forTabRun(ResourceKey<CreativeModeTab> groupKey, BiConsumer<CreativeModeTab.ItemDisplayParameters, CreativeModeTab.Output> biConsumer);
 
         public abstract boolean operatorTabEnabled();
-    }
-
-    private static ResourceKey<CreativeModeTab> createKey(String name) {
-        return ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.withDefaultNamespace(name));
     }
 }

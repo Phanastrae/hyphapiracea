@@ -12,6 +12,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.structure.IntermediateGenLevel;
 import phanastrae.hyphapiracea.structure.IntermediateStructureStorage;
@@ -23,14 +24,14 @@ import static phanastrae.hyphapiracea.structure.StructurePlacer.checkLoadedOrOut
 
 public class FillStoragePiecesStage extends AbstractLeukboxStage {
 
-    private final Structure structure;
+    private final @Nullable Structure structure;
     private final PiecesContainer structurePieces;
     private final BoundingBox boundingBox;
     private final BlockPos structureOrigin;
     private final Queue<StructurePiece> unplacedPieces;
     private final IntermediateStructureStorage intermediateStructureStorage;
 
-    public FillStoragePiecesStage(BlockPos leukboxPos, BlockPos structureOrigin, LinkedList<StructurePiece> unplacedPieces, Structure structure, PiecesContainer piecesContainer, BoundingBox boundingBox) {
+    public FillStoragePiecesStage(BlockPos leukboxPos, BlockPos structureOrigin, LinkedList<StructurePiece> unplacedPieces, @Nullable Structure structure, PiecesContainer piecesContainer, BoundingBox boundingBox) {
         super(leukboxPos, LeukboxStage.FILL_STORAGE_PIECES);
 
         this.unplacedPieces = unplacedPieces;
@@ -106,7 +107,7 @@ public class FillStoragePiecesStage extends AbstractLeukboxStage {
                             }
                     );
         } catch (Exception e) {
-            HyphaPiracea.LOGGER.error("Error trying to place piece for structure {} with Leukbox at {}!", this.structure.toString(), this.leukboxPos.toString());
+            HyphaPiracea.LOGGER.error("Error trying to place piece for structure with Leukbox at {}!", this.leukboxPos.toString());
             return false;
         }
 

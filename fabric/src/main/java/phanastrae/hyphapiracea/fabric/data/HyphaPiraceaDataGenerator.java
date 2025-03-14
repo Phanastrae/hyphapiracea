@@ -12,9 +12,12 @@ public class HyphaPiraceaDataGenerator implements DataGeneratorEntrypoint {
 
 		pack.addProvider(ModelProvider::new);
 
-		pack.addProvider(BlockTagProvider::new);
+		BlockTagProvider blockTagProvider = pack.addProvider(BlockTagProvider::new);
+		pack.addProvider((output, registriesFuture) -> new ItemTagProvider(output, registriesFuture, blockTagProvider));
+
 		pack.addProvider(EntityTypeTagProvider::new);
 		pack.addProvider(DamageTypeTagProvider::new);
+
 		pack.addProvider(BlockLootTableProvider::new);
 		pack.addProvider(RecipeProvider::new);
 	}

@@ -1,7 +1,10 @@
 {
   "parent": "hyphapiracea:block/template_conductor_wall",
   "textures": {
-    "all": "hyphapiracea:block/azimuldey_mass",
-    "particle": "hyphapiracea:block/azimuldey_mass"
+    "base_end": "hyphapiracea:block/azimuldey_mass",
+    "base_side": "hyphapiracea:block/azimulic_stem_side",
+    "particle": "hyphapiracea:block/azimulic_stem_side",
+    "rod_end": "hyphapiracea:block/azimuldey_mass",
+    "rod_side": "hyphapiracea:block/azimuldey_mass"
   }
 }

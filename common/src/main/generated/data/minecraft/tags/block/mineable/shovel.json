@@ -4,8 +4,11 @@
     "hyphapiracea:azimulic_stem",
     "hyphapiracea:hyphal_node",
     "hyphapiracea:hyphal_stem",
-    "hyphapiracea:hyphal_conductor",
     "hyphapiracea:piraceatic_tar",
-    "hyphapiracea:piraceatic_globglass"
+    "hyphapiracea:piraceatic_globglass",
+    {
+      "id": "#hyphapiracea:hyphal_conductor",
+      "required": false
+    }
   ]
 }

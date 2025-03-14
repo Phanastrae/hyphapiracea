@@ -13,6 +13,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.structure.BoxedContainer;
 import phanastrae.hyphapiracea.structure.IntermediateGenLevel;
@@ -23,12 +24,12 @@ import java.util.LinkedList;
 
 public class FillStorageAfterStage extends AbstractLeukboxStage {
 
-    private final Structure structure;
+    private final @Nullable Structure structure;
     private final IntermediateStructureStorage intermediateStructureStorage;
     private final BoundingBox boundingBox;
     private final PiecesContainer piecesContainer;
 
-    public FillStorageAfterStage(BlockPos leukboxPos, IntermediateStructureStorage intermediateStructureStorage, Structure structure, PiecesContainer piecesContainer, BoundingBox boundingBox) {
+    public FillStorageAfterStage(BlockPos leukboxPos, IntermediateStructureStorage intermediateStructureStorage, @Nullable Structure structure, PiecesContainer piecesContainer, BoundingBox boundingBox) {
         super(leukboxPos, LeukboxStage.FILL_STORAGE_AFTER);
 
         this.structure = structure;
@@ -66,33 +67,35 @@ public class FillStorageAfterStage extends AbstractLeukboxStage {
 
         ChunkPos startPos = new ChunkPos(SectionPos.blockToSectionCoord(this.boundingBox.minX()), SectionPos.blockToSectionCoord(this.boundingBox.minZ()));
         ChunkPos endPos = new ChunkPos(SectionPos.blockToSectionCoord(this.boundingBox.maxX()), SectionPos.blockToSectionCoord(this.boundingBox.maxZ()));
-        try {
-            ChunkPos.rangeClosed(startPos, endPos)
-                    .forEach(
-                            chunkPos -> {
-                                if(serverLevel.isLoaded(chunkPos.getWorldPosition())) {
-                                    afterPlaceInChunk(
-                                            this.structure,
-                                            this.piecesContainer,
-                                            intermediateGenLevel,
-                                            structureManager,
-                                            chunkGenerator,
-                                            randomSource,
-                                            new BoundingBox(
-                                                    chunkPos.getMinBlockX(),
-                                                    minHeight,
-                                                    chunkPos.getMinBlockZ(),
-                                                    chunkPos.getMaxBlockX(),
-                                                    maxHeight,
-                                                    chunkPos.getMaxBlockZ()
-                                            ),
-                                            chunkPos);
+        if(this.structure != null) {
+            try {
+                ChunkPos.rangeClosed(startPos, endPos)
+                        .forEach(
+                                chunkPos -> {
+                                    if (serverLevel.isLoaded(chunkPos.getWorldPosition())) {
+                                        afterPlaceInChunk(
+                                                this.structure,
+                                                this.piecesContainer,
+                                                intermediateGenLevel,
+                                                structureManager,
+                                                chunkGenerator,
+                                                randomSource,
+                                                new BoundingBox(
+                                                        chunkPos.getMinBlockX(),
+                                                        minHeight,
+                                                        chunkPos.getMinBlockZ(),
+                                                        chunkPos.getMaxBlockX(),
+                                                        maxHeight,
+                                                        chunkPos.getMaxBlockZ()
+                                                ),
+                                                chunkPos);
+                                    }
                                 }
-                            }
-                    );
-        } catch (Exception e) {
-            HyphaPiracea.LOGGER.error("Error trying to apply after-place for structure {} with Leukbox at {}!", this.structure.toString(), this.leukboxPos.toString());
-            return false;
+                        );
+            } catch (Exception e) {
+                HyphaPiracea.LOGGER.error("Error trying to apply after-place for structure with Leukbox at {}!", this.leukboxPos.toString());
+                return false;
+            }
         }
 
         return true;

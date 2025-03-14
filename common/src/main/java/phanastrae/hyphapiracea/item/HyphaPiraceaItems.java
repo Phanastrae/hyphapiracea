@@ -12,6 +12,8 @@ import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
 import phanastrae.hyphapiracea.component.type.KeyedDiscComponent;
 import phanastrae.hyphapiracea.component.type.WireLineComponent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import static phanastrae.hyphapiracea.component.type.WireLineComponent.textureOf;
@@ -20,16 +22,52 @@ public class HyphaPiraceaItems {
 
     public static final BlockItem AZIMULDEY_MASS = ofBlock(HyphaPiraceaBlocks.AZIMULDEY_MASS);
     public static final BlockItem AZIMULIC_STEM = ofBlock(HyphaPiraceaBlocks.AZIMULIC_STEM);
+
     public static final BlockItem HYPHAL_NODE = ofBlock(HyphaPiraceaBlocks.HYPHAL_NODE);
     public static final BlockItem HYPHAL_STEM = ofBlock(HyphaPiraceaBlocks.HYPHAL_STEM);
+
     public static final BlockItem HYPHAL_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
+
+    public static final BlockItem OAK_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.OAK_CONDUCTOR);
+    public static final BlockItem SPRUCE_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.SPRUCE_CONDUCTOR);
+    public static final BlockItem BIRCH_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.BIRCH_CONDUCTOR);
+    public static final BlockItem JUNGLE_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.JUNGLE_CONDUCTOR);
+    public static final BlockItem ACACIA_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.ACACIA_CONDUCTOR);
+    public static final BlockItem DARK_OAK_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.DARK_OAK_CONDUCTOR);
+    public static final BlockItem MANGROVE_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.MANGROVE_CONDUCTOR);
+    public static final BlockItem CHERRY_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.CHERRY_CONDUCTOR);
+    public static final BlockItem BAMBOO_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.BAMBOO_CONDUCTOR);
+    public static final BlockItem CRIMSON_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.CRIMSON_CONDUCTOR);
+    public static final BlockItem WARPED_CONDUCTOR = ofBlock(HyphaPiraceaBlocks.WARPED_CONDUCTOR);
+
+    public static final List<Item> CONDUCTORS = getConductorList();
+
+    public static List<Item> getConductorList() {
+        List<Item> c = new ArrayList<>();
+        c.add(HYPHAL_CONDUCTOR);
+        c.add(OAK_CONDUCTOR);
+        c.add(SPRUCE_CONDUCTOR);
+        c.add(BIRCH_CONDUCTOR);
+        c.add(JUNGLE_CONDUCTOR);
+        c.add(ACACIA_CONDUCTOR);
+        c.add(DARK_OAK_CONDUCTOR);
+        c.add(MANGROVE_CONDUCTOR);
+        c.add(CHERRY_CONDUCTOR);
+        c.add(BAMBOO_CONDUCTOR);
+        c.add(CRIMSON_CONDUCTOR);
+        c.add(WARPED_CONDUCTOR);
+        return c;
+    }
+
     public static final BlockItem STORMSAP_CELL = ofBlock(HyphaPiraceaBlocks.STORMSAP_CELL);
     public static final BlockItem CREATIVE_CELL = ofBlock(HyphaPiraceaBlocks.CREATIVE_CELL, properties().rarity(Rarity.EPIC));
     public static final BlockItem HYPHAL_AMMETER = ofBlock(HyphaPiraceaBlocks.HYPHAL_AMMETER);
     public static final BlockItem HYPHAL_VOLTMETER = ofBlock(HyphaPiraceaBlocks.HYPHAL_VOLTMETER);
     public static final BlockItem CIRCUIT_SWITCH = ofBlock(HyphaPiraceaBlocks.CIRCUIT_SWITCH);
     public static final BlockItem LEYFIELD_MAGNETOMETER_BLOCK = ofBlock(HyphaPiraceaBlocks.LEYFIELD_MAGNETOMETER_BLOCK);
+
     public static final BlockItem ELECTROMAGNETIC_DUST_BOX = ofBlock(HyphaPiraceaBlocks.ELECTROMAGNETIC_DUST_BOX);
+
     public static final BlockItem PIRACEATIC_LEUKBOX = ofBlock(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
     public static final BlockItem PIRACEATIC_GLOBGLASS = ofBlock(HyphaPiraceaBlocks.PIRACEATIC_GLOBGLASS);
 
@@ -44,16 +82,22 @@ public class HyphaPiraceaItems {
     ));
     public static final Item LEYFIELD_MAGNETOMETER = new MagnetometerItem(properties().stacksTo(1));
     public static final Item ELECTROMAGNETIC_DUST = new ElectromagneticDustItem(properties());
+
     public static final Item KEYED_DISC = new KeyedDiscItem(properties().stacksTo(1).rarity(Rarity.UNCOMMON).component(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, new KeyedDiscComponent(ResourceLocation.fromNamespaceAndPath("minecraft", "fortress"), 48.0F, 0.000001F, 8)));
+
     public static final Item POSITIVE_CHARGEBALL = new ChargeballItem(properties(),1, 0);
     public static final Item NEGATIVE_CHARGEBALL = new ChargeballItem(properties(),-1, 0);
     public static final Item NORTHERN_CHARGEBALL = new ChargeballItem(properties(),0, 1);
     public static final Item SOUTHERN_CHARGEBALL = new ChargeballItem(properties(),0, -1);
+
     public static final Item POSITIVE_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.POSITIVE_SPOREBERRY));
     public static final Item NEGATIVE_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NEGATIVE_SPOREBERRY));
     public static final Item NORTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NORTHERN_SPOREBERRY));
     public static final Item SOUTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.SOUTHERN_SPOREBERRY));
-    public static final Item PIRACEATIC_GLOB = new Item(properties());
+
+    public static final Item PIRACEATIC_GLOB = new Item(properties().food(HyphaPiraceaFoodProperties.PIRACEATIC_GLOB));
+
+    public static final Item LEUKBOX_LOCK = new LeukboxLockItem(properties().stacksTo(1).rarity(Rarity.EPIC));
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
         BiConsumer<String, Item> rwt = (s, i) -> { // register and add to creative mode tab
@@ -63,33 +107,58 @@ public class HyphaPiraceaItems {
 
         rwt.accept("azimuldey_mass", AZIMULDEY_MASS);
         rwt.accept("azimulic_stem", AZIMULIC_STEM);
+
         rwt.accept("hyphal_node", HYPHAL_NODE);
         rwt.accept("hyphal_stem", HYPHAL_STEM);
+
         rwt.accept("hyphaline", HYPHALINE);
         rwt.accept("ogral_hyphaline", OGRAL_HYPHALINE);
         rwt.accept("ferric_wardline", FERRIC_WARDLINE);
+
         rwt.accept("hyphal_conductor", HYPHAL_CONDUCTOR);
+        rwt.accept("oak_conductor", OAK_CONDUCTOR);
+        rwt.accept("spruce_conductor", SPRUCE_CONDUCTOR);
+        rwt.accept("birch_conductor", BIRCH_CONDUCTOR);
+        rwt.accept("jungle_conductor", JUNGLE_CONDUCTOR);
+        rwt.accept("acacia_conductor", ACACIA_CONDUCTOR);
+        rwt.accept("dark_oak_conductor", DARK_OAK_CONDUCTOR);
+        rwt.accept("mangrove_conductor", MANGROVE_CONDUCTOR);
+        rwt.accept("cherry_conductor", CHERRY_CONDUCTOR);
+        rwt.accept("bamboo_conductor", BAMBOO_CONDUCTOR);
+        rwt.accept("crimson_conductor", CRIMSON_CONDUCTOR);
+        rwt.accept("warped_conductor", WARPED_CONDUCTOR);
+
         rwt.accept("stormsap_cell", STORMSAP_CELL);
         rwt.accept("creative_cell", CREATIVE_CELL);
         rwt.accept("ammeter_block", HYPHAL_AMMETER);
         rwt.accept("voltmeter_block", HYPHAL_VOLTMETER);
         rwt.accept("circuit_switch", CIRCUIT_SWITCH);
+
         rwt.accept("magnetometer", LEYFIELD_MAGNETOMETER);
         rwt.accept("magnetometer_block", LEYFIELD_MAGNETOMETER_BLOCK);
+
         rwt.accept("electromagnetic_dust", ELECTROMAGNETIC_DUST);
         rwt.accept("electromagnetic_dust_box", ELECTROMAGNETIC_DUST_BOX);
+
         rwt.accept("piraceatic_leukbox", PIRACEATIC_LEUKBOX);
+
         rwt.accept("keyed_disc", KEYED_DISC);
+
         rwt.accept("positive_chargeball", POSITIVE_CHARGEBALL);
         rwt.accept("negative_chargeball", NEGATIVE_CHARGEBALL);
         rwt.accept("northern_chargeball", NORTHERN_CHARGEBALL);
         rwt.accept("southern_chargeball", SOUTHERN_CHARGEBALL);
+
         rwt.accept("positive_sporeberry", POSITIVE_SPOREBERRY);
         rwt.accept("negative_sporeberry", NEGATIVE_SPOREBERRY);
         rwt.accept("northern_sporeberry", NORTHERN_SPOREBERRY);
         rwt.accept("southern_sporeberry", SOUTHERN_SPOREBERRY);
+
         rwt.accept("piraceatic_glob", PIRACEATIC_GLOB);
+
         rwt.accept("piraceatic_globglass", PIRACEATIC_GLOBGLASS);
+
+        rwt.accept("leukbox_lock", LEUKBOX_LOCK);
     }
 
     private static ResourceLocation id(String path) {

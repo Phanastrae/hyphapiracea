@@ -1,0 +1,10 @@
+{
+  "parent": "hyphapiracea:block/template_conductor_wall",
+  "textures": {
+    "base_end": "minecraft:block/birch_log_top",
+    "base_side": "minecraft:block/birch_log",
+    "particle": "minecraft:block/birch_log",
+    "rod_end": "minecraft:block/stripped_birch_log_top",
+    "rod_side": "minecraft:block/stripped_birch_log"
+  }
+}

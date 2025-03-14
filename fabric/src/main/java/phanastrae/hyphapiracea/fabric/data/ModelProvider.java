@@ -12,6 +12,7 @@ import net.minecraft.data.models.model.TexturedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import phanastrae.hyphapiracea.HyphaPiracea;
 import phanastrae.hyphapiracea.block.HyphaPiraceaBlocks;
@@ -28,6 +29,7 @@ import static net.minecraft.data.models.BlockModelGenerators.createHorizontalFac
 import static net.minecraft.data.models.blockstates.VariantProperties.*;
 import static net.minecraft.data.models.blockstates.VariantProperties.Rotation.*;
 import static net.minecraft.data.models.model.TextureSlot.*;
+import static phanastrae.hyphapiracea.fabric.data.HyphaPiraceaModelTemplates.*;
 
 public class ModelProvider extends FabricModelProvider {
     public ModelProvider(FabricDataOutput output) {
@@ -55,7 +57,19 @@ public class ModelProvider extends FabricModelProvider {
         this.createHyphalNode(BMG, HyphaPiraceaBlocks.AZIMULDEY_MASS);
         this.createHyphalNode(BMG, HyphaPiraceaBlocks.HYPHAL_NODE);
 
-        this.createConductorBlock(BMG, HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
+        // conductors
+        this.createHyphalConductorBlock(BMG, HyphaPiraceaBlocks.HYPHAL_CONDUCTOR);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.OAK_CONDUCTOR, Blocks.OAK_LOG, Blocks.STRIPPED_OAK_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.SPRUCE_CONDUCTOR, Blocks.SPRUCE_LOG, Blocks.STRIPPED_SPRUCE_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.BIRCH_CONDUCTOR, Blocks.BIRCH_LOG, Blocks.STRIPPED_BIRCH_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.JUNGLE_CONDUCTOR, Blocks.JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.ACACIA_CONDUCTOR, Blocks.ACACIA_LOG, Blocks.STRIPPED_ACACIA_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.DARK_OAK_CONDUCTOR, Blocks.DARK_OAK_LOG, Blocks.STRIPPED_DARK_OAK_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.MANGROVE_CONDUCTOR, Blocks.MANGROVE_LOG, Blocks.STRIPPED_MANGROVE_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.CHERRY_CONDUCTOR, Blocks.CHERRY_LOG, Blocks.STRIPPED_CHERRY_LOG);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.BAMBOO_CONDUCTOR, Blocks.BAMBOO_BLOCK, Blocks.STRIPPED_BAMBOO_BLOCK);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.CRIMSON_CONDUCTOR, Blocks.CRIMSON_STEM, Blocks.STRIPPED_CRIMSON_STEM);
+        this.createWoodenConductorBlock(BMG, HyphaPiraceaBlocks.WARPED_CONDUCTOR, Blocks.WARPED_STEM, Blocks.STRIPPED_WARPED_STEM);
 
         this.createLeukbox(BMG, HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX);
     }
@@ -76,7 +90,8 @@ public class ModelProvider extends FabricModelProvider {
                 HyphaPiraceaItems.NEGATIVE_SPOREBERRY,
                 HyphaPiraceaItems.NORTHERN_SPOREBERRY,
                 HyphaPiraceaItems.SOUTHERN_SPOREBERRY,
-                HyphaPiraceaItems.PIRACEATIC_GLOB
+                HyphaPiraceaItems.PIRACEATIC_GLOB,
+                HyphaPiraceaItems.LEUKBOX_LOCK
         );
     }
 
@@ -90,15 +105,37 @@ public class ModelProvider extends FabricModelProvider {
         IMG.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
     }
 
-    public void createConductorBlock(BlockModelGenerators BMG, Block block) {
+    public void createWoodenConductorBlock(BlockModelGenerators BMG, Block block, Block log, Block strippedLog) {
+        ResourceLocation baseSide = getBlockTexture(log);
+        ResourceLocation baseTop = getBlockTexture(log, "_top");
+        ResourceLocation rodSide = getBlockTexture(strippedLog);
+        ResourceLocation rodTop = getBlockTexture(strippedLog, "_top");
+        this.createConductorBlock(BMG, block, baseSide, baseTop, rodSide, rodTop);
+    }
+
+    public void createHyphalConductorBlock(BlockModelGenerators BMG, Block block) {
+        ResourceLocation baseSide = getBlockTexture(HyphaPiraceaBlocks.AZIMULIC_STEM, "_side");
+        ResourceLocation baseTop = getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+        ResourceLocation rodSide = getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+        ResourceLocation rodTop = getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS);
+        this.createConductorBlock(BMG, block, baseSide, baseTop, rodSide, rodTop);
+    }
+
+    public void createConductorBlock(BlockModelGenerators BMG, Block block, ResourceLocation baseSide, ResourceLocation baseTop, ResourceLocation rodSide, ResourceLocation rodTop) {
         TextureMapping verticalMapping = new TextureMapping()
-                .put(PARTICLE, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS))
-                .put(ALL, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS));
+                .put(PARTICLE, baseSide)
+                .put(BASE_SIDE, baseSide)
+                .put(BASE_END, baseTop)
+                .put(ROD_SIDE, rodSide)
+                .put(ROD_END, rodTop);
         ResourceLocation verticalModel = HyphaPiraceaModelTemplates.CONDUCTOR.create(block, verticalMapping, BMG.modelOutput);
 
         TextureMapping horizontalMapping = new TextureMapping()
-                .put(PARTICLE, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS))
-                .put(ALL, getBlockTexture(HyphaPiraceaBlocks.AZIMULDEY_MASS));
+                .put(PARTICLE, baseSide)
+                .put(BASE_SIDE, baseSide)
+                .put(BASE_END, baseTop)
+                .put(ROD_SIDE, rodSide)
+                .put(ROD_END, rodTop);
         ResourceLocation horizontalModel = HyphaPiraceaModelTemplates.CONDUCTOR_WALL.create(block, horizontalMapping, BMG.modelOutput);
 
         BMG.blockStateOutput

@@ -4,6 +4,9 @@
     "hyphapiracea:azimulic_stem",
     "hyphapiracea:hyphal_node",
     "hyphapiracea:hyphal_stem",
-    "hyphapiracea:hyphal_conductor"
+    {
+      "id": "#hyphapiracea:hyphal_conductor",
+      "required": false
+    }
   ]
 }
