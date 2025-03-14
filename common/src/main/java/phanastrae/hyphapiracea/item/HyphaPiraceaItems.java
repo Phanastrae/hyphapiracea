@@ -54,6 +54,7 @@ public class HyphaPiraceaItems {
     public static final Item NORTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.NORTHERN_SPOREBERRY));
     public static final Item SOUTHERN_SPOREBERRY = new Item(properties().food(HyphaPiraceaFoodProperties.SOUTHERN_SPOREBERRY));
     public static final Item PIRACEATIC_GLOB = new Item(properties().food(HyphaPiraceaFoodProperties.PIRACEATIC_GLOB));
+    public static final Item LEUKBOX_LOCK = new LeukboxLockItem(properties().stacksTo(1).rarity(Rarity.EPIC));
 
     public static void init(BiConsumer<ResourceLocation, Item> r) {
         BiConsumer<String, Item> rwt = (s, i) -> { // register and add to creative mode tab
@@ -90,6 +91,7 @@ public class HyphaPiraceaItems {
         rwt.accept("southern_sporeberry", SOUTHERN_SPOREBERRY);
         rwt.accept("piraceatic_glob", PIRACEATIC_GLOB);
         rwt.accept("piraceatic_globglass", PIRACEATIC_GLOBGLASS);
+        rwt.accept("leukbox_lock", LEUKBOX_LOCK);
     }
 
     private static ResourceLocation id(String path) {

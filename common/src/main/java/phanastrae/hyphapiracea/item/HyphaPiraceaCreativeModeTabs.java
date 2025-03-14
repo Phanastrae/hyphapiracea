@@ -107,7 +107,8 @@ public class HyphaPiraceaCreativeModeTabs {
 
         if(helper.operatorTabEnabled()) {
             helper.add(OP_BLOCKS,
-                    HyphaPiraceaItems.CREATIVE_CELL
+                    HyphaPiraceaItems.CREATIVE_CELL,
+                    HyphaPiraceaItems.LEUKBOX_LOCK
             );
         }
     }

@@ -30,6 +30,7 @@ import phanastrae.hyphapiracea.block.LeukboxBlock;
 import phanastrae.hyphapiracea.block.MiniCircuit;
 import phanastrae.hyphapiracea.block.MiniCircuitHolder;
 import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
+import phanastrae.hyphapiracea.component.type.DiscLockComponent;
 import phanastrae.hyphapiracea.component.type.KeyedDiscComponent;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNetwork;
 import phanastrae.hyphapiracea.electromagnetism.CircuitNode;
@@ -49,6 +50,7 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     public static final String TAG_STAGE_DATA = "stage_data";
     public static final String TAG_HAS_SUFFICIENT_POWER = "has_sufficient_power";
     public static final String TAG_POWER = "power";
+    public static final String TAG_LEUKBOX_LOCK = "leukbox_lock";
 
     private ItemStack item = ItemStack.EMPTY;
     private boolean discRecoverable = true;
@@ -62,6 +64,8 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     private boolean hasSufficientPower;
 
     private double power;
+
+    private String leukboxLock = "";
 
     public LeukboxBlockEntity(BlockPos pos, BlockState blockState) {
         super(HyphaPiraceaBlockEntityTypes.PIRACEATIC_LEUKBOX, pos, blockState);
@@ -105,6 +109,11 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
         if(nbt.contains(TAG_HAS_SUFFICIENT_POWER, Tag.TAG_BYTE)) {
             this.hasSufficientPower = nbt.getBoolean(TAG_HAS_SUFFICIENT_POWER);
+        }
+        if(nbt.contains(TAG_LEUKBOX_LOCK, Tag.TAG_STRING)) {
+            this.leukboxLock = nbt.getString(TAG_LEUKBOX_LOCK);
+        } else {
+            this.leukboxLock = "";
         }
 
 
@@ -187,6 +196,10 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         fakeClientStage.saveAdditional(fakeClientStageData, registryLookup);
         nbtCompound.put(TAG_STAGE_DATA, fakeClientStageData);
         nbtCompound.putDouble(TAG_POWER, this.getPower());
+
+        if(!this.leukboxLock.isEmpty()) {
+            nbtCompound.putString(TAG_LEUKBOX_LOCK, this.leukboxLock);
+        }
 
         return nbtCompound;
     }
@@ -409,6 +422,12 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
     }
 
     public Component getStructureText() {
+        if(this.getStage() == LeukboxStage.IDLE) {
+            if(!this.leukboxLock.isEmpty()) {
+                return Component.translatable("hyphapiracea.leukbox.lock.current", this.leukboxLock).withStyle(ChatFormatting.RED);
+            }
+        }
+
         if(!this.getStage().isActive()) {
             return null;
         }
@@ -610,7 +629,9 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        return stack.has(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
+        String stackLock = DiscLockComponent.getDiscLockFromDisc(stack);
+        String thisLock = this.leukboxLock;
+        return stackLock.equals(thisLock) && stack.has(HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT);
     }
 
     @Override
@@ -662,5 +683,15 @@ public class LeukboxBlockEntity extends BlockEntity implements Clearable, Contai
         }
 
         return null;
+    }
+
+    public void setLeukboxLock(String leukboxLock) {
+        this.leukboxLock = leukboxLock;
+        this.setChanged();
+        this.sendUpdate();
+    }
+
+    public String getLeukboxLock() {
+        return leukboxLock;
     }
 }

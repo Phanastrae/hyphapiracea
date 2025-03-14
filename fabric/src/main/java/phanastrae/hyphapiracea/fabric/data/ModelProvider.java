@@ -76,7 +76,8 @@ public class ModelProvider extends FabricModelProvider {
                 HyphaPiraceaItems.NEGATIVE_SPOREBERRY,
                 HyphaPiraceaItems.NORTHERN_SPOREBERRY,
                 HyphaPiraceaItems.SOUTHERN_SPOREBERRY,
-                HyphaPiraceaItems.PIRACEATIC_GLOB
+                HyphaPiraceaItems.PIRACEATIC_GLOB,
+                HyphaPiraceaItems.LEUKBOX_LOCK
         );
     }
 

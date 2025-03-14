@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
-import net.minecraft.world.level.block.DispenserBlock;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +66,7 @@ public class HyphaPiracea {
 
     public static void addTooltips(ItemStack stack, Item.TooltipContext tooltipContext, Consumer<Component> componentConsumer, TooltipFlag tooltipFlag) {
         addToTooltip(stack, HyphaPiraceaComponentTypes.KEYED_DISC_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
+        addToTooltip(stack, HyphaPiraceaComponentTypes.DISC_LOCK_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
         addToTooltip(stack, HyphaPiraceaComponentTypes.WIRE_LINE_COMPONENT, tooltipContext, componentConsumer, tooltipFlag);
     }
 

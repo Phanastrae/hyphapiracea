@@ -1,9 +1,12 @@
 package phanastrae.hyphapiracea.block;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -31,6 +34,9 @@ import phanastrae.hyphapiracea.block.entity.HyphaPiraceaBlockEntityTypes;
 import phanastrae.hyphapiracea.block.entity.LeukboxBlockEntity;
 import phanastrae.hyphapiracea.block.state.HyphaPiraceaBlockProperties;
 import phanastrae.hyphapiracea.component.HyphaPiraceaComponentTypes;
+import phanastrae.hyphapiracea.component.type.DiscLockComponent;
+import phanastrae.hyphapiracea.item.HyphaPiraceaItems;
+import phanastrae.hyphapiracea.item.LeukboxLockItem;
 import phanastrae.hyphapiracea.structure.leubox_stages.AbstractLeukboxStage;
 
 public class LeukboxBlock extends BaseEntityBlock implements MiniCircuitHolder {
@@ -126,6 +132,27 @@ public class LeukboxBlock extends BaseEntityBlock implements MiniCircuitHolder {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if(stack.is(HyphaPiraceaItems.LEUKBOX_LOCK) && player.getAbilities().mayBuild) {
+            if(level.getBlockEntity(pos) instanceof LeukboxBlockEntity leukboxBlockEntity) {
+                String lockLock = DiscLockComponent.getDiscLockFromLock(stack);
+                String boxLock = leukboxBlockEntity.getLeukboxLock();
+
+                if(!lockLock.equals(boxLock)) {
+                    LeukboxLockItem.playLockSound(player);
+                    if(!level.isClientSide()) {
+                        leukboxBlockEntity.setLeukboxLock(lockLock);
+                        Component component = lockLock.isEmpty()
+                                ? Component.translatable("hyphapiracea.leukbox.lock.set.empty")
+                                : Component.translatable("hyphapiracea.leukbox.lock.set", lockLock);
+
+                        player.displayClientMessage(component, true);
+                    }
+
+                    return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                }
+            }
+        }
+
         if (state.getValue(HAS_DISC)) {
             ItemInteractionResult iteminteractionresult = tryRemoveItem(level, pos, player);
             return !iteminteractionresult.consumesAction() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : iteminteractionresult;
@@ -163,22 +190,34 @@ public class LeukboxBlock extends BaseEntityBlock implements MiniCircuitHolder {
         } else {
             BlockState blockstate = level.getBlockState(pos);
             if (blockstate.is(HyphaPiraceaBlocks.PIRACEATIC_LEUKBOX) && !blockstate.getValue(HAS_DISC)) {
-                if (!level.isClientSide) {
-                    ItemStack itemstack = stack.consumeAndReturn(1, player);
-                    if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
-                        blockEntity.setTheItem(itemstack);
-                        blockEntity.setDiscRecoverable(true);
+                if (level.getBlockEntity(pos) instanceof LeukboxBlockEntity blockEntity) {
+                    String discLock = DiscLockComponent.getDiscLockFromDisc(stack);
+                    String boxLock = blockEntity.getLeukboxLock();
+                    if(discLock.equals(boxLock)) {
+                        if (!level.isClientSide) {
+                            ItemStack itemstack = stack.consumeAndReturn(1, player);
 
-                        level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 1.5F, 0.2F);
-                        level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, blockstate));
+                            blockEntity.setTheItem(itemstack);
+                            blockEntity.setDiscRecoverable(true);
+
+                            level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 1.5F, 0.2F);
+                            level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, blockstate));
+                        }
+
+                        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                    } else {
+                        MutableComponent component = boxLock.isEmpty()
+                                ? Component.translatable("hyphapiracea.leukbox.lock.invalid.empty")
+                                : Component.translatable("hyphapiracea.leukbox.lock.invalid", boxLock);
+                        player.displayClientMessage(component.withStyle(ChatFormatting.RED), true);
+
+                        return ItemInteractionResult.CONSUME;
                     }
                 }
-
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
-            } else {
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
         }
+
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
