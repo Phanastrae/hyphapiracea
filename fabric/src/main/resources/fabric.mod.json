@@ -26,6 +26,7 @@
 			"phanastrae.hyphapiracea.fabric.data.HyphaPiraceaDataGenerator"
 		]
 	},
+	"accessWidener": "${mod_id}.accesswidener",
 	"mixins": [
 		"${mod_id}.common.mixins.json",
 		"${mod_id}.fabric.mixins.json"
