@@ -40,11 +40,13 @@ public class PlaceSpecialsStage extends AbstractLeukboxStage {
                 int my = sectionPos.minBlockY();
                 int mz = sectionPos.minBlockZ();
                 for (int x = box.minX(); x <= box.maxX(); x++) {
+                    mutableBlockPos.setX(mx + x);
                     for (int y = box.minY(); y <= box.maxY(); y++) {
+                        mutableBlockPos.setY(my + y);
                         for (int z = box.minZ(); z <= box.maxZ(); z++) {
                             BlockState state = boxedContainer.get(x, y, z);
                             if (!state.is(Blocks.STRUCTURE_VOID)) {
-                                mutableBlockPos.set(mx + x, my + y, mz + z);
+                                mutableBlockPos.setZ(mz + z);
 
                                 if(isPositionInRange(mutableBlockPos, this.leukboxPos, maxOperatingRadius)) {
                                     BlockState oldState = level.getBlockState(mutableBlockPos);
@@ -77,9 +79,11 @@ public class PlaceSpecialsStage extends AbstractLeukboxStage {
                 int my = sectionPos.minBlockY();
                 int mz = sectionPos.minBlockZ();
                 for (int x = box.minX(); x <= box.maxX(); x++) {
+                    mutableBlockPos.setX(mx + x);
                     for (int y = box.minY(); y <= box.maxY(); y++) {
+                        mutableBlockPos.setY(my + y);
                         for (int z = box.minZ(); z <= box.maxZ(); z++) {
-                            mutableBlockPos.set(mx + x, my + y, mz + z);
+                            mutableBlockPos.setZ(mz + z);
 
                             if(isPositionInRange(mutableBlockPos, this.leukboxPos, maxOperatingRadius)) {
                                 BlockState state = boxedContainer.get(x, y, z);

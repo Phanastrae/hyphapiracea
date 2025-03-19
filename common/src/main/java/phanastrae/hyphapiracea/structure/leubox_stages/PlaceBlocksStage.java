@@ -77,8 +77,10 @@ public class PlaceBlocksStage extends AbstractLeukboxStage implements SpawnTimeH
             if (!isBoxInTimeRange(box, this.leukboxPos.subtract(new Vec3i(mx, my, mz)), this.currentSpawnTime)) return;
 
             for (int x = box.minX(); x <= box.maxX(); x++) {
+                mutableBlockPos.setX(mx + x);
                 int dx = mx + x - this.leukboxPos.getX();
                 for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                    mutableBlockPos.setZ(mz + z);
                     int dz = mz + z - this.leukboxPos.getZ();
 
                     double r = calcHorizontalFactor(dx, dz);
@@ -91,7 +93,7 @@ public class PlaceBlocksStage extends AbstractLeukboxStage implements SpawnTimeH
                         if(tInRange(t, currentSpawnTime)) {
                             BlockState newState = boxedContainer.get(x, y, z);
                             if (!newState.is(Blocks.STRUCTURE_VOID)) {
-                                mutableBlockPos.set(mx + x, my + y, mz + z);
+                                mutableBlockPos.setY(my + y);
 
                                 if(isPositionInRange(mutableBlockPos, this.leukboxPos, maxOperatingRadius)) {
                                     BlockState oldState = level.getBlockState(mutableBlockPos);
@@ -105,7 +107,7 @@ public class PlaceBlocksStage extends AbstractLeukboxStage implements SpawnTimeH
                         } else if(tInRange(t + CONVERSION_DELAY, currentSpawnTime)) {
                             BlockState newState = boxedContainer.get(x, y, z);
                             if (!newState.is(Blocks.STRUCTURE_VOID)) {
-                                mutableBlockPos.set(mx + x, my + y, mz + z);
+                                mutableBlockPos.setY(my + y);
 
                                 if(isPositionInRange(mutableBlockPos, this.leukboxPos, maxOperatingRadius - noise)) {
                                     BlockState oldState = level.getBlockState(mutableBlockPos);
