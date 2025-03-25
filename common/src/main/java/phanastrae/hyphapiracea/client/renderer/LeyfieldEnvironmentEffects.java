@@ -85,6 +85,10 @@ public class LeyfieldEnvironmentEffects {
             float time = ((level.getGameTime() % 24000) + partialTick) / 24000.0F;
 
             RenderSystem.enableBlend();
+
+            // default blend should already be set, but we set it again here just in case someone else were to (hypothetically) be messing with the render state incorrectly.
+            RenderSystem.defaultBlendFunc();
+
             RenderSystem.disableDepthTest();
             RenderSystem.setShaderTexture(0, LEYFIELD_AZIMUTH_SHIMMER);
             for (int i = 1; i <= 5; i++) {
